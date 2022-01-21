@@ -66,8 +66,12 @@ func updateVars() {
 	packagesVersionsArr = strings.Split(packagesVersionsStr, ";")
 }
 
-func downloadSpecifiedPackages() {
+func searchSpecifiedPackages() {
 
+}
+
+func downloadSpecifiedPackages() {
+	searchSpecifiedPackages()
 }
 
 func uploadDownloadedPackages() {
