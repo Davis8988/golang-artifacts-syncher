@@ -1,5 +1,9 @@
 # VsCode
+.vscode
 slnx.sqlite
+
+# Visual Studio
+.vs
 
 # Binaries for programs and plugins
 *.exe
