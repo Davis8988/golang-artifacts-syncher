@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 	"log"
+	"strings"
 )
 
 var (
@@ -50,7 +51,9 @@ func parseArgs() {
 
 func updateVars() {
 	log.Print("Updating vars")
-	
+	serversUrlsArr = strings.Split(";", serversUrlsStr)
+	reposNamesArr = strings.Split(";", reposNamesStr)
+	packagesNamesArr = strings.Split(";", packagesNamesStr)
 }
 
 func main() {
