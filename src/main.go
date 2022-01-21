@@ -66,12 +66,21 @@ func updateVars() {
 	packagesVersionsArr = strings.Split(packagesVersionsStr, ";")
 }
 
+func downloadSpecifiedPackages() {
+
+}
+
+func uploadDownloadedPackages() {
+
+}
+
 func main() {
 	log.Print("Started")
 	initVars()
 	parseArgs()
 	updateVars()
 	printVars()
-	
+	downloadSpecifiedPackages()
+	uploadDownloadedPackages()
 	log.Print("Finished")
 }
