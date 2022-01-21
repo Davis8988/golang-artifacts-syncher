@@ -8,10 +8,12 @@ import (
 )
 
 var (
-	serversUrlsStr = ""
-	reposNamesStr = ""
-	packagesNamesStr = ""
-	packagesVersionsStr = ""
+	userToUse string
+	passToUse string
+	serversUrlsStr string
+	reposNamesStr string
+	packagesNamesStr string
+	packagesVersionsStr string
 
 	serversUrlsArr [] string
 	reposNamesArr [] string
@@ -31,6 +33,8 @@ func getenv(key, fallback string) string {
 
 func initVars() {
 	log.Print("Initializing vars")
+	userToUse = getenv("USER_TO_USE", "")
+	passToUse = getenv("PASS_TO_USE", "")
 	serversUrlsStr = getenv("SERVERS_URLS_STR", "")
 	reposNamesStr = getenv("REPOS_NAMES_STR", "")
 	packagesNamesStr = getenv("PACKAGES_NAMES_STR", "")
