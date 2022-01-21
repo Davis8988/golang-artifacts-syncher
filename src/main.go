@@ -30,13 +30,21 @@ func initVars() {
 	packagesVersionsStr = getenv("PACKAGES_VERSIONS_STR", "")
 }
 
-func main() {
-	flag.Parse()
-	initVars()
-	log.Print("Started")
+func printVars() {
 	log.Printf("SERVERS_URLS_STR: '%s'", serversUrlsStr)
 	log.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
 	log.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
 	log.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
+}
+
+func parseArgs() {
+	flag.Parse()
+}
+
+func main() {
+	initVars()
+	parseArgs()
+	log.Print("Started")
+	
 
 }
