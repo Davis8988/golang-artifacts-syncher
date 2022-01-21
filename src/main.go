@@ -11,6 +11,11 @@ var (
 	reposNamesStr = ""
 	packagesNamesStr = ""
 	packagesVersionsStr = ""
+
+	serversUrlsArr [] string
+	reposNamesArr [] string
+	packagesNamesArr [] string
+	packagesVersionsArr [] string
 )
 
 // Attempts to resolve an environment variable, 
@@ -24,6 +29,7 @@ func getenv(key, fallback string) string {
 }
 
 func initVars() {
+	log.Print("Initializing vars")
 	serversUrlsStr = getenv("SERVERS_URLS_STR", "")
 	reposNamesStr = getenv("REPOS_NAMES_STR", "")
 	packagesNamesStr = getenv("PACKAGES_NAMES_STR", "")
@@ -38,13 +44,20 @@ func printVars() {
 }
 
 func parseArgs() {
+	log.Print("Parsing args")
 	flag.Parse()
 }
 
+func updateVars() {
+	log.Print("Updating vars")
+	
+}
+
 func main() {
+	log.Print("Started")
 	initVars()
 	parseArgs()
-	log.Print("Started")
+	updateVars()
 	printVars()
 	
 	log.Print("Finished")
