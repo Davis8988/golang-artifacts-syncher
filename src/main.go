@@ -42,6 +42,11 @@ func printVars() {
 	log.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
 	log.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
 	log.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
+	
+	log.Printf("serversUrlsArr: %v", serversUrlsArr)
+	log.Printf("reposNamesArr: %v", reposNamesArr)
+	log.Printf("packagesNamesArr: %v", packagesNamesArr)
+	log.Printf("packagesVersionsArr: %v", packagesVersionsArr)
 }
 
 func parseArgs() {
@@ -51,9 +56,10 @@ func parseArgs() {
 
 func updateVars() {
 	log.Print("Updating vars")
-	serversUrlsArr = strings.Split(";", serversUrlsStr)
-	reposNamesArr = strings.Split(";", reposNamesStr)
-	packagesNamesArr = strings.Split(";", packagesNamesStr)
+	serversUrlsArr = strings.Split(serversUrlsStr, ";")
+	reposNamesArr = strings.Split(reposNamesStr, ";")
+	packagesNamesArr = strings.Split(packagesNamesStr, ";")
+	packagesVersionsArr = strings.Split(packagesVersionsStr, ";")
 }
 
 func main() {
