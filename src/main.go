@@ -66,12 +66,14 @@ func updateVars() {
 	packagesVersionsArr = strings.Split(packagesVersionsStr, ";")
 }
 
-func searchSpecifiedPackages() {
-
+func searchSpecifiedPackages() []string {
+	countries := []string{"USA", "Singapore", "Germany", "India", "Australia"}
+	return countries 
 }
 
 func downloadSpecifiedPackages() {
-	searchSpecifiedPackages()
+	foundPackagesArr := searchSpecifiedPackages()
+	log.Printf("Found packages: %v", foundPackagesArr)
 }
 
 func uploadDownloadedPackages() {
