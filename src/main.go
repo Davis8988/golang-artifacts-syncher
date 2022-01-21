@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"os"
 	"fmt"
 )
 
@@ -13,10 +14,11 @@ var (
 
 func main() {
 	flag.Parse()
-
+	var envVal = os.Getenv("david")
 	fmt.Println("file name: ", *file)
 	fmt.Println("count: ", *count)
 	fmt.Println("repeat: ", *repeat)
+	fmt.Println("envVal: '{}'", envVal)
 
 	fmt.Println("Hello World")
 }
