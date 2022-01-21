@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"os"
-	"fmt"
+	"log"
 )
 
 var (
@@ -33,10 +33,10 @@ func initVars() {
 func main() {
 	flag.Parse()
 	initVars()
-	fmt.Println("Hello World")
-	fmt.Println("SERVERS_URLS_STR: '{}'", serversUrlsStr)
-	fmt.Println("REPOS_NAMES_STR: '{}'", reposNamesStr)
-	fmt.Println("PACKAGES_NAMES_STR: '{}'", packagesNamesStr)
-	fmt.Println("PACKAGES_VERSIONS_STR: '{}'", packagesVersionsStr)
+	log.Print("Started")
+	log.Printf("SERVERS_URLS_STR: '%s'", serversUrlsStr)
+	log.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
+	log.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
+	log.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
 
 }
