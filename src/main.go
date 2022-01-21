@@ -45,6 +45,6 @@ func main() {
 	initVars()
 	parseArgs()
 	log.Print("Started")
-	
+	printVars()
 
 }
