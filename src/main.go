@@ -67,8 +67,8 @@ func updateVars() {
 }
 
 func searchSpecifiedPackages() []string {
-	countries := []string{"USA", "Singapore", "Germany", "India", "Australia"}
-	return countries 
+	var foundPackagesArr []string
+	return foundPackagesArr 
 }
 
 func downloadSpecifiedPackages() {
