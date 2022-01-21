@@ -7,18 +7,36 @@ import (
 )
 
 var (
-	file   = flag.String("file", "", "file-name")
-	count  = flag.Int("count", 2, "count params")
-	repeat = flag.Bool("repeat", false, "Repeat execution")
+	serversUrlsStr = ""
+	reposNamesStr = ""
+	packagesNamesStr = ""
+	packagesVersionsStr = ""
 )
+
+// Attempts to resolve an environment variable, 
+//  with a default value if it's empty
+func getenv(key, fallback string) string {
+    value := os.Getenv(key)
+    if len(value) == 0 {
+        return fallback
+    }
+    return value
+}
+
+func initVars() {
+	serversUrlsStr = getenv("SERVERS_URLS_STR", "")
+	reposNamesStr = getenv("REPOS_NAMES_STR", "")
+	packagesNamesStr = getenv("PACKAGES_NAMES_STR", "")
+	packagesVersionsStr = getenv("PACKAGES_VERSIONS_STR", "")
+}
 
 func main() {
 	flag.Parse()
-	var envVal = os.Getenv("david")
-	fmt.Println("file name: ", *file)
-	fmt.Println("count: ", *count)
-	fmt.Println("repeat: ", *repeat)
-	fmt.Println("envVal: '{}'", envVal)
-
+	initVars()
 	fmt.Println("Hello World")
+	fmt.Println("SERVERS_URLS_STR: '{}'", serversUrlsStr)
+	fmt.Println("REPOS_NAMES_STR: '{}'", reposNamesStr)
+	fmt.Println("PACKAGES_NAMES_STR: '{}'", packagesNamesStr)
+	fmt.Println("PACKAGES_VERSIONS_STR: '{}'", packagesVersionsStr)
+
 }
