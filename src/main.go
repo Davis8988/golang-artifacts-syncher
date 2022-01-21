@@ -32,7 +32,7 @@ func getenv(key, fallback string) string {
 }
 
 func initVars() {
-	log.Print("Initializing vars")
+	log.Print("Initializing from envs vars")
 	userToUse = getenv("USER_TO_USE", "")
 	passToUse = getenv("PASS_TO_USE", "")
 	serversUrlsStr = getenv("SERVERS_URLS_STR", "")
