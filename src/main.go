@@ -68,6 +68,8 @@ func updateVars() {
 
 func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
+	log.Printf("Searching for packages")
+	
 	return foundPackagesArr 
 }
 
