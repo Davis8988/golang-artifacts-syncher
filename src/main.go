@@ -32,8 +32,7 @@ var (
 
 	serversUrlsArr [] string
 	reposNamesArr [] string
-	packagesNamesArr [] string
-	packagesVersionsArr [] string
+	packagesToDownloadMap map[string][] string
 )
 
 
@@ -103,17 +102,17 @@ func updateVars() {
 
 func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
-	var searchUrlsArr []string
+	// var searchUrlsArr []string
 	
 	log.Printf("Preparing search packages urls array")
-	searchOptionsUrl := "Search()?"
-	for _, serverUrl := range serversUrlsArr {
-		for _, repoName := range reposNamesArr {
-			for _, pkgName := range packagesNamesArr {
-				searchUrlsArr = append(searchUrlsArr, serverUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
-			}
-		}
-	}
+	// searchOptionsUrl := "Search()?"
+	// for _, serverUrl := range serversUrlsArr {
+	// 	for _, repoName := range reposNamesArr {
+	// 		for _, pkgName := range packagesNamesArr {
+	// 			searchUrlsArr = append(searchUrlsArr, serverUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
+	// 		}
+	// 	}
+	// }
 	return foundPackagesArr 
 }
 
