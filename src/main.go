@@ -55,6 +55,8 @@ func printVars() {
 
 func validateEnv() {
 	log.Print("Validating envs")
+	log.Print("Comparing packages names & versions arrays lengths")
+	
 	
 }
 
