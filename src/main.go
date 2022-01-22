@@ -101,10 +101,7 @@ func updateVars() {
 
 	for i, pkgName := range packagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
-		if _, ok := packagesToDownloadMap[pkgName]; ! ok {
-			packagesToDownloadMap[pkgName] = make([] string, 0)
-		}
-
+		if _, ok := packagesToDownloadMap[pkgName]; ! ok {packagesToDownloadMap[pkgName] = make([] string, 0)}
 		// If received a version array for it - add it to the list
 		if len(packagesVersionsArr) >= i {
 			pkgVersion := packagesVersionsArr[i]
