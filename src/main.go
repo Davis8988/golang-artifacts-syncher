@@ -75,7 +75,7 @@ func validateEnv() {
 		}
 	}
 	
-	log.Print("OK")
+	log.Print("Done. OK")
 }
 
 func parseArgs() {
