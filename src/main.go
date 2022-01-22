@@ -44,6 +44,10 @@ func getenv(key, fallback string) string {
     return value
 }
 
+func isStrArrayEmpty(arrToCheck []string) bool {
+	return len(arrToCheck) == 0
+}
+
 func initVars() {
 	LogInfo.Print("Initializing from envs vars")
 	userToUse = getenv("USER_TO_USE", "")
@@ -77,7 +81,7 @@ func validateEnv() {
 	LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
-	if len(packagesVersionsArr) > 0 {
+	if ! isStrArrayEmpty(packagesVersionsArr) {
 		LogInfo.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
@@ -104,7 +108,7 @@ func updateVars() {
 	packagesVersionsArr = strings.Split(packagesVersionsStr, ";")
 }
 
-/* func prepareSearchUrlsArray() []string {
+func prepareSearchUrlsArray() []string {
 	log.Printf("Preparing search packages urls")
 	searchOptionsUrl := "Search()?"
 	for _, serverUrl := range serversUrlsArr {
@@ -114,7 +118,7 @@ func updateVars() {
 			}
 		}
 	}
-} */
+} 
 
 func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
@@ -140,6 +144,7 @@ func main() {
 	updateVars()
 	printVars()
 	validateEnv()
+	prepareSearchUrlsArray()
 	downloadSpecifiedPackages()
 	uploadDownloadedPackages()
 	LogInfo.Print("Finished")
