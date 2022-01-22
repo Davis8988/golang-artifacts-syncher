@@ -1,7 +1,8 @@
 package main
 
 import (
-	helpers "golang-artifacts-syncher/src/helpers"
+	"golang-artifacts-syncher/src/helpers"
+	"golang-artifacts-syncher/src/nexus3"
 	"errors"
 	"flag"
 	"os"
@@ -69,7 +70,7 @@ func validateEnv() {
 	LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
-	if ! helpers.IsStrArrayEmpty(packagesVersionsArr) {
+	if ! nexus3.IsStrArrayEmpty(packagesVersionsArr) {
 		LogInfo.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
@@ -80,7 +81,7 @@ func validateEnv() {
 		}
 	}
 	
-	LogInfo.Print("Done. OK")
+	LogInfo.Print("All Good")
 }
 
 func parseArgs() {
@@ -96,8 +97,8 @@ func updateVars() {
 	packagesVersionsArr = strings.Split(packagesVersionsStr, ";")
 }
 
-func prepareSearchUrlsArray() []string {
-	log.Printf("Preparing search packages urls")
+// func prepareSearchUrlsArray() []string {
+	// log.Printf("Preparing search packages urls")
 	// searchOptionsUrl := "Search()?"
 	// for _, serverUrl := range serversUrlsArr {
 	// 	for _, repoName := range reposNamesArr {
@@ -106,7 +107,7 @@ func prepareSearchUrlsArray() []string {
 	// 		}
 	// 	}
 	// }
-} 
+// } 
 
 func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
@@ -132,7 +133,7 @@ func main() {
 	updateVars()
 	printVars()
 	validateEnv()
-	prepareSearchUrlsArray()
+	// prepareSearchUrlsArray()
 	downloadSpecifiedPackages()
 	uploadDownloadedPackages()
 	LogInfo.Print("Finished")
