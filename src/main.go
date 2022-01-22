@@ -10,16 +10,16 @@ import (
 
 var (
 	// Info writes logs in the color blue with "INFO: " as prefix
-	LogInfo = log.New(os.Stdout, "", log.LstdFlags)
+	LogInfo = log.New(os.Stdout, "\u001b[37m", log.LstdFlags)
 
 	// Warning writes logs in the color yellow with "WARNING: " as prefix
-	LogWarning = log.New(os.Stdout, "\u001b[33mWARNING: \u001B[0m", log.LstdFlags)
+	LogWarning = log.New(os.Stdout, "\u001b[33mWARNING: ", log.LstdFlags)
 
 	// Error writes logs in the color red with "ERROR: " as prefix
-	LogError = log.New(os.Stdout, "\u001b[31mERROR: \u001b[0m", log.LstdFlags)
+	LogError = log.New(os.Stdout, "\u001b[35mERROR: \u001B[31m", log.LstdFlags)
 
 	// Debug writes logs in the color cyan with "DEBUG: " as prefix
-	LogDebug = log.New(os.Stdout, "\u001b[36mDEBUG: \u001B[0m", log.LstdFlags)
+	LogDebug = log.New(os.Stdout, "\u001b[36mDEBUG: ", log.LstdFlags)
 
 	userToUse string
 	passToUse string
@@ -68,7 +68,6 @@ func printVars() {
 
 func abortWithError(errMsg string, exitCode int) {
 	e := errors.New(errMsg)
-	LogError.Printf("Error")
 	LogError.Printf("%s", e)
 	LogError.Printf("Aborting with exit code: %d", exitCode)
 	os.Exit(exitCode)
