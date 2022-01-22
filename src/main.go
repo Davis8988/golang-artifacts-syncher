@@ -32,6 +32,8 @@ var (
 
 	serversUrlsArr [] string
 	reposNamesArr [] string
+	packagesNamesArr [] string
+	packagesVersionsArr [] string
 	packagesToDownloadMap map[string][] string
 )
 
