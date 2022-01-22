@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"os"
 	"log"
@@ -53,9 +54,26 @@ func printVars() {
 	log.Printf("packagesVersionsArr: %v", packagesVersionsArr)
 }
 
+func abortWithError(errMsg string, exitCode int) {
+	e := errors.New(errMsg)
+	log.Printf("Error")
+	log.Printf("%s", e)
+	log.Printf("Aborting with exit code: %d", exitCode)
+	os.Exit(exitCode)
+}
+
 func validateEnv() {
 	log.Print("Validating envs")
-	log.Print("Comparing packages names & versions arrays lengths")
+	if len(packagesVersionsArr) > 0 {
+		log.Print("Comparing packages names & versions arrays lengths")
+		if len(packagesVersionsArr) != len(packagesNamesArr) {
+			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
+			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
+			errMsg += "When passing packages versions to search - the versions count must be of the same count of packages names to search.\n"
+			errMsg += "A version for each package name to search"
+			abortWithError(errMsg, 1)
+		}
+	}
 	
 	
 }
@@ -72,7 +90,7 @@ func updateVars() {
 	packagesNamesArr = strings.Split(packagesNamesStr, ";")
 }
 
-func prepareSearchUrlsArray() []string {
+/* func prepareSearchUrlsArray() []string {
 	log.Printf("Preparing search packages urls")
 	searchOptionsUrl := "Search()?"
 	for _, serverUrl := range serversUrlsArr {
@@ -82,7 +100,7 @@ func prepareSearchUrlsArray() []string {
 			}
 		}
 	}
-}
+} */
 
 func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
