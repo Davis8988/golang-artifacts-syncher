@@ -90,6 +90,7 @@ func updateVars() {
 	serversUrlsArr = strings.Split(serversUrlsStr, ";")
 	reposNamesArr = strings.Split(reposNamesStr, ";")
 	packagesNamesArr = strings.Split(packagesNamesStr, ";")
+	packagesVersionsArr = strings.Split(packagesVersionsStr, ";")
 }
 
 /* func prepareSearchUrlsArray() []string {
