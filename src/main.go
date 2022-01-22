@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"os"
+	"sync"
 	"log"
 	"strings"
 )
@@ -35,6 +36,8 @@ var (
 	packagesNamesArr [] string
 	packagesVersionsArr [] string
 	packagesToDownloadMap map[string][] string
+
+	lock sync.RWMutex
 )
 
 
@@ -47,6 +50,7 @@ func initVars() {
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 	packagesToDownloadMap = make(map[string][] string)
+	lock = sync.RWMutex{}
 }
 
 func printVars() {
@@ -130,7 +134,7 @@ func searchSpecifiedPackages() []string {
 		}
 	}
 
-	
+
 
 	return foundPackagesArr 
 }
