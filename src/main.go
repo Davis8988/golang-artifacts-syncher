@@ -46,7 +46,7 @@ func initVars() {
 	reposNamesStr = helpers.Getenv("REPOS_NAMES_STR", "")
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
-	packagesToDownloadMap := make(map[string][] string)
+	packagesToDownloadMap = make(map[string][] string)
 }
 
 func printVars() {
@@ -59,6 +59,7 @@ func printVars() {
 	LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
 	LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
 	LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
+	LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMap)
 }
 
 func abortWithError(errMsg string, exitCode int) {
