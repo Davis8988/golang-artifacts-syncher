@@ -2,7 +2,7 @@ package main
 
 import (
 	"golang-artifacts-syncher/src/helpers"
-	nexus3 "golang-artifacts-syncher/src/nexus3-adapter"
+	"golang-artifacts-syncher/src/nexus3-adapter"
 	"errors"
 	"flag"
 	"os"
@@ -70,7 +70,7 @@ func validateEnv() {
 	LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
-	if ! nexus3.IsStrArrayEmpty(packagesVersionsArr) {
+	if ! nexus3_adapter.IsStrArrayEmpty(packagesVersionsArr) {
 		LogInfo.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
