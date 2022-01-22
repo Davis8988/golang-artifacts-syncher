@@ -48,6 +48,11 @@ func printVars() {
 	log.Printf("packagesNamesArr: %v", packagesNamesArr)
 }
 
+func validateEnv() {
+	log.Print("Validating envs")
+	
+}
+
 func parseArgs() {
 	log.Print("Parsing args")
 	flag.Parse()
@@ -95,6 +100,7 @@ func main() {
 	parseArgs()
 	updateVars()
 	printVars()
+	validateEnv()
 	downloadSpecifiedPackages()
 	uploadDownloadedPackages()
 	log.Print("Finished")
