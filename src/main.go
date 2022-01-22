@@ -98,22 +98,22 @@ func updateVars() {
 }
 
 // func prepareSearchUrlsArray() []string {
-	// log.Printf("Preparing search packages urls")
-	// searchOptionsUrl := "Search()?"
-	// for _, serverUrl := range serversUrlsArr {
-	// 	for _, repoName := range reposNamesArr {
-	// 		for _, pkgName := range packagesNamesArr {
-	// 			searchUrlsArr = append(searchUrlsArr, serverUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
-	// 		}
-	// 	}
-	// }
+	
 // } 
 
 func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
 	var searchUrlsArr []string
 	
-	LogInfo.Printf("Search array: %v", searchUrlsArr)
+	log.Printf("Preparing search packages urls array")
+	searchOptionsUrl := "Search()?"
+	for _, serverUrl := range serversUrlsArr {
+		for _, repoName := range reposNamesArr {
+			for _, pkgName := range packagesNamesArr {
+				searchUrlsArr = append(searchUrlsArr, serverUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
+			}
+		}
+	}
 	return foundPackagesArr 
 }
 
@@ -133,7 +133,6 @@ func main() {
 	updateVars()
 	printVars()
 	validateEnv()
-	// prepareSearchUrlsArray()
 	downloadSpecifiedPackages()
 	uploadDownloadedPackages()
 	LogInfo.Print("Finished")
