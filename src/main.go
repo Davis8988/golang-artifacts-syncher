@@ -10,16 +10,16 @@ import (
 
 var (
 	// Info writes logs in the color blue with "INFO: " as prefix
-	Info = log.New(os.Stdout, "\u001b[34mINFO: \u001B[0m", log.LstdFlags|log.Lshortfile)
+	LogInfo = log.New(os.Stdout, "", log.LstdFlags)
 
 	// Warning writes logs in the color yellow with "WARNING: " as prefix
-	Warning = log.New(os.Stdout, "\u001b[33mWARNING: \u001B[0m", log.LstdFlags|log.Lshortfile)
+	LogWarning = log.New(os.Stdout, "\u001b[33mWARNING: \u001B[0m", log.LstdFlags)
 
 	// Error writes logs in the color red with "ERROR: " as prefix
-	Error = log.New(os.Stdout, "\u001b[31mERROR: \u001b[0m", log.LstdFlags|log.Lshortfile)
+	LogError = log.New(os.Stdout, "\u001b[31mERROR: \u001b[0m", log.LstdFlags)
 
 	// Debug writes logs in the color cyan with "DEBUG: " as prefix
-	Debug = log.New(os.Stdout, "\u001b[36mDEBUG: \u001B[0m", log.LstdFlags|log.Lshortfile)
+	LogDebug = log.New(os.Stdout, "\u001b[36mDEBUG: \u001B[0m", log.LstdFlags)
 
 	userToUse string
 	passToUse string
@@ -45,7 +45,7 @@ func getenv(key, fallback string) string {
 }
 
 func initVars() {
-	log.Print("Initializing from envs vars")
+	LogInfo.Print("Initializing from envs vars")
 	userToUse = getenv("USER_TO_USE", "")
 	passToUse = getenv("PASS_TO_USE", "")
 	serversUrlsStr = getenv("SERVERS_URLS_STR", "")
@@ -55,31 +55,31 @@ func initVars() {
 }
 
 func printVars() {
-	log.Printf("SERVERS_URLS_STR: '%s'", serversUrlsStr)
-	log.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
-	log.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
-	log.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
+	LogInfo.Printf("SERVERS_URLS_STR: '%s'", serversUrlsStr)
+	LogInfo.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
+	LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
+	LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
 	
-	log.Printf("serversUrlsArr: %v", serversUrlsArr)
-	log.Printf("reposNamesArr: %v", reposNamesArr)
-	log.Printf("packagesNamesArr: %v", packagesNamesArr)
-	log.Printf("packagesVersionsArr: %v", packagesVersionsArr)
+	LogInfo.Printf("serversUrlsArr: %v", serversUrlsArr)
+	LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
+	LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
+	LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
 }
 
 func abortWithError(errMsg string, exitCode int) {
 	e := errors.New(errMsg)
-	log.Printf("Error")
-	log.Printf("%s", e)
-	log.Printf("Aborting with exit code: %d", exitCode)
+	LogError.Printf("Error")
+	LogError.Printf("%s", e)
+	LogError.Printf("Aborting with exit code: %d", exitCode)
 	os.Exit(exitCode)
 }
 
 func validateEnv() {
-	log.Print("Validating envs")
+	LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
 	if len(packagesVersionsArr) > 0 {
-		log.Print("Comparing packages names & versions arrays lengths")
+		LogInfo.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
 			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
@@ -89,16 +89,16 @@ func validateEnv() {
 		}
 	}
 	
-	log.Print("Done. OK")
+	LogInfo.Print("Done. OK")
 }
 
 func parseArgs() {
-	log.Print("Parsing args")
+	LogInfo.Print("Parsing args")
 	flag.Parse()
 }
 
 func updateVars() {
-	log.Print("Updating vars")
+	LogInfo.Print("Updating vars")
 	serversUrlsArr = strings.Split(serversUrlsStr, ";")
 	reposNamesArr = strings.Split(reposNamesStr, ";")
 	packagesNamesArr = strings.Split(packagesNamesStr, ";")
@@ -121,13 +121,13 @@ func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
 	var searchUrlsArr []string
 	
-	log.Printf("Search array: %v", searchUrlsArr)
+	LogInfo.Printf("Search array: %v", searchUrlsArr)
 	return foundPackagesArr 
 }
 
 func downloadSpecifiedPackages() {
 	foundPackagesArr := searchSpecifiedPackages()
-	log.Printf("Found packages: %v", foundPackagesArr)
+	LogInfo.Printf("Found packages: %v", foundPackagesArr)
 }
 
 func uploadDownloadedPackages() {
@@ -135,7 +135,7 @@ func uploadDownloadedPackages() {
 }
 
 func main() {
-	log.Print("Started")
+	LogInfo.Print("Started")
 	initVars()
 	parseArgs()
 	updateVars()
@@ -143,5 +143,5 @@ func main() {
 	validateEnv()
 	downloadSpecifiedPackages()
 	uploadDownloadedPackages()
-	log.Print("Finished")
+	LogInfo.Print("Finished")
 }
