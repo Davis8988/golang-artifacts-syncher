@@ -9,17 +9,17 @@ import (
 )
 
 var (
-	// Info writes logs in the color blue with "INFO: " as prefix
+	// Info writes logs in the color white
 	LogInfo = log.New(os.Stdout, "\u001b[37m", log.LstdFlags)
 
 	// Warning writes logs in the color yellow with "WARNING: " as prefix
 	LogWarning = log.New(os.Stdout, "\u001b[33mWARNING: ", log.LstdFlags)
 
-	// Error writes logs in the color red with "ERROR: " as prefix
-	LogError = log.New(os.Stdout, "\u001b[35m ** ERROR: \u001B[31m", log.LstdFlags)
+	// Error writes logs in the color red with " Error: " as prefix
+	LogError = log.New(os.Stdout, "\u001b[35m Error: \u001B[31m", log.LstdFlags)
 
-	// Debug writes logs in the color cyan with "DEBUG: " as prefix
-	LogDebug = log.New(os.Stdout, "\u001b[36mDEBUG: ", log.LstdFlags)
+	// Debug writes logs in the color cyan with "Debug: " as prefix
+	LogDebug = log.New(os.Stdout, "\u001b[36mDebug: ", log.LstdFlags)
 
 	userToUse string
 	passToUse string
