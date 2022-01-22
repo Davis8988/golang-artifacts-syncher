@@ -64,6 +64,8 @@ func abortWithError(errMsg string, exitCode int) {
 
 func validateEnv() {
 	log.Print("Validating envs")
+
+	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
 	if len(packagesVersionsArr) > 0 {
 		log.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
