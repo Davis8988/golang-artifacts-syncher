@@ -46,6 +46,7 @@ func initVars() {
 	reposNamesStr = helpers.Getenv("REPOS_NAMES_STR", "")
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
+	packagesToDownloadMap := make(map[string][] string)
 }
 
 func printVars() {
@@ -96,6 +97,10 @@ func updateVars() {
 	reposNamesArr = strings.Split(reposNamesStr, ";")
 	packagesNamesArr = strings.Split(packagesNamesStr, ";")
 	packagesVersionsArr = strings.Split(packagesVersionsStr, ";")
+
+	for _, pkgName := range packagesNamesArr {
+		packagesToDownloadMap[pkgName] = [3]string
+	}
 }
 
 // func prepareSearchUrlsArray() []string {
