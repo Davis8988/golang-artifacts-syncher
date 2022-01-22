@@ -1,6 +1,7 @@
 package main
 
 import (
+	helpers "golang-artifacts-syncher/src/helpers"
 	"errors"
 	"flag"
 	"os"
@@ -34,28 +35,15 @@ var (
 	packagesVersionsArr [] string
 )
 
-// Attempts to resolve an environment variable, 
-//  with a default value if it's empty
-func getenv(key, fallback string) string {
-    value := os.Getenv(key)
-    if len(value) == 0 {
-        return fallback
-    }
-    return value
-}
-
-func isStrArrayEmpty(arrToCheck []string) bool {
-	return len(arrToCheck) == 0
-}
 
 func initVars() {
 	LogInfo.Print("Initializing from envs vars")
-	userToUse = getenv("USER_TO_USE", "")
-	passToUse = getenv("PASS_TO_USE", "")
-	serversUrlsStr = getenv("SERVERS_URLS_STR", "")
-	reposNamesStr = getenv("REPOS_NAMES_STR", "")
-	packagesNamesStr = getenv("PACKAGES_NAMES_STR", "")
-	packagesVersionsStr = getenv("PACKAGES_VERSIONS_STR", "")
+	userToUse = helpers.Getenv("USER_TO_USE", "")
+	passToUse = helpers.Getenv("PASS_TO_USE", "")
+	serversUrlsStr = helpers.Getenv("SERVERS_URLS_STR", "")
+	reposNamesStr = helpers.Getenv("REPOS_NAMES_STR", "")
+	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
+	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 }
 
 func printVars() {
@@ -81,7 +69,7 @@ func validateEnv() {
 	LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
-	if ! isStrArrayEmpty(packagesVersionsArr) {
+	if ! helpers.IsStrArrayEmpty(packagesVersionsArr) {
 		LogInfo.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
@@ -110,14 +98,14 @@ func updateVars() {
 
 func prepareSearchUrlsArray() []string {
 	log.Printf("Preparing search packages urls")
-	searchOptionsUrl := "Search()?"
-	for _, serverUrl := range serversUrlsArr {
-		for _, repoName := range reposNamesArr {
-			for _, pkgName := range packagesNamesArr {
-				searchUrlsArr = append(searchUrlsArr, serverUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
-			}
-		}
-	}
+	// searchOptionsUrl := "Search()?"
+	// for _, serverUrl := range serversUrlsArr {
+	// 	for _, repoName := range reposNamesArr {
+	// 		for _, pkgName := range packagesNamesArr {
+	// 			searchUrlsArr = append(searchUrlsArr, serverUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
+	// 		}
+	// 	}
+	// }
 } 
 
 func searchSpecifiedPackages() []string {
