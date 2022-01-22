@@ -2,7 +2,7 @@ package main
 
 import (
 	"golang-artifacts-syncher/src/helpers"
-	"golang-artifacts-syncher/src/nexus3-adapter"
+	"golang-artifacts-syncher/src/nexus3_adapter"
 	"errors"
 	"flag"
 	"os"
