@@ -1,4 +1,4 @@
-package nexus3
+package nexus3-adapter
 
 import (
 	"os"
