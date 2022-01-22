@@ -16,7 +16,7 @@ var (
 	LogWarning = log.New(os.Stdout, "\u001b[33mWARNING: ", log.LstdFlags)
 
 	// Error writes logs in the color red with "ERROR: " as prefix
-	LogError = log.New(os.Stdout, "\u001b[35mERROR: \u001B[31m", log.LstdFlags)
+	LogError = log.New(os.Stdout, "\u001b[35m ** ERROR: \u001B[31m", log.LstdFlags)
 
 	// Debug writes logs in the color cyan with "DEBUG: " as prefix
 	LogDebug = log.New(os.Stdout, "\u001b[36mDEBUG: ", log.LstdFlags)
