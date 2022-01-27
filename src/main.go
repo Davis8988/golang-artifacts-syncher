@@ -35,7 +35,8 @@ var (
 	reposNamesArr [] string
 	packagesNamesArr [] string
 	packagesVersionsArr [] string
-	packagesToDownloadMap map[string][] string
+	// packagesToDownloadMap map[string][] string
+	packagesToDownloadMap sync.Map
 
 	lock sync.RWMutex
 )
@@ -49,7 +50,7 @@ func initVars() {
 	reposNamesStr = helpers.Getenv("REPOS_NAMES_STR", "")
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
-	packagesToDownloadMap = make(map[string][] string)
+	// packagesToDownloadMap = make(map[string][] string)
 	lock = sync.RWMutex{}
 }
 
@@ -105,11 +106,13 @@ func updateVars() {
 
 	for i, pkgName := range packagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
-		if _, ok := packagesToDownloadMap[pkgName]; ! ok { packagesToDownloadMap[pkgName] = make([] string, 0) }
+		packagesToDownloadMap.LoadOrStore(pkgName, make([] string, 0))
 		// If received a version array for it - add it to the list
 		if len(packagesVersionsArr) >= i {
 			pkgVersion := packagesVersionsArr[i]
-			packagesToDownloadMap[pkgName] = append(packagesToDownloadMap[pkgName], pkgVersion)
+			currentInterfaceValue, _ := packagesToDownloadMap.Load(pkgName)
+			var currentVersionsArr []string = currentInterfaceValue.([]string)
+			packagesToDownloadMap.Store(pkgName, append(currentVersionsArr, pkgVersion))
 		}
 	}
 }
