@@ -41,7 +41,7 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
 		currentInterfaceValue, _ := synchedMap.Load(key)
         var currentStrArr []string = currentInterfaceValue.([]string)
 		keyStr := key.(string) // Convert to string
-        result += keyStr + " : " + strings.Join(currentStrArr, ", ") + "\n"
+        result += keyStr + " : [" + strings.Join(currentStrArr, ", ") + "]\n"
         return true
 	})
     return result
