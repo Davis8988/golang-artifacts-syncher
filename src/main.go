@@ -122,14 +122,14 @@ func updateVars() {
 
 func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
-	var searchUrlsArr []string
+	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
 	log.Printf("Preparing search packages urls array")
 	searchOptionsUrl := "Search()?"
 	for _, serverUrl := range serversUrlsArr {
 		for _, repoName := range reposNamesArr {
 			for _, pkgName := range packagesNamesArr {
-				versionsToSearchArr := packagesToDownloadMap[pkgName]
+				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
 				if len(versionsToSearchArr) > 0 {continue}
 				searchUrlsArr = append(searchUrlsArr, serverUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
 			}
