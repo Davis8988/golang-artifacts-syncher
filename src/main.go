@@ -148,7 +148,7 @@ func prepareSearchUrlsArray() []string {
 func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
 	searchUrlsArr := prepareSearchUrlsArray()
-	
+	if len(searchUrlsArr) > 1 {}
 
 	return foundPackagesArr 
 }
