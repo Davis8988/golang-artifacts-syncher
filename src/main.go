@@ -133,7 +133,7 @@ func updateVars() {
 // } 
 
 func searchSpecifiedPackages() []string {
-	// var foundPackagesArr []string
+	var foundPackagesArr []string
 	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
 	LogInfo.Print("Preparing search packages urls array")
@@ -150,7 +150,7 @@ func searchSpecifiedPackages() []string {
 
 
 
-	return searchUrlsArr 
+	return foundPackagesArr 
 }
 
 func downloadSpecifiedPackages() {
