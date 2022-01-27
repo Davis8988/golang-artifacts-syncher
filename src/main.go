@@ -107,14 +107,18 @@ func parseArgs() {
 
 func updateVars() {
 	LogInfo.Print("Updating vars")
-	serversUrlsArr = strings.Split(serversUrlsStr, ";")
-	reposNamesArr = strings.Split(reposNamesStr, ";")
-	packagesNamesArr = strings.Split(packagesNamesStr, ";")
-	packagesVersionsArr = strings.Split(packagesVersionsStr, ";")
+	serversUrlsArr = make([]string, 0, 4)
+	reposNamesArr = make([]string, 0, 4)
+	packagesNamesArr = make([]string, 0, 10)
+	packagesVersionsArr = make([]string, 0, 10)
+	if len(serversUrlsStr) > 1 {serversUrlsArr = strings.Split(serversUrlsStr, ";")}
+	if len(reposNamesStr) > 1 {reposNamesArr = strings.Split(reposNamesStr, ";")}
+	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
+	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
 
 	for i, pkgName := range packagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
-		packagesToDownloadMap.LoadOrStore(pkgName, make([] string, 0))
+		packagesToDownloadMap.LoadOrStore(pkgName, make([] string, 0, 10))
 		// If received a version array for it - add it to the list
 		if len(packagesVersionsArr) >= i {
 			pkgVersion := packagesVersionsArr[i]
@@ -129,7 +133,7 @@ func updateVars() {
 // } 
 
 func searchSpecifiedPackages() []string {
-	var foundPackagesArr []string
+	// var foundPackagesArr []string
 	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
 	LogInfo.Print("Preparing search packages urls array")
@@ -146,7 +150,7 @@ func searchSpecifiedPackages() []string {
 
 
 
-	return foundPackagesArr 
+	return searchUrlsArr 
 }
 
 func downloadSpecifiedPackages() {
