@@ -128,12 +128,7 @@ func updateVars() {
 	}
 }
 
-// func prepareSearchUrlsArray() []string {
-	
-// } 
-
-func searchSpecifiedPackages() []string {
-	var foundPackagesArr []string
+func prepareSearchUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
 	LogInfo.Print("Preparing search packages urls array")
@@ -147,8 +142,13 @@ func searchSpecifiedPackages() []string {
 			}
 		}
 	}
+	return searchUrlsArr
+} 
 
-
+func searchSpecifiedPackages() []string {
+	var foundPackagesArr []string
+	searchUrlsArr := prepareSearchUrlsArray()
+	
 
 	return foundPackagesArr 
 }
