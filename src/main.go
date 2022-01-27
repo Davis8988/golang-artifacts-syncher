@@ -64,7 +64,8 @@ func printVars() {
 	LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
 	LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
 	LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
-	LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMap)
+	packagesToDownloadMapStr := helpers.ConvertSyncedMapToString(packagesToDownloadMap)
+	LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
 }
 
 func abortWithError(errMsg string, exitCode int) {
