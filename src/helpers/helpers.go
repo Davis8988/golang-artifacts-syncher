@@ -3,6 +3,8 @@ package helpers
 import (
 	"os"
 	"sync"
+	"fmt"
+	"strings"
 )
 
 // Attempts to resolve an environment variable, 
@@ -19,9 +21,28 @@ func IsStrArrayEmpty(arrToCheck []string) bool {
 	return len(arrToCheck) == 0
 }
 
-func LoadStringArrValueFromSynchedMap(someMap sync.Map, key string) [] string {
-    currentInterfaceValue, _ := someMap.Load(key)
+func LoadStringArrValueFromSynchedMap(synchedMap sync.Map, key string) [] string {
+    currentInterfaceValue, _ := synchedMap.Load(key)
     var currentStrArr []string = currentInterfaceValue.([]string)
     return currentStrArr
+}
+
+func PrintSyncedMap(synchedMap sync.Map) {
+	synchedMap.Range(func(key interface{}, value interface{}) bool {
+		someVal, _ := synchedMap.Load(key)
+		fmt.Println(someVal)
+		return true
+	})
+}
+
+func ConvertSyncedMapToString(synchedMap sync.Map) string {
+	var result string
+    synchedMap.Range(func(key interface{}, value interface{}) bool {
+		currentInterfaceValue, _ := synchedMap.Load(key)
+        var currentStrArr []string = currentInterfaceValue.([]string)
+		result += strings.Join(currentStrArr, ", ") + "\n"
+        return true
+	})
+    return result
 }
 
