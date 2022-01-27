@@ -125,7 +125,7 @@ func searchSpecifiedPackages() []string {
 	var foundPackagesArr []string
 	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
-	LogInfo.("Preparing search packages urls array")
+	LogInfo.Print("Preparing search packages urls array")
 	searchOptionsUrl := "Search()?"
 	for _, serverUrl := range serversUrlsArr {
 		for _, repoName := range reposNamesArr {
