@@ -41,6 +41,13 @@ var (
 	lock sync.RWMutex
 )
 
+func convertSyncedMapToString(synchedMap sync.Map) string {
+	lock.Lock()
+	result := helpers.ConvertSyncedMapToString(synchedMap)
+	lock.Unlock()
+	return result
+}
+
 
 func initVars() {
 	LogInfo.Print("Initializing from envs vars")
@@ -64,7 +71,7 @@ func printVars() {
 	LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
 	LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
 	LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
-	packagesToDownloadMapStr := helpers.ConvertSyncedMapToString(packagesToDownloadMap)
+	packagesToDownloadMapStr := convertSyncedMapToString(packagesToDownloadMap)
 	LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
 }
 
