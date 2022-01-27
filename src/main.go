@@ -110,8 +110,7 @@ func updateVars() {
 		// If received a version array for it - add it to the list
 		if len(packagesVersionsArr) >= i {
 			pkgVersion := packagesVersionsArr[i]
-			currentInterfaceValue, _ := packagesToDownloadMap.Load(pkgName)
-			var currentVersionsArr []string = currentInterfaceValue.([]string)
+			currentVersionsArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
 			packagesToDownloadMap.Store(pkgName, append(currentVersionsArr, pkgVersion))
 		}
 	}
