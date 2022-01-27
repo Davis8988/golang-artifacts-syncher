@@ -41,7 +41,7 @@ var (
 	lock sync.RWMutex
 )
 
-func convertSyncedMapToString(synchedMap sync.Map) string {
+func synched_convertSyncedMapToString(synchedMap sync.Map) string {
 	lock.Lock()
 	result := helpers.ConvertSyncedMapToString(synchedMap)
 	lock.Unlock()
@@ -71,7 +71,7 @@ func printVars() {
 	LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
 	LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
 	LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
-	packagesToDownloadMapStr := convertSyncedMapToString(packagesToDownloadMap)
+	packagesToDownloadMapStr := synched_convertSyncedMapToString(packagesToDownloadMap)
 	LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
 }
 
