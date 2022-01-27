@@ -120,7 +120,7 @@ func updateVars() {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
 		packagesToDownloadMap.LoadOrStore(pkgName, make([] string, 0, 10))
 		// If received a version array for it - add it to the list
-		if len(packagesVersionsArr) >= i {
+		if len(packagesVersionsArr) > i {
 			pkgVersion := packagesVersionsArr[i]
 			currentVersionsArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
 			packagesToDownloadMap.Store(pkgName, append(currentVersionsArr, pkgVersion))
