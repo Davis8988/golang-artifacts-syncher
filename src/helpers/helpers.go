@@ -40,7 +40,7 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
     synchedMap.Range(func(key interface{}, value interface{}) bool {
 		currentInterfaceValue, _ := synchedMap.Load(key)
         var currentStrArr []string = currentInterfaceValue.([]string)
-		result += strings.Join(currentStrArr, ", ") + "\n"
+		result += key + " : " + strings.Join(currentStrArr, ", ") + "\n"
         return true
 	})
     return result
