@@ -135,7 +135,9 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 func searchAvailableVersionsOfSpecifiedPackages() []string {
 	var foundPackagesNamesArr []string
 	searchUrlsArr := prepareSearchAllPkgsVersionsUrlsArray()
-	if len(searchUrlsArr) > 1 {}
+	if len(searchUrlsArr) > 1 {
+		for _, urlToCheck := range searchUrlsArr {helpers.SearchPackagesAvailableVersionsByURLRequest(urlToCheck)}
+	}
 
 	return foundPackagesNamesArr 
 }
