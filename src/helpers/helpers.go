@@ -64,6 +64,6 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
 
 func SearchPackagesAvailableVersionsByURLRequest(urlToCheck string) [] string {
     packagesAavilableVersions := make([] string, 0, 10)
-    LogInfo.Printf("Querying URL: '%s'", urlToCheck)
+    LogInfo.Printf("Querying URL: \"%s\"", urlToCheck)
     return packagesAavilableVersions
 }
