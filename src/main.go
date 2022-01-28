@@ -145,7 +145,7 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 	return searchUrlsArr
 } 
 
-func searchSpecifiedPackages() []string {
+func searchAvailableVersionsOfSpecifiedPackages() []string {
 	var foundPackagesArr []string
 	searchUrlsArr := prepareSearchAllPkgsVersionsUrlsArray()
 	if len(searchUrlsArr) > 1 {}
@@ -154,7 +154,7 @@ func searchSpecifiedPackages() []string {
 }
 
 func downloadSpecifiedPackages() {
-	foundPackagesArr := searchSpecifiedPackages()
+	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
 	LogInfo.Printf("Found packages: %v", foundPackagesArr)
 }
 
