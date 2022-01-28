@@ -4,7 +4,22 @@ import (
 	"os"
 	"sync"
 	"fmt"
+	"log"
 	"strings"
+)
+
+var (
+    // Info writes logs in the color white
+    LogInfo = log.New(os.Stdout, "\u001b[37m", log.LstdFlags)
+
+    // Warning writes logs in the color yellow with "WARNING: " as prefix
+    LogWarning = log.New(os.Stdout, "\u001b[33mWARNING: ", log.LstdFlags)
+
+    // Error writes logs in the color red with " Error: " as prefix
+    LogError = log.New(os.Stdout, "\u001b[35m Error: \u001B[31m", log.LstdFlags)
+
+    // Debug writes logs in the color cyan with "Debug: " as prefix
+    LogDebug = log.New(os.Stdout, "\u001b[36mDebug: ", log.LstdFlags)
 )
 
 // Attempts to resolve an environment variable, 
@@ -49,6 +64,6 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
 
 func SearchPackagesAvailableVersionsByURLRequest(urlToCheck string) [] string {
     packagesAavilableVersions := make([] string, 0, 10)
-
+    
     return packagesAavilableVersions
 }

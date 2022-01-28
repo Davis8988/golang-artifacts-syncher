@@ -7,23 +7,10 @@ import (
 	"flag"
 	"os"
 	"sync"
-	"log"
 	"strings"
 )
 
 var (
-	// Info writes logs in the color white
-	LogInfo = log.New(os.Stdout, "\u001b[37m", log.LstdFlags)
-
-	// Warning writes logs in the color yellow with "WARNING: " as prefix
-	LogWarning = log.New(os.Stdout, "\u001b[33mWARNING: ", log.LstdFlags)
-
-	// Error writes logs in the color red with " Error: " as prefix
-	LogError = log.New(os.Stdout, "\u001b[35m Error: \u001B[31m", log.LstdFlags)
-
-	// Debug writes logs in the color cyan with "Debug: " as prefix
-	LogDebug = log.New(os.Stdout, "\u001b[36mDebug: ", log.LstdFlags)
-
 	userToUse string
 	passToUse string
 	serversUrlsStr string
@@ -50,7 +37,7 @@ func synched_convertSyncedMapToString(synchedMap sync.Map) string {
 
 
 func initVars() {
-	LogInfo.Print("Initializing from envs vars")
+	helpers.LogInfo.Print("Initializing from envs vars")
 	userToUse = helpers.Getenv("USER_TO_USE", "")
 	passToUse = helpers.Getenv("PASS_TO_USE", "")
 	serversUrlsStr = helpers.Getenv("SERVERS_URLS_STR", "")
@@ -62,32 +49,32 @@ func initVars() {
 }
 
 func printVars() {
-	LogInfo.Printf("SERVERS_URLS_STR: '%s'", serversUrlsStr)
-	LogInfo.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
-	LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
-	LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
+	helpers.LogInfo.Printf("SERVERS_URLS_STR: '%s'", serversUrlsStr)
+	helpers.LogInfo.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
+	helpers.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
+	helpers.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
 	
-	LogInfo.Printf("serversUrlsArr: %v", serversUrlsArr)
-	LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
-	LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
-	LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
+	helpers.LogInfo.Printf("serversUrlsArr: %v", serversUrlsArr)
+	helpers.LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
+	helpers.LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
+	helpers.LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
 	packagesToDownloadMapStr := synched_convertSyncedMapToString(packagesToDownloadMap)
-	LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
+	helpers.LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
 }
 
 func abortWithError(errMsg string, exitCode int) {
 	e := errors.New(errMsg)
-	LogError.Printf("%s", e)
-	LogError.Printf("Aborting with exit code: %d", exitCode)
+	helpers.LogError.Printf("%s", e)
+	helpers.LogError.Printf("Aborting with exit code: %d", exitCode)
 	os.Exit(exitCode)
 }
 
 func validateEnv() {
-	LogInfo.Print("Validating envs")
+	helpers.LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
 	if ! nexus3_adapter.IsStrArrayEmpty(packagesVersionsArr) {
-		LogInfo.Print("Comparing packages names & versions arrays lengths")
+		helpers.LogInfo.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
 			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
@@ -97,16 +84,16 @@ func validateEnv() {
 		}
 	}
 	
-	LogInfo.Print("All Good")
+	helpers.LogInfo.Print("All Good")
 }
 
 func parseArgs() {
-	LogInfo.Print("Parsing args")
+	helpers.LogInfo.Print("Parsing args")
 	flag.Parse()
 }
 
 func updateVars() {
-	LogInfo.Print("Updating vars")
+	helpers.LogInfo.Print("Updating vars")
 	serversUrlsArr = make([]string, 0, 4)
 	reposNamesArr = make([]string, 0, 4)
 	packagesNamesArr = make([]string, 0, 10)
@@ -131,7 +118,7 @@ func updateVars() {
 func prepareSearchAllPkgsVersionsUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
-	LogInfo.Print("Preparing search packages urls array")
+	helpers.LogInfo.Print("Preparing search packages urls array")
 	searchOptionsUrl := "Search()?"
 	for _, serverUrl := range serversUrlsArr {
 		for _, repoName := range reposNamesArr {
@@ -155,7 +142,7 @@ func searchAvailableVersionsOfSpecifiedPackages() []string {
 
 func downloadSpecifiedPackages() {
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
-	LogInfo.Printf("Found packages: %v", foundPackagesArr)
+	helpers.LogInfo.Printf("Found packages: %v", foundPackagesArr)
 }
 
 func uploadDownloadedPackages() {
@@ -163,7 +150,7 @@ func uploadDownloadedPackages() {
 }
 
 func main() {
-	LogInfo.Print("Started")
+	helpers.LogInfo.Print("Started")
 	initVars()
 	parseArgs()
 	updateVars()
@@ -171,5 +158,5 @@ func main() {
 	validateEnv()
 	downloadSpecifiedPackages()
 	uploadDownloadedPackages()
-	LogInfo.Print("Finished")
+	helpers.LogInfo.Print("Finished")
 }
