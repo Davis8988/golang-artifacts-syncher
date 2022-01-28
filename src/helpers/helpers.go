@@ -47,7 +47,8 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
     return result
 }
 
-func SearchPackagesAvailableVersionsByURLRequest() [] string {
+func SearchPackagesAvailableVersionsByURLRequest(urlToCheck string) [] string {
     packagesAavilableVersions := make([] string, 0, 10)
-    
+
+    return packagesAavilableVersions
 }
