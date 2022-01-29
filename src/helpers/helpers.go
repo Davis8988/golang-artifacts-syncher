@@ -130,6 +130,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     // Adding headers:
     if headersMap != nil {
         for k := range headersMap {
+            LogInfo.Printf("Adding header: '%s'=\"%s\"", k, headersMap[k])
             req.Header.Add(k, headersMap[k])
         }
     }
