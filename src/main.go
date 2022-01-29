@@ -106,6 +106,14 @@ func updateVars() {
 	if len(reposNamesStr) > 1 {reposNamesArr = strings.Split(reposNamesStr, ";")}
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
+	if len(httpRequestHeadersStr) > 1 {
+		tempHeadersPairsArr := make([]string, 0, 6)
+		tempHeadersPairsArr = strings.Split(httpRequestHeadersStr, ";")
+		helpers.LogInfo.Printf("Looping on headers values to init headers map")
+		for _, element := range someSlice {
+
+		}
+	}
 
 	for i, pkgName := range packagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
