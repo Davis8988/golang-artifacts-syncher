@@ -83,7 +83,8 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
             LogError.Printf("Found header pair: \"%v\"  that is not in the right format of: \"key=value\"", tempPairArr)
             return nil
         }
-
+        headerKey := tempPairArr[0]
+        headerValue := tempPairArr[1]
     }
 }
 
