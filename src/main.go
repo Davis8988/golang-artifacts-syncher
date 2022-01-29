@@ -45,6 +45,7 @@ func initVars() {
 	reposNamesStr = helpers.Getenv("REPOS_NAMES_STR", "")
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
+	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")
 	// packagesToDownloadMap = make(map[string][] string)
 	lock = sync.RWMutex{}
 }
