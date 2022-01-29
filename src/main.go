@@ -47,7 +47,7 @@ func initVars() {
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")  // Example: "key=value;key1=value1;key2=value2"
-	httpRequestTimeoutSeconds = helpers.StrToInt(helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_STR", "45"))
+	httpRequestTimeoutSeconds = helpers.StrToInt(helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 	// packagesToDownloadMap = make(map[string][] string)
 	lock = sync.RWMutex{}
 }
@@ -58,7 +58,7 @@ func printVars() {
 	helpers.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
 	helpers.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
 	helpers.LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
-	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_STR: '%d'", httpRequestTimeoutSeconds)
+	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSeconds)
 	
 	helpers.LogInfo.Printf("serversUrlsArr: %v", serversUrlsArr)
 	helpers.LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
