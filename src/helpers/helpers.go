@@ -137,7 +137,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 
     // Adding creds
     if len(username) > 0 && len(password) > 0 {
-        LogInfo.Printf("Adding creds of user:  %s", username)
+        LogInfo.Printf("Adding creds of user:  '%s'", username)
         req.SetBasicAuth(username, password)
     }
 
