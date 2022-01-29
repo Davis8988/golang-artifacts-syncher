@@ -90,6 +90,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
         headerValue := tempPairArr[1]
         httpRequestHeadersMap[headerKey] = headerValue
     }
+    return httpRequestHeadersMap
 }
 
 func SearchPackagesAvailableVersionsByURLRequest(argsMap map[string]string) [] string {
