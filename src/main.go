@@ -23,7 +23,7 @@ var (
 	reposNamesArr [] string
 	packagesNamesArr [] string
 	packagesVersionsArr [] string
-	// packagesToDownloadMap map[string][] string
+	httpRequestHeadersMap map[string] string
 	packagesToDownloadMap sync.Map
 
 	lock sync.RWMutex
