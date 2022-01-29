@@ -72,6 +72,18 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
     return result
 }
 
+func ParseHttpHeadersStrToMap(httpHeadersStr string) map[string]string {
+    tempHeadersPairsArr := make([]string, 0, 6)
+    tempPairArr := make([]string, 0, 2)
+    tempHeadersPairsArr = strings.Split(httpRequestHeadersStr, ";")
+    helpers.LogInfo.Printf("Looping on headers values to init headers map")
+    for _, headersPairStr := range tempHeadersPairsArr {
+        tempPairArr := strings.Split(headersPairStr, "=")
+        if len(tempPairArr) != 2 {
+            helpers.LogError
+    }
+}
+
 func SearchPackagesAvailableVersionsByURLRequest(argsMap map[string]string) [] string {
     urlToCheck := argsMap["HTTP_REQUEST_URL"]
     headers := ""
