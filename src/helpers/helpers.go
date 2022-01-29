@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type HttpRequestArgs struct {
+type HttpRequestArgsStruct struct {
 	UrlAddress  string
 	HeadersMap  map[string]string
     UserToUse  string
@@ -93,7 +93,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     return httpRequestHeadersMap
 }
 
-func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs) [] string {
+func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] string {
     urlToCheck := argsMap["HTTP_REQUEST_URL"]
     headers := ""
     if v, found := m["pi"]; found {
