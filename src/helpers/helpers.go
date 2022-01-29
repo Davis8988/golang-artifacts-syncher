@@ -110,6 +110,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
     password := httpRequestArgs.PassToUse
+    timeoutSec := httpRequestArgs.TimeoutSec
 
     packagesAavilableVersions := make([] string, 0, 10)
     LogInfo.Printf("Querying URL: \"%s\"", urlToCheck)
