@@ -101,6 +101,7 @@ func updateVars() {
 	reposNamesArr = make([]string, 0, 4)
 	packagesNamesArr = make([]string, 0, 10)
 	packagesVersionsArr = make([]string, 0, 10)
+	httpRequestHeadersMap = make(map[string] string)
 	if len(serversUrlsStr) > 1 {serversUrlsArr = strings.Split(serversUrlsStr, ";")}
 	if len(reposNamesStr) > 1 {reposNamesArr = strings.Split(reposNamesStr, ";")}
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
