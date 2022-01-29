@@ -9,6 +9,7 @@ import (
     "net/http"
 	"strings"
 	"time"
+	"strconv"
 )
 
 type HttpRequestArgsStruct struct {
@@ -42,6 +43,15 @@ func Getenv(key, fallback string) string {
         return fallback
     }
     return value
+}
+
+func StrToInt(strVar string) int {
+	intVar, err := strconv.Atoi(strVar)
+    if err != nil {
+        LogError.Printf("%s\nFailed converting string: \"%s\" to integer", err, strVar)
+        panic(err)
+    }
+    return intVar
 }
 
 func IsStrArrayEmpty(arrToCheck []string) bool {

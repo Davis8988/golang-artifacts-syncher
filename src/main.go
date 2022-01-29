@@ -47,7 +47,7 @@ func initVars() {
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")  // Example: "key=value;key1=value1;key2=value2"
-	httpRequestTimeoutStr = helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_STR", "45")  
+	httpRequestTimeoutSeconds = helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_STR", "45")  
 	// packagesToDownloadMap = make(map[string][] string)
 	lock = sync.RWMutex{}
 }
@@ -109,6 +109,7 @@ func updateVars() {
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
 	httpRequestHeadersMap = helpers.ParseHttpHeadersStrToMap(httpRequestHeadersStr)
+	if len(httpRequestTimeoutStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
 
 	for i, pkgName := range packagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
