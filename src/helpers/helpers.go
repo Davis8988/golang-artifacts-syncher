@@ -135,6 +135,12 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
         }
     }
 
+    // Adding creds
+    if len(username) > 0 && len(password) > 0 {
+        LogInfo.Printf("Adding creds of user:  %s", username)
+        req.SetBasicAuth(username, password)
+    }
+
     response, err := client.Do(req)
     if err != nil {
         LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
