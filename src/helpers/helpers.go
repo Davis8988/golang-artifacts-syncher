@@ -73,6 +73,9 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
 }
 
 func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
+    httpRequestHeadersMap := make(map[string] string)
+    if len(httpRequestHeadersStr) <= 1 {return httpRequestHeadersMap}
+    
     tempHeadersPairsArr := make([]string, 0, 6)
     tempPairArr := make([]string, 0, 2)
     tempHeadersPairsArr = strings.Split(httpRequestHeadersStr, ";")
