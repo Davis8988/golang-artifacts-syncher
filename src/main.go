@@ -17,6 +17,7 @@ var (
 	reposNamesStr string
 	packagesNamesStr string
 	packagesVersionsStr string
+	httpRequestHeadersStr string
 
 	serversUrlsArr [] string
 	reposNamesArr [] string
