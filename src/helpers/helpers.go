@@ -121,7 +121,11 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
         Timeout: time.Duration(timeoutSec) * time.Second,
     }
 
-    http.NewRequest(method, url, nil)
+    req, err := http.NewRequest(method, urlToCheck, nil)
+    if err != nil {
+        LogError.Printf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlToCheck)
+        return nil
+    }
 
     resp, err := http.Get(urlToCheck)
     if err != nil {
