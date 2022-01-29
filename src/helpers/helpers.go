@@ -4,7 +4,9 @@ import (
 	"os"
 	"sync"
 	"fmt"
-	"log"
+	"io/ioutil"
+    "log"
+    "net/http"
 	"strings"
 )
 
@@ -65,5 +67,22 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
 func SearchPackagesAvailableVersionsByURLRequest(urlToCheck string) [] string {
     packagesAavilableVersions := make([] string, 0, 10)
     LogInfo.Printf("Querying URL: \"%s\"", urlToCheck)
+
+    resp, err := http.Get(urlToCheck)
+    if err != nil {
+        LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
+        return nil
+    }
+  
+    defer resp.Body.Close()  // Finally step: close the body obj
+    
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
+        return nil
+    }
+  
+    LogInfo.Printf(string(body))
+
     return packagesAavilableVersions
 }
