@@ -10,6 +10,14 @@ import (
 	"strings"
 )
 
+type HttpRequestArgs struct {
+	urlAddress  string
+	headersMap  map[string]string
+    userToUse  string
+    passToUse  string
+}
+
+
 var (
     // Info writes logs in the color white
     LogInfo = log.New(os.Stdout, "\u001b[37m", log.LstdFlags)
@@ -64,7 +72,12 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
     return result
 }
 
-func SearchPackagesAvailableVersionsByURLRequest(urlToCheck string) [] string {
+func SearchPackagesAvailableVersionsByURLRequest(argsMap map[string]string) [] string {
+    urlToCheck := argsMap["HTTP_REQUEST_URL"]
+    headers := ""
+    if v, found := m["pi"]; found {
+        headers := argsMap["HTTP_REQUEST_URL"]
+    }
     packagesAavilableVersions := make([] string, 0, 10)
     LogInfo.Printf("Querying URL: \"%s\"", urlToCheck)
 
