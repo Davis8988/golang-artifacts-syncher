@@ -18,6 +18,7 @@ var (
 	packagesNamesStr string
 	packagesVersionsStr string
 	httpRequestHeadersStr string
+	httpRequestTimeoutSeconds int
 
 	serversUrlsArr [] string
 	reposNamesArr [] string
