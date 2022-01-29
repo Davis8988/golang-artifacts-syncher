@@ -95,7 +95,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
 
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] string {
     urlToCheck := httpRequestArgs.UrlAddress
-    headersMao := httpRequestArgs.HeadersMap
+    headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
     password := httpRequestArgs.PassToUse
     if v, found := m["pi"]; found {
