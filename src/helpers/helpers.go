@@ -17,7 +17,7 @@ type HttpRequestArgsStruct struct {
 	HeadersMap  map[string]string
     UserToUse  string
     PassToUse  string
-    Timeout  int
+    TimeoutSec  int
 }
 
 

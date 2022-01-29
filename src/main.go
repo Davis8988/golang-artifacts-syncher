@@ -48,7 +48,6 @@ func initVars() {
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")  // Example: "key=value;key1=value1;key2=value2"
 	httpRequestTimeoutSeconds = helpers.StrToInt(helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
-	// packagesToDownloadMap = make(map[string][] string)
 	lock = sync.RWMutex{}
 }
 
@@ -150,6 +149,7 @@ func searchAvailableVersionsOfSpecifiedPackages() []string {
 				HeadersMap: httpRequestHeadersMap,
 				UserToUse: userToUse,
 				PassToUse: passToUse,
+				TimeoutSec: httpRequestTimeoutSeconds,
 			}
 			helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 		}
