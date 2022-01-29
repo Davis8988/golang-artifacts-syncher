@@ -127,6 +127,13 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
         return nil
     }
 
+    // Adding headers:
+    if headersMap != nil {
+        for k := range headersMap {
+            req.Header.Add(k, headersMap[k])
+        }
+    }
+
     resp, err := http.Get(urlToCheck)
     if err != nil {
         LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
