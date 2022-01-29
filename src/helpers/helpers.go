@@ -11,10 +11,10 @@ import (
 )
 
 type HttpRequestArgs struct {
-	urlAddress  string
-	headersMap  map[string]string
-    userToUse  string
-    passToUse  string
+	UrlAddress  string
+	HeadersMap  map[string]string
+    UserToUse  string
+    PassToUse  string
 }
 
 
@@ -93,7 +93,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     return httpRequestHeadersMap
 }
 
-func SearchPackagesAvailableVersionsByURLRequest(argsMap map[string]string) [] string {
+func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs) [] string {
     urlToCheck := argsMap["HTTP_REQUEST_URL"]
     headers := ""
     if v, found := m["pi"]; found {

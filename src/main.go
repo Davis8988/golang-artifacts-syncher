@@ -142,7 +142,13 @@ func searchAvailableVersionsOfSpecifiedPackages() []string {
 	if len(searchUrlsArr) > 0 {
 		helpers.LogInfo.Printf("Checking %d URL addresses for pkgs versions", len(searchUrlsArr))
 		for _, urlToCheck := range searchUrlsArr {
-			helpers.SearchPackagesAvailableVersionsByURLRequest(urlToCheck)
+			httpRequestArgs := helpers.HttpRequestArgs {
+				UrlAddress: urlToCheck,
+				HeadersMap: httpRequestHeadersMap,
+				UserToUse: userToUse,
+				PassToUse: passToUse,
+			}
+			helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 		}
 	}
 
