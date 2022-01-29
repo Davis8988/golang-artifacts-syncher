@@ -108,10 +108,11 @@ func updateVars() {
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
 	if len(httpRequestHeadersStr) > 1 {
 		tempHeadersPairsArr := make([]string, 0, 6)
+		tempPairArr := make([]string, 0, 2)
 		tempHeadersPairsArr = strings.Split(httpRequestHeadersStr, ";")
 		helpers.LogInfo.Printf("Looping on headers values to init headers map")
-		for _, element := range someSlice {
-
+		for _, headersPairStr := range tempHeadersPairsArr {
+			tempPairArr := strings.Split(headersPairStr, "=")
 		}
 	}
 
