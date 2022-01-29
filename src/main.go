@@ -150,6 +150,7 @@ func searchAvailableVersionsOfSpecifiedPackages() []string {
 				UserToUse: userToUse,
 				PassToUse: passToUse,
 				TimeoutSec: httpRequestTimeoutSeconds,
+				Method: "GET",
 			}
 			helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 		}
