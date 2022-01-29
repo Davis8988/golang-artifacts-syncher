@@ -114,7 +114,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     timeoutSec := httpRequestArgs.TimeoutSec
     method := httpRequestArgs.Method
 
-    packagesAavilableVersions := make([] string, 0, 10)
+    packagesAvailableVersions := make([] string, 0, 10)
     LogInfo.Printf("Querying URL: \"%s\"", urlToCheck)
 
     client := http.Client{
@@ -151,5 +151,5 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
   
     LogInfo.Printf(string(body))
 
-    return packagesAavilableVersions
+    return packagesAvailableVersions
 }
