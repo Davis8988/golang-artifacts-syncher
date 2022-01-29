@@ -18,6 +18,7 @@ type HttpRequestArgsStruct struct {
     UserToUse  string
     PassToUse  string
     TimeoutSec  int
+    Method  string
 }
 
 
@@ -114,6 +115,12 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 
     packagesAavilableVersions := make([] string, 0, 10)
     LogInfo.Printf("Querying URL: \"%s\"", urlToCheck)
+
+    client := http.Client{
+        Timeout: time.Duration(timeoutSec) * time.Second,
+    }
+
+    http.NewRequest(method, url, nil)
 
     resp, err := http.Get(urlToCheck)
     if err != nil {
