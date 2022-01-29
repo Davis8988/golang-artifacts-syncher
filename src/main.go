@@ -58,7 +58,7 @@ func printVars() {
 	helpers.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
 	helpers.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
 	helpers.LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
-	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_STR: '%s'", httpRequestTimeoutStr)
+	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_STR: '%d'", httpRequestTimeoutSeconds)
 	
 	helpers.LogInfo.Printf("serversUrlsArr: %v", serversUrlsArr)
 	helpers.LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
@@ -109,7 +109,6 @@ func updateVars() {
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
 	httpRequestHeadersMap = helpers.ParseHttpHeadersStrToMap(httpRequestHeadersStr)
-	if len(httpRequestTimeoutStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
 
 	for i, pkgName := range packagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
