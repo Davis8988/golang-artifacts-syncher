@@ -8,6 +8,7 @@ import (
     "log"
     "net/http"
 	"strings"
+	"time"
 )
 
 type HttpRequestArgsStruct struct {
@@ -15,6 +16,7 @@ type HttpRequestArgsStruct struct {
 	HeadersMap  map[string]string
     UserToUse  string
     PassToUse  string
+    Timeout  int
 }
 
 
@@ -98,9 +100,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
     password := httpRequestArgs.PassToUse
-    if v, found := m["pi"]; found {
-        headers := argsMap["HTTP_REQUEST_URL"]
-    }
+
     packagesAavilableVersions := make([] string, 0, 10)
     LogInfo.Printf("Querying URL: \"%s\"", urlToCheck)
 
