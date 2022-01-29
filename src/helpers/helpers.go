@@ -78,7 +78,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     tempHeadersPairsArr = strings.Split(httpRequestHeadersStr, ";")
     LogInfo.Printf("Looping on headers values to init headers map")
     for _, headersPairStr := range tempHeadersPairsArr {
-        tempPairArr := strings.Split(headersPairStr, "=")
+        tempPairArr = strings.Split(headersPairStr, "=")
         if len(tempPairArr) != 2 {
             LogError.Printf("Found header pair: \"%v\"  that is not in the right format of: \"key=value\"", tempPairArr)
             return nil
