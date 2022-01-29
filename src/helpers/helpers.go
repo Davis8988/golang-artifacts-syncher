@@ -130,20 +130,20 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     // Adding headers:
     if headersMap != nil {
         for k := range headersMap {
-            LogInfo.Printf("Adding header: '%s'=\"%s\"", k, headersMap[k])
+            LogInfo.Printf("Adding header:  '%s'=\"%s\"", k, headersMap[k])
             req.Header.Add(k, headersMap[k])
         }
     }
 
-    resp, err := http.Get(urlToCheck)
+    response, err := client.Do(req)
     if err != nil {
         LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
         return nil
     }
   
-    defer resp.Body.Close()  // Finally step: close the body obj
+    defer response.Body.Close()  // Finally step: close the body obj
     
-    body, err := ioutil.ReadAll(resp.Body)
+    body, err := ioutil.ReadAll(response.Body)
     if err != nil {
         LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
         return nil
