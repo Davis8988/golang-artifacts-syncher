@@ -141,6 +141,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
         req.SetBasicAuth(username, password)
     }
 
+    // Make the http request
     response, err := client.Do(req)
     if err != nil {
         LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
