@@ -161,5 +161,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
   
     LogInfo.Printf(bodyStr)
 
+    if response.StatusCode >= 400 {LogError.Printf("Failed querying: %s", urlToCheck)}
+
     return packagesAvailableVersions
 }
