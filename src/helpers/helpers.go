@@ -157,7 +157,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     }
 
     bodyStr := string(body)
-    if len(response.Status) > 0 {bodyStr = fmt.Sprintf("%s - %s", response.Status, bodyStr)}
+    if len(response.Status) > 0 {bodyStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
   
     LogInfo.Printf(bodyStr)
 
