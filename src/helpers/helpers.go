@@ -10,7 +10,9 @@ import (
 	"strings"
 	"time"
 	"strconv"
+    "regexp"
 )
+
 
 type HttpRequestArgsStruct struct {
 	UrlAddress  string
