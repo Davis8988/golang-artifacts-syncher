@@ -154,16 +154,17 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     }
 
     bodyStr := string(body)
-    if len(response.Status) > 0 {bodyStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
-  
-    LogInfo.Printf(bodyStr)
+    msgStr := bodyStr
+    if len(response.Status) > 0 {msgStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
+    LogInfo.Printf(msgStr)
 
     if response.StatusCode >= 400 {LogError.Printf("Failed querying: %s", urlToCheck)}
+
+    return bodyStr
 }
 
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] string {
     
-
     packagesAvailableVersions := make([] string, 0, 10)
     
 
