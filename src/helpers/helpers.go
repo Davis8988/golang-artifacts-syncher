@@ -21,7 +21,6 @@ type HttpRequestArgsStruct struct {
     Method  string
 }
 
-
 var (
     // Info writes logs in the color white
     LogInfo = log.New(os.Stdout, "\u001b[37m", log.LstdFlags)
