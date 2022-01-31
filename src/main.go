@@ -3,9 +3,7 @@ package main
 import (
 	"golang-artifacts-syncher/src/helpers"
 	"golang-artifacts-syncher/src/nexus3_adapter"
-	"errors"
 	"flag"
-	"os"
 	"sync"
 	"strings"
 )
@@ -67,13 +65,6 @@ func printVars() {
 	helpers.LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
 }
 
-func abortWithError(errMsg string, exitCode int) {
-	e := errors.New(errMsg)
-	helpers.LogError.Printf("%s", e)
-	helpers.LogError.Printf("Aborting with exit code: %d", exitCode)
-	os.Exit(exitCode)
-}
-
 func validateEnv() {
 	helpers.LogInfo.Print("Validating envs")
 
@@ -85,7 +76,7 @@ func validateEnv() {
 			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
 			errMsg += "When passing packages versions to search - the versions count must be of the same count of packages names to search.\n"
 			errMsg += "A version for each package name to search"
-			abortWithError(errMsg, 1)
+			helpers.LogError.Fatal(errMsg)
 		}
 	}
 	
