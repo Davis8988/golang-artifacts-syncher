@@ -171,12 +171,12 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     return bodyStr
 }
 
-func ParseHttpRequestResponseForPackagesVersions(responseBody string) map[string] [] string {
-    parsedPackagesVersionsMap := make(map[string] [] string, 10)
+func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPackageDetailsStruct {
+    parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 10)
     LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseNugetPackagesXmlData(responseBody)
     LogInfo.Printf("%s", parsedPackagesDetailsStruct)
-    return parsedPackagesVersionsMap
+    return parsedPackagesVersionsArr
 }
 
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] string {
