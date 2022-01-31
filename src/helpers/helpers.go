@@ -156,7 +156,7 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     bodyStr := string(body)
     msgStr := bodyStr
     if len(response.Status) > 0 {msgStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
-    LogInfo.Printf(msgStr)
+    LogDebug.Printf(msgStr)
 
     if response.StatusCode >= 400 {LogError.Printf("Failed querying: %s", urlToCheck)}
 
