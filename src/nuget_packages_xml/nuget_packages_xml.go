@@ -1,7 +1,6 @@
 package nuget_packages_xml
 
 import (
-	"golang-artifacts-syncher/src/helpers"
     "encoding/xml"
 )
 
@@ -131,7 +130,6 @@ type PackagesDetailsXmlStruct struct {
 
 
 func ParseNugetPackagesXmlData(xmlDataStr string) PackagesDetailsXmlStruct {
-    helpers.LogInfo.Printf("Attempting to parse nuget packages xml data")
     xmlDataByteArr := []byte(xmlDataStr)
     var result PackagesDetailsXmlStruct
     xml.Unmarshal(xmlDataByteArr, &result)

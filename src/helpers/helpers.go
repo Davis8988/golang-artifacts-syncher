@@ -1,6 +1,7 @@
 package helpers
 
 import (
+    "golang-artifacts-syncher/src/nuget_packages_xml"
 	"os"
 	"sync"
 	"fmt"
@@ -10,7 +11,6 @@ import (
 	"strings"
 	"time"
 	"strconv"
-    "regexp"
 )
 
 
@@ -166,7 +166,7 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
 func PraseHttpRequestResponseForPackagesVersions(responseBody string) map[string] [] string {
     parsedPackagesVersionsMap := make(map[string] [] string, 10)
-
+    
     return parsedPackagesVersionsMap
 }
 
