@@ -163,11 +163,15 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     return bodyStr
 }
 
+func PraseHttpRequestResponseForPackagesVersions() {
+
+}
+
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] string {
     
     responseBody := MakeAnHttpRequest(httpRequestArgs)
     if len(responseBody) == 0 {return nil}
-    
+
     packagesAvailableVersions := make([] string, 0, 10)
 
     return packagesAvailableVersions
