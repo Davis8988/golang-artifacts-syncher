@@ -164,7 +164,7 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     return bodyStr
 }
 
-func PraseHttpRequestResponseForPackagesVersions(responseBody string) map[string] [] string {
+func ParseHttpRequestResponseForPackagesVersions(responseBody string) map[string] [] string {
     parsedPackagesVersionsMap := make(map[string] [] string, 10)
     LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseNugetPackagesXmlData(responseBody)
@@ -176,7 +176,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     
     responseBody := MakeAnHttpRequest(httpRequestArgs)
     if len(responseBody) == 0 {return nil}
-
+    ParseHttpRequestResponseForPackagesVersions(responseBody)
     packagesAvailableVersions := make([] string, 0, 10)
 
     return packagesAvailableVersions
