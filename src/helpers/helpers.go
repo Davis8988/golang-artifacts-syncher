@@ -106,7 +106,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     return httpRequestHeadersMap
 }
 
-func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] string {
+func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     urlToCheck := httpRequestArgs.UrlAddress
     headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
@@ -114,7 +114,6 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     timeoutSec := httpRequestArgs.TimeoutSec
     method := httpRequestArgs.Method
 
-    packagesAvailableVersions := make([] string, 0, 10)
     LogInfo.Printf("Querying URL: \"%s\"", urlToCheck)
 
     client := http.Client{
@@ -124,7 +123,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     req, err := http.NewRequest(method, urlToCheck, nil)
     if err != nil {
         LogError.Printf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlToCheck)
-        return nil
+        return ""
     }
 
     // Adding headers:
@@ -143,15 +142,15 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     response, err := client.Do(req)
     if err != nil {
         LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
-        return nil
+        return ""
     }
   
-    defer response.Body.Close()  // Finally step: close the body obj
+    defer response.Body.Close() // Finally step: close the body obj
     
     body, err := ioutil.ReadAll(response.Body)
     if err != nil {
         LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
-        return nil
+        return ""
     }
 
     bodyStr := string(body)
@@ -160,6 +159,13 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     LogInfo.Printf(bodyStr)
 
     if response.StatusCode >= 400 {LogError.Printf("Failed querying: %s", urlToCheck)}
+}
+
+func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] string {
+    
+
+    packagesAvailableVersions := make([] string, 0, 10)
+    
 
     return packagesAvailableVersions
 }
