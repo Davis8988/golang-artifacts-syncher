@@ -155,8 +155,11 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
         LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
         return nil
     }
+
+    bodyStr := string(body)
+    if len(response.Status) > 0 {bodyStr = fmt.Sprintf("%s - %s", response.Status, bodyStr)}
   
-    LogInfo.Printf(string(body))
+    LogInfo.Printf(bodyStr)
 
     return packagesAvailableVersions
 }
