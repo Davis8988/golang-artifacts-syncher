@@ -168,7 +168,7 @@ func PraseHttpRequestResponseForPackagesVersions(responseBody string) map[string
     parsedPackagesVersionsMap := make(map[string] [] string, 10)
     LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseNugetPackagesXmlData(responseBody)
-    
+    LogInfo.Printf("%s", parsedPackagesDetailsStruct)
     return parsedPackagesVersionsMap
 }
 
