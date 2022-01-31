@@ -164,7 +164,8 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
 func PraseHttpRequestResponseForPackagesVersions(responseBody string) map[string] [] string {
     parsedPackagesVersionsMap := make(map[string] [] string, 10)
-    
+
+    return parsedPackagesVersionsMap
 }
 
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] string {
