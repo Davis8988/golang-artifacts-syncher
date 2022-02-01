@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 	"strconv"
+	"regexp"
 )
 
 
@@ -28,6 +29,7 @@ type NugetPackageDetailsStruct struct {
     Version string
     Checksum string
     ChecksumType string
+    PkgFileUrl string
 }
 
 var (
@@ -171,11 +173,26 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     return bodyStr
 }
 
+func ParsePkgNameAndVersionFromFileURL(pkgFileUrl string) [] string {
+    LogDebug.Printf("Parsing URL for Name & Version: \"%s\"", pkgFileUrl)
+    resultArr := make([] string, 2)
+    re := regexp.MustCompile("'(.*?)'")  // Find values in between quotes
+    resultArr = re.FindAllString(pkgFileUrl, 2)  // 2 = find up to 2 available matches. Use -1 for ALL available matches
+    return resultArr
+}
+
 func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPackageDetailsStruct {
     parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 10)
     LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseNugetPackagesXmlData(responseBody)
-    LogInfo.Printf("%s", parsedPackagesDetailsStruct)
+    for _, entryStruct := range parsedPackagesDetailsStruct.Entry {
+        Checksum := entryStruct.Properties.PackageHash
+        ChecksumType := entryStruct.Properties.PackageHashAlgorithm
+        PkgFileUrl := entryStruct.ID
+        parsedNameAndVersionArr := ParsePkgNameAndVersionFromFileURL(PkgFileUrl)
+        
+
+    }
     return parsedPackagesVersionsArr
 }
 
