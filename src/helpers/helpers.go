@@ -175,23 +175,34 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
 func ParsePkgNameAndVersionFromFileURL(pkgFileUrl string) [] string {
     LogDebug.Printf("Parsing URL for Name & Version: \"%s\"", pkgFileUrl)
-    resultArr := make([] string, 2)
     re := regexp.MustCompile("'(.*?)'")  // Find values in between quotes
-    resultArr = re.FindAllString(pkgFileUrl, 2)  // 2 = find up to 2 available matches. Use -1 for ALL available matches
+    resultArr := re.FindAllString(pkgFileUrl, -1)  // -1 = find ALL available matches
+    if len(resultArr) != 2 {
+        LogError.Printf("Failed to parse URL for pkg Name & Version:  \"%s\"", pkgFileUrl)
+        LogError.Printf("Found regex result count is: %d different from 2", len(resultArr))
+        return nil
+    }
     return resultArr
 }
 
 func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPackageDetailsStruct {
     parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 10)
+    curPkgDetailsInd := 0
     LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseNugetPackagesXmlData(responseBody)
     for _, entryStruct := range parsedPackagesDetailsStruct.Entry {
-        Checksum := entryStruct.Properties.PackageHash
-        ChecksumType := entryStruct.Properties.PackageHashAlgorithm
-        PkgFileUrl := entryStruct.ID
-        parsedNameAndVersionArr := ParsePkgNameAndVersionFromFileURL(PkgFileUrl)
-        
-
+        var pkgDetailsStruct NugetPackageDetailsStruct
+        pkgDetailsStruct.Checksum = entryStruct.Properties.PackageHash
+        pkgDetailsStruct.ChecksumType = entryStruct.Properties.PackageHashAlgorithm
+        pkgDetailsStruct.PkgFileUrl = entryStruct.ID
+        pkgDetailsStruct.Name = ""
+        pkgDetailsStruct.Version = ""
+        parsedNameAndVersionArr := ParsePkgNameAndVersionFromFileURL(pkgDetailsStruct.PkgFileUrl)
+        if parsedNameAndVersionArr == nil {continue}
+        pkgDetailsStruct.Name = parsedNameAndVersionArr[0]
+        pkgDetailsStruct.Version = parsedNameAndVersionArr[1]
+        parsedPackagesVersionsArr[curPkgDetailsInd] = pkgDetailsStruct
+        curPkgDetailsInd++
     }
     return parsedPackagesVersionsArr
 }
