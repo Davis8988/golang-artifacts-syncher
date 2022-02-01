@@ -185,6 +185,7 @@ func ParsePkgNameAndVersionFromFileURL(pkgFileUrl string) [] string {
     return resultArr
 }
 
+
 func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPackageDetailsStruct {
     parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 10)
     curPkgDetailsInd := 0
@@ -207,12 +208,11 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPa
     return parsedPackagesVersionsArr
 }
 
-func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] string {
+func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] NugetPackageDetailsStruct {
     
     responseBody := MakeAnHttpRequest(httpRequestArgs)
     if len(responseBody) == 0 {return nil}
-    ParseHttpRequestResponseForPackagesVersions(responseBody)
-    packagesAvailableVersions := make([] string, 0, 10)
+    parsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
 
-    return packagesAvailableVersions
+    return parsedPackagesDetailsArr
 }
