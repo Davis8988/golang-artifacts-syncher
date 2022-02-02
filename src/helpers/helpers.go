@@ -44,7 +44,17 @@ var (
 
     // Debug writes logs in the color cyan with "Debug: " as prefix
     LogDebug = log.New(os.Stdout, "\u001b[36mDebug: ", log.LstdFlags)
+
+    // Locks
+    convertSyncedMapToString_Lock sync.RWMutex
+    appendPkgDetailsArr_Lock sync.RWMutex
 )
+
+func Init() {
+    LogInfo.Print("Initializing helpers pkg vars")
+    convertSyncedMapToString_Lock = sync.RWMutex{}
+    appendPkgDetailsArr_Lock = sync.RWMutex{}
+}
 
 // Attempts to resolve an environment variable, 
 //  with a default value if it's empty
@@ -215,4 +225,18 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     parsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
 
     return parsedPackagesDetailsArr
+}
+
+func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
+	convertSyncedMapToString_Lock.Lock()
+	result := ConvertSyncedMapToString(synchedMap)
+	convertSyncedMapToString_Lock.Unlock()
+	return result
+}
+
+func Synched_AppendPkgDetailsObj(arr_1 [] NugetPackageDetailsStruct, arr_2 [] NugetPackageDetailsStruct) [] NugetPackageDetailsStruct {
+    appendPkgDetailsArr_Lock.Lock()
+    result := append(arr_1, arr_2...)
+    appendPkgDetailsArr_Lock.Unlock()
+    return result
 }

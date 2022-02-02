@@ -25,18 +25,11 @@ var (
 	httpRequestHeadersMap map[string] string
 	packagesToDownloadMap sync.Map
 
-	lock sync.RWMutex
 )
-
-func synched_convertSyncedMapToString(synchedMap sync.Map) string {
-	lock.Lock()
-	result := helpers.ConvertSyncedMapToString(synchedMap)
-	lock.Unlock()
-	return result
-}
 
 
 func initVars() {
+	helpers.Init()
 	helpers.LogInfo.Print("Initializing from envs vars")
 	userToUse = helpers.Getenv("USER_TO_USE", "")
 	passToUse = helpers.Getenv("PASS_TO_USE", "")
@@ -46,7 +39,6 @@ func initVars() {
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")  // Example: "key=value;key1=value1;key2=value2"
 	httpRequestTimeoutSeconds = helpers.StrToInt(helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
-	lock = sync.RWMutex{}
 }
 
 func printVars() {
@@ -61,7 +53,7 @@ func printVars() {
 	helpers.LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
 	helpers.LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
 	helpers.LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
-	packagesToDownloadMapStr := synched_convertSyncedMapToString(packagesToDownloadMap)
+	packagesToDownloadMapStr := helpers.Synched_ConvertSyncedMapToString(packagesToDownloadMap)
 	helpers.LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
 }
 
@@ -130,24 +122,37 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 } 
 
 func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetailsStruct {
-	var foundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
+	var totalFoundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
 	searchUrlsArr := prepareSearchAllPkgsVersionsUrlsArray()
+	//line below is my question
+	wg := sync.WaitGroup{}
+	
+	// Ensure all routines finish before returning
+	defer wg.Wait()
+
+
 	if len(searchUrlsArr) > 0 {
 		helpers.LogInfo.Printf("Checking %d URL addresses for pkgs versions", len(searchUrlsArr))
 		for _, urlToCheck := range searchUrlsArr {
-			httpRequestArgs := helpers.HttpRequestArgsStruct {
-				UrlAddress: urlToCheck,
-				HeadersMap: httpRequestHeadersMap,
-				UserToUse: userToUse,
-				PassToUse: passToUse,
-				TimeoutSec: httpRequestTimeoutSeconds,
-				Method: "GET",
-			}
-			foundPackagesDetailsArr = append(foundPackagesDetailsArr, helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)...)
+			wg.Add(1)
+			go func(urlToCheck string) {
+				defer wg.Done()
+				httpRequestArgs := helpers.HttpRequestArgsStruct {
+					UrlAddress: urlToCheck,
+					HeadersMap: httpRequestHeadersMap,
+					UserToUse: userToUse,
+					PassToUse: passToUse,
+					TimeoutSec: httpRequestTimeoutSeconds,
+					Method: "GET",
+				}
+				foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+				totalFoundPackagesDetailsArr = append(totalFoundPackagesDetailsArr, foundPackagesDetailsArr...)
+			}(urlToCheck)
 		}
 	}
+	wg.Wait()
 
-	return foundPackagesDetailsArr 
+	return totalFoundPackagesDetailsArr 
 }
 
 func downloadSpecifiedPackages() {
