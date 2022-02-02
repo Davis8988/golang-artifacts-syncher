@@ -129,8 +129,8 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 	return searchUrlsArr
 } 
 
-func searchAvailableVersionsOfSpecifiedPackages() []string {
-	var foundPackagesNamesArr []string
+func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetailsStruct {
+	var foundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
 	searchUrlsArr := prepareSearchAllPkgsVersionsUrlsArray()
 	if len(searchUrlsArr) > 0 {
 		helpers.LogInfo.Printf("Checking %d URL addresses for pkgs versions", len(searchUrlsArr))
@@ -143,11 +143,11 @@ func searchAvailableVersionsOfSpecifiedPackages() []string {
 				TimeoutSec: httpRequestTimeoutSeconds,
 				Method: "GET",
 			}
-			helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			foundPackagesDetailsArr = append(foundPackagesDetailsArr, helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)...)
 		}
 	}
 
-	return foundPackagesNamesArr 
+	return foundPackagesDetailsArr 
 }
 
 func downloadSpecifiedPackages() {
