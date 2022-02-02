@@ -230,13 +230,12 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
 	convertSyncedMapToString_Lock.Lock()
 	result := ConvertSyncedMapToString(synchedMap)
-	convertSyncedMapToString_Lock.Unlock()
+	defer convertSyncedMapToString_Lock.Unlock()
 	return result
 }
 
-func Synched_AppendPkgDetailsObj(arr_1 [] NugetPackageDetailsStruct, arr_2 [] NugetPackageDetailsStruct) [] NugetPackageDetailsStruct {
+func Synched_AppendPkgDetailsObj(arr_1 *[] NugetPackageDetailsStruct, arr_2 [] NugetPackageDetailsStruct) {
     appendPkgDetailsArr_Lock.Lock()
-    result := append(arr_1, arr_2...)
+    *arr_1 = append(*arr_1, arr_2...)
     appendPkgDetailsArr_Lock.Unlock()
-    return result
 }
