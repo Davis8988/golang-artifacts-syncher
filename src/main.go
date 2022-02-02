@@ -146,7 +146,7 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 					Method: "GET",
 				}
 				foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
-				totalFoundPackagesDetailsArr = append(totalFoundPackagesDetailsArr, foundPackagesDetailsArr...)
+				totalFoundPackagesDetailsArr = helpers.Synched_AppendPkgDetailsObj(totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
 			}(urlToCheck)
 		}
 	}
