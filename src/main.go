@@ -157,7 +157,7 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 
 func downloadSpecifiedPackages() {
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
-	helpers.LogInfo.Printf("Found packages: %v", foundPackagesArr)
+	helpers.LogInfo.Printf("Found packages: %d", len(foundPackagesArr))
 }
 
 func uploadDownloadedPackages() {

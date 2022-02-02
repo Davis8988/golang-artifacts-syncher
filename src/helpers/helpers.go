@@ -197,8 +197,7 @@ func ParsePkgNameAndVersionFromFileURL(pkgFileUrl string) [] string {
 
 
 func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPackageDetailsStruct {
-    parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 10)
-    curPkgDetailsInd := 0
+    parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 0)
     LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseNugetPackagesXmlData(responseBody)
     for _, entryStruct := range parsedPackagesDetailsStruct.Entry {
@@ -212,8 +211,7 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPa
         if parsedNameAndVersionArr == nil {continue}
         pkgDetailsStruct.Name = parsedNameAndVersionArr[0]
         pkgDetailsStruct.Version = parsedNameAndVersionArr[1]
-        parsedPackagesVersionsArr[curPkgDetailsInd] = pkgDetailsStruct
-        curPkgDetailsInd++
+        parsedPackagesVersionsArr = append(parsedPackagesVersionsArr, pkgDetailsStruct)
     }
     return parsedPackagesVersionsArr
 }
