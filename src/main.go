@@ -167,6 +167,7 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 			helpers.LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
 			continue
 		}
+		
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
