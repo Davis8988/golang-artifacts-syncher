@@ -11,7 +11,7 @@ import (
 var (
 	userToUse string
 	passToUse string
-	serversUrlsStr string
+	srcServersUrlsStr string
 	reposNamesStr string
 	packagesNamesStr string
 	packagesVersionsStr string
@@ -33,7 +33,7 @@ func initVars() {
 	helpers.LogInfo.Print("Initializing from envs vars")
 	userToUse = helpers.Getenv("USER_TO_USE", "")
 	passToUse = helpers.Getenv("PASS_TO_USE", "")
-	serversUrlsStr = helpers.Getenv("SERVERS_URLS_STR", "")
+	srcServersUrlsStr = helpers.Getenv("SRC_SERVERS_URLS_STR", "")
 	reposNamesStr = helpers.Getenv("REPOS_NAMES_STR", "")
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
@@ -43,7 +43,7 @@ func initVars() {
 }
 
 func printVars() {
-	helpers.LogInfo.Printf("SERVERS_URLS_STR: '%s'", serversUrlsStr)
+	helpers.LogInfo.Printf("SRC_SERVERS_URLS_STR: '%s'", srcServersUrlsStr)
 	helpers.LogInfo.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
 	helpers.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
 	helpers.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
@@ -88,7 +88,7 @@ func updateVars() {
 	reposNamesArr = make([]string, 0, 4)
 	packagesNamesArr = make([]string, 0, 10)
 	packagesVersionsArr = make([]string, 0, 10)
-	if len(serversUrlsStr) > 1 {serversUrlsArr = strings.Split(serversUrlsStr, ";")}
+	if len(srcServersUrlsStr) > 1 {serversUrlsArr = strings.Split(srcServersUrlsStr, ";")}
 	if len(reposNamesStr) > 1 {reposNamesArr = strings.Split(reposNamesStr, ";")}
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
