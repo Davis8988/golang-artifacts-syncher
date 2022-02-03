@@ -161,8 +161,7 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 				requestedVersion := ""
 				if i < len(versionsToSearchArr) {requestedVersion = versionsToSearchArr[i]}
 				foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
-				foundPackagesDetailsArr := filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr, requestedVersion)
-
+				foundPackagesDetailsArr = filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr, requestedVersion)
 				helpers.Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
 			}(urlToCheck)
 		}
