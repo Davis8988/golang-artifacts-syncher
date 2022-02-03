@@ -122,7 +122,7 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 					continue
 				}
 				for _, pkgVersion := range versionsToSearchArr {
-					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages(Id='" + pkgName + ",Version='" + pkgVersion + "')")
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')")
 				}
 				
 			}
@@ -214,12 +214,12 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 	return totalDownloadedPackagesDetailsArr
 }
 
-func uploadDownloadedPackages(downloadedPkgsArr [] helpers.DownloadPackageDetailsStruct) {
-	helpers.LogInfo.Printf("Uploading downloaded %d packages", len(downloadedPkgsArr))
-	for _, downloadedPkgStruct := range downloadedPkgsArr {
+// func uploadDownloadedPackages(downloadedPkgsArr [] helpers.DownloadPackageDetailsStruct) {
+// 	helpers.LogInfo.Printf("Uploading downloaded %d packages", len(downloadedPkgsArr))
+// 	for _, downloadedPkgStruct := range downloadedPkgsArr {
 		
-	}
-}
+// 	}
+// }
 
 func main() {
 	helpers.LogInfo.Print("Started")
@@ -229,7 +229,8 @@ func main() {
 	printVars()
 	validateEnv()
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
-	downloadedPkgsArr := downloadSpecifiedPackages(foundPackagesArr)
-	uploadDownloadedPackages(downloadedPkgsArr)
+	downloadSpecifiedPackages(foundPackagesArr)
+	// downloadedPkgsArr := downloadSpecifiedPackages(foundPackagesArr)
+	// uploadDownloadedPackages(downloadedPkgsArr)
 	helpers.LogInfo.Print("Finished")
 }

@@ -129,7 +129,7 @@ type PackagesDetailsXmlStruct struct {
 }
 
 
-func ParseNugetPackagesXmlData(xmlDataStr string) PackagesDetailsXmlStruct {
+func ParseMultipleNugetPackagesXmlData(xmlDataStr string) PackagesDetailsXmlStruct {
     xmlDataByteArr := []byte(xmlDataStr)
     var result PackagesDetailsXmlStruct
     xml.Unmarshal(xmlDataByteArr, &result)

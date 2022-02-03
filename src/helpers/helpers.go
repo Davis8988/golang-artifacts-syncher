@@ -298,7 +298,7 @@ func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
 func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPackageDetailsStruct {
     parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 0)
     LogInfo.Printf("Parsing http request response for packages details")
-    parsedPackagesDetailsStruct := nuget_packages_xml.ParseNugetPackagesXmlData(responseBody)
+    parsedPackagesDetailsStruct := nuget_packages_xml.ParseMultipleNugetPackagesXmlData(responseBody)
     for _, entryStruct := range parsedPackagesDetailsStruct.Entry {
         var pkgDetailsStruct NugetPackageDetailsStruct
         pkgDetailsStruct.Checksum = entryStruct.Properties.PackageHash
