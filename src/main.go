@@ -125,6 +125,7 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 } 
 
 func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct) [] helpers.NugetPackageDetailsStruct {
+	helpers.LogInfo.Printf("Filtering found pkgs by requested versions")
 	var filteredPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
 	for _, pkgDetailStruct := range foundPackagesDetailsArr {
 		pkgVersion := pkgDetailStruct.Version
