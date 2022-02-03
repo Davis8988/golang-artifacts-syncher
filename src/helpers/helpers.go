@@ -56,12 +56,14 @@ var (
     // Locks
     convertSyncedMapToString_Lock sync.RWMutex
     appendPkgDetailsArr_Lock sync.RWMutex
+    appendDownloadedPkgDetailsArr_Lock sync.RWMutex
 )
 
 func Init() {
     LogInfo.Print("Initializing helpers pkg vars")
     convertSyncedMapToString_Lock = sync.RWMutex{}
     appendPkgDetailsArr_Lock = sync.RWMutex{}
+    appendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
 }
 
 func GetCurrentProgramDir() string {
@@ -241,7 +243,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     return parsedPackagesDetailsArr
 }
 
-func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
+func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) [] helpers.NugetPackageDetailsStruct {
 
 }
 
@@ -256,4 +258,10 @@ func Synched_AppendPkgDetailsObj(arr_1 *[] NugetPackageDetailsStruct, arr_2 [] N
     appendPkgDetailsArr_Lock.Lock()
     *arr_1 = append(*arr_1, arr_2...)
     appendPkgDetailsArr_Lock.Unlock()
+}
+
+func Synched_AppendDownalodedPkgDetailsObj(arr_1 *[] DownloadPackageDetailsStruct, arr_2 [] DownloadPackageDetailsStruct) {
+    appendDownloadedPkgDetailsArr_Lock.Lock()
+    *arr_1 = append(*arr_1, arr_2...)
+    appendDownloadedPkgDetailsArr_Lock.Unlock()
 }
