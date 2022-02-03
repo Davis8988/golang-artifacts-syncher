@@ -163,8 +163,8 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 	defer wg.Wait()
 
 	for _, pkgDetailsStruct := range foundPackagesArr {
-		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Name) == 0 {
-			helpers.LogInfo.Print("Skipping downloading of unnamed/unversioned pkg")
+		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
+			helpers.LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
 			continue
 		}
 		wg.Add(1)
