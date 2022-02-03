@@ -155,9 +155,8 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 	return totalFoundPackagesDetailsArr 
 }
 
-func downloadSpecifiedPackages() {
-	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
-	helpers.LogInfo.Printf("Found packages: %d", len(foundPackagesArr))
+func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsStruct) {
+	helpers.LogInfo.Printf("Found %d packages", len(foundPackagesArr))
 }
 
 func uploadDownloadedPackages() {
@@ -171,7 +170,8 @@ func main() {
 	updateVars()
 	printVars()
 	validateEnv()
-	downloadSpecifiedPackages()
+	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
+	downloadSpecifiedPackages(foundPackagesArr)
 	uploadDownloadedPackages()
 	helpers.LogInfo.Print("Finished")
 }
