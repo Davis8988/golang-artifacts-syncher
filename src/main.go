@@ -140,6 +140,28 @@ func prepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 	return searchUrlsArr
 } 
 
+func prepareDestSearchAllPkgsVersionsUrlsArray() []string {
+	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
+	
+	helpers.LogInfo.Print("Preparing src search packages urls array")
+	for _, srcServerUrl := range srcServersUrlsArr {
+		for _, repoName := range srcReposNamesArr {
+			for _, pkgName := range packagesNamesArr {
+				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
+				if len(versionsToSearchArr) == 0 {  // Either use search
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Search()?id='" + pkgName + "'")
+					continue
+				}                   // Or specific package details request for each specified requested version
+				for _, pkgVersion := range versionsToSearchArr {
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')")
+				}
+				
+			}
+		}
+	}
+	return searchUrlsArr
+} 
+
 func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct) [] helpers.NugetPackageDetailsStruct {
 	helpers.LogInfo.Printf("Filtering found pkgs by requested versions")
 	var filteredPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
