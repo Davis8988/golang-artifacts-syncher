@@ -16,6 +16,7 @@ import (
 	"errors"
     "path/filepath"
     "crypto/sha512"
+    "encoding/base64"
 )
 
 
@@ -196,7 +197,7 @@ func CalculateFileChecksum(filePath string) string {
         panic(err)
     }
 
-    return string(h.Sum(nil))  // nil instead of a byte array to append to
+    return base64.StdEncoding.EncodeToString(h.Sum(nil))  // nil instead of a byte array to append to
 }
 
 func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
@@ -248,7 +249,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
         if len(downloadFileChecksum) > 0 {
             currentFileChecksum := CalculateFileChecksum(downloadFilePath)
             if currentFileChecksum == downloadFileChecksum {
-                LogDebug.Printf("File to download match existing file's checksum - skipping downloading..")
+                LogDebug.Printf("Checksum match: download target file already exists. Skipping download..")
                 return "" // Finish here
             }
         }
