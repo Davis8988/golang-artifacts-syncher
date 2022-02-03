@@ -135,9 +135,7 @@ func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr [] helpers.Nu
 			continue
 		}
 		for _, requestedVersion := range versionsToSearchArr {
-			if pkgVersion == requestedVersion {
-				filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)  // This version is requested - Add pkg details obj to the result filtered array
-			} 
+			if pkgVersion == requestedVersion {filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)}  // This version is requested - Add pkg details obj to the result filtered array
 		}
 	}
 	return filteredPackagesDetailsArr
@@ -154,7 +152,7 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 
 	if len(searchUrlsArr) > 0 {
 		helpers.LogInfo.Printf("Checking %d URL addresses for pkgs versions", len(searchUrlsArr))
-		for i, urlToCheck := range searchUrlsArr {
+		for _, urlToCheck := range searchUrlsArr {
 			wg.Add(1)
 			go func(urlToCheck string) {
 				defer wg.Done()
