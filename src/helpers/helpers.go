@@ -315,7 +315,7 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPa
     parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 0)
     LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseMultipleNugetPackagesXmlData(responseBody)
-    if len(parsedPackagesDetailsStruct.Entry) == 0 {
+    if len(parsedPackagesDetailsStruct.Entry) == 0 {  // If failed to parse entries, it might be only a single entry and in that case attempt to parse it
         entryStruct := nuget_packages_xml.ParseSingleNugetPackagesXmlData(responseBody)
         pkgDetailsStruct := ParseXmlDataToSinglePkgDetailsStruct(entryStruct)
         parsedPackagesVersionsArr = append(parsedPackagesVersionsArr, pkgDetailsStruct)
