@@ -140,18 +140,6 @@ func prepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 	return searchUrlsArr
 } 
 
-func prepareDestSearchAllPkgsVersionsUrlsArray(pkgName string, pkgVersion string) []string {
-	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
-	
-	helpers.LogInfo.Print("Preparing dest search packages urls array")
-	for _, srcServerUrl := range destServersUrlsArr {
-		for _, repoName := range destReposNamesArr {
-			searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')")
-		}
-	}
-	return searchUrlsArr
-} 
-
 func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct) [] helpers.NugetPackageDetailsStruct {
 	helpers.LogInfo.Printf("Filtering found pkgs by requested versions")
 	var filteredPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
@@ -239,22 +227,21 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 	helpers.LogInfo.Printf("Uploading package: %s==%s", downloadedPkgStruct.PkgDetailsStruct.Name, downloadedPkgStruct.PkgDetailsStruct.Version)
 	pkgName := downloadedPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := downloadedPkgStruct.PkgDetailsStruct.Version
-	searchUrlsArr := prepareDestSearchAllPkgsVersionsUrlsArray(pkgName, pkgVersion)
 	
-	if len(searchUrlsArr) > 0 {
-		helpers.LogInfo.Printf("Checking %d dest URL addresses for pkgs versions", len(searchUrlsArr))
-		for _, urlToCheck := range searchUrlsArr {
+	for _, srcServerUrl := range destServersUrlsArr {
+		for _, repoName := range destReposNamesArr {
+			helpers.LogInfo.Printf("Checking %d dest URL addresses for pkgs versions", len(searchUrlsArr))
+			checkDestServerPkgExistUrl := srcServerUrl + "/" + repoName + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
 			httpRequestArgs := helpers.HttpRequestArgsStruct {
-				UrlAddress: urlToCheck,
+				UrlAddress: checkDestServerPkgExistUrl,
 				HeadersMap: httpRequestHeadersMap,
 				UserToUse: userToUse,
 				PassToUse: passToUse,
 				TimeoutSec: httpRequestTimeoutSecondsInt,
 				Method: "GET",
 			}
+
 			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
-			
-			
 		}
 	}
 
