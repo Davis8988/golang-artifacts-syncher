@@ -39,6 +39,7 @@ func initVars() {
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")  // Example: "key=value;key1=value1;key2=value2"
+	downloadPkgsDirPath = helpers.Getenv("DOWNLOAD_PKGS_DIR_PATH", helpers.GetCurrentProgramDir())
 	httpRequestTimeoutSecondsInt = helpers.StrToInt(helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
 
