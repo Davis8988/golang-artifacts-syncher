@@ -209,6 +209,9 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 
 func uploadDownloadedPackages(downloadedPkgsArr [] helpers.DownloadPackageDetailsStruct) {
 	helpers.LogInfo.Printf("Uploading downloaded %d packages", len(downloadedPkgsArr))
+	for _, downloadedPkgStruct := range downloadedPkgsArr {
+
+	}
 }
 
 func main() {
