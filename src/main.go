@@ -23,6 +23,7 @@ var (
 	srcServersUrlsArr [] string
 	srcReposNamesArr [] string
 	destServersUrlsArr [] string
+	destReposNamesArr [] string
 	packagesNamesArr [] string
 	packagesVersionsArr [] string
 	httpRequestHeadersMap map[string] string
