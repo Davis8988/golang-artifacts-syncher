@@ -66,9 +66,9 @@ func Init() {
     appendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
 }
 
-func trimQuotes(s string) string {
+func TrimQuotes(s string) string {
     if len(s) >= 2 {
-        if s[0] == '"' && s[len(s)-1] == '"' {
+        if c := s[len(s)-1]; s[0] == c && (c == '"' || c == '\'') {
             return s[1 : len(s)-1]
         }
     }
@@ -220,7 +220,7 @@ func ParsePkgNameAndVersionFromFileURL(pkgFileUrl string) [] string {
         return nil
     }
     // Trim
-    for i, value := range resultArr {resultArr[i] = trimQuotes(value)}
+    for i, value := range resultArr {resultArr[i] = TrimQuotes(value)}
     return resultArr
 }
 
@@ -254,7 +254,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 }
 
 func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) [] DownloadPackageDetailsStruct {
-    LogInfo.Printf("Downloading pkg: %s-%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
+    LogInfo.Printf("Downloading pkg: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     return [] DownloadPackageDetailsStruct{downloadPkgDetailsStruct}
 }
 
