@@ -1,11 +1,12 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"golang-artifacts-syncher/src/helpers"
 	"golang-artifacts-syncher/src/nexus3_adapter"
-	"flag"
-	"sync"
 	"strings"
+	"sync"
 )
 
 var (
@@ -224,14 +225,15 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 }
 
 func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsStruct) helpers.DownloadPackageDetailsStruct {
-	helpers.LogInfo.Printf("Uploading package: %s==%s", downloadedPkgStruct.PkgDetailsStruct.Name, downloadedPkgStruct.PkgDetailsStruct.Version)
+	pkgPrintStr := fmt.Sprintf("%s==%s", downloadedPkgStruct.PkgDetailsStruct.Name, downloadedPkgStruct.PkgDetailsStruct.Version)
+	helpers.LogInfo.Printf("Uploading package: %s", pkgPrintStr)
 	pkgName := downloadedPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := downloadedPkgStruct.PkgDetailsStruct.Version
 	
 	for _, destServerUrl := range destServersUrlsArr {
 		for _, repoName := range destReposNamesArr {
 			destServerRepo := destServerUrl + "/" + repoName
-			helpers.LogInfo.Printf("Checking dest server for existing pkg version: %s", destServerRepo)
+			helpers.LogInfo.Printf("Checking if pkg: '%s' exists at dest server: %s", pkgPrintStr, destServerRepo)
 			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
 			httpRequestArgs := helpers.HttpRequestArgsStruct {
 				UrlAddress: checkDestServerPkgExistUrl,
