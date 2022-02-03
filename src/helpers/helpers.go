@@ -12,6 +12,7 @@ import (
 	"time"
 	"strconv"
 	"regexp"
+    "path/filepath"
 )
 
 
@@ -54,6 +55,14 @@ func Init() {
     LogInfo.Print("Initializing helpers pkg vars")
     convertSyncedMapToString_Lock = sync.RWMutex{}
     appendPkgDetailsArr_Lock = sync.RWMutex{}
+}
+
+func GetCurrentProgramDir() string {
+    ex, err := os.Executable()
+    if err != nil {
+        LogError.Panicln("%s\nFailed getting current program's dir", err)
+    }
+    return filepath.Dir(ex)
 }
 
 // Attempts to resolve an environment variable, 
