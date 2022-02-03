@@ -156,7 +156,23 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 }
 
 func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsStruct) {
-	helpers.LogInfo.Printf("Found %d packages", len(foundPackagesArr))
+	helpers.LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
+	//line below is my question
+	wg := sync.WaitGroup{}
+	// Ensure all routines finish before returning
+	defer wg.Wait()
+
+	for _, pkgDetailsStruct := range foundPackagesArr {
+		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Name) == 0 {
+			helpers.LogInfo.Print("Skipping downloading of unnamed/unversioned pkg")
+			continue
+		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			
+		}()
+	}
 }
 
 func uploadDownloadedPackages() {

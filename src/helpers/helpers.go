@@ -225,6 +225,10 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     return parsedPackagesDetailsArr
 }
 
+func DownloadPkg() {
+
+}
+
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
 	convertSyncedMapToString_Lock.Lock()
 	result := ConvertSyncedMapToString(synchedMap)
