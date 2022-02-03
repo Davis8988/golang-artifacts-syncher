@@ -46,6 +46,7 @@ func initVars() {
 
 func printVars() {
 	helpers.LogInfo.Printf("SRC_SERVERS_URLS_STR: '%s'", srcServersUrlsStr)
+	helpers.LogInfo.Printf("DEST_SERVERS_URLS_STR: '%s'", destServersUrlsStr)
 	helpers.LogInfo.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
 	helpers.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
 	helpers.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
