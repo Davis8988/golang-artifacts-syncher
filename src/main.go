@@ -16,7 +16,7 @@ var (
 	packagesNamesStr string
 	packagesVersionsStr string
 	httpRequestHeadersStr string
-	httpRequestTimeoutSeconds int
+	httpRequestTimeoutSecondsInt int
 
 	serversUrlsArr [] string
 	reposNamesArr [] string
@@ -38,7 +38,7 @@ func initVars() {
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")  // Example: "key=value;key1=value1;key2=value2"
-	httpRequestTimeoutSeconds = helpers.StrToInt(helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
+	httpRequestTimeoutSecondsInt = helpers.StrToInt(helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
 
 func printVars() {
@@ -47,7 +47,7 @@ func printVars() {
 	helpers.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
 	helpers.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
 	helpers.LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
-	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSeconds)
+	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSecondsInt)
 	
 	helpers.LogInfo.Printf("serversUrlsArr: %v", serversUrlsArr)
 	helpers.LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
@@ -142,7 +142,7 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 					HeadersMap: httpRequestHeadersMap,
 					UserToUse: userToUse,
 					PassToUse: passToUse,
-					TimeoutSec: httpRequestTimeoutSeconds,
+					TimeoutSec: httpRequestTimeoutSecondsInt,
 					Method: "GET",
 				}
 				foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
@@ -167,7 +167,7 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 			helpers.LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
 			continue
 		}
-		
+
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
