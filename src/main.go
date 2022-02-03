@@ -117,10 +117,10 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 		for _, repoName := range reposNamesArr {
 			for _, pkgName := range packagesNamesArr {
 				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
-				if len(versionsToSearchArr) == 0 {
+				if len(versionsToSearchArr) == 0 {  // Either use search
 					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Search()?id='" + pkgName + "'")
 					continue
-				}
+				}                   // Or specific package details request
 				for _, pkgVersion := range versionsToSearchArr {
 					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')")
 				}
