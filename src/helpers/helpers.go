@@ -271,9 +271,9 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     }
 
     bodyStr := string(body)
-    msgStr := bodyStr
+    /* msgStr := bodyStr
     if len(response.Status) > 0 {msgStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
-    LogDebug.Printf(msgStr)
+    LogDebug.Printf(msgStr) */
 
     if response.StatusCode >= 400 {LogError.Printf("Failed querying: %s", urlAddress)}
 
