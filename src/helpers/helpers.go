@@ -260,7 +260,7 @@ func Synched_AppendPkgDetailsObj(arr_1 *[] NugetPackageDetailsStruct, arr_2 [] N
     appendPkgDetailsArr_Lock.Unlock()
 }
 
-func Synched_AppendDownalodedPkgDetailsObj(arr_1 *[] DownloadPackageDetailsStruct, arr_2 [] DownloadPackageDetailsStruct) {
+func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] DownloadPackageDetailsStruct, arr_2 [] DownloadPackageDetailsStruct) {
     appendDownloadedPkgDetailsArr_Lock.Lock()
     *arr_1 = append(*arr_1, arr_2...)
     appendDownloadedPkgDetailsArr_Lock.Unlock()
