@@ -13,7 +13,7 @@ var (
 	passToUse string
 	srcServersUrlsStr string
 	destServersUrlsStr string
-	reposNamesStr string
+	srcReposNamesStr string
 	packagesNamesStr string
 	packagesVersionsStr string
 	httpRequestHeadersStr string
@@ -37,7 +37,7 @@ func initVars() {
 	passToUse = helpers.Getenv("PASS_TO_USE", "")
 	srcServersUrlsStr = helpers.Getenv("SRC_SERVERS_URLS_STR", "")
 	destServersUrlsStr = helpers.Getenv("DEST_SERVERS_URLS_STR", "")
-	reposNamesStr = helpers.Getenv("REPOS_NAMES_STR", "")
+	srcReposNamesStr = helpers.Getenv("SRC_REPOS_NAMES_STR", "")
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")  // Example: "key=value;key1=value1;key2=value2"
@@ -48,7 +48,7 @@ func initVars() {
 func printVars() {
 	helpers.LogInfo.Printf("SRC_SERVERS_URLS_STR: '%s'", srcServersUrlsStr)
 	helpers.LogInfo.Printf("DEST_SERVERS_URLS_STR: '%s'", destServersUrlsStr)
-	helpers.LogInfo.Printf("REPOS_NAMES_STR: '%s'", reposNamesStr)
+	helpers.LogInfo.Printf("SRC_REPOS_NAMES_STR: '%s'", srcReposNamesStr)
 	helpers.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
 	helpers.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
 	helpers.LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
@@ -96,7 +96,7 @@ func updateVars() {
 	packagesVersionsArr = make([]string, 0, 10)
 	if len(srcServersUrlsStr) > 1 {srcServersUrlsArr = strings.Split(srcServersUrlsStr, ";")}
 	if len(destServersUrlsStr) > 1 {destServersUrlsArr = strings.Split(destServersUrlsStr, ";")}
-	if len(reposNamesStr) > 1 {reposNamesArr = strings.Split(reposNamesStr, ";")}
+	if len(srcReposNamesStr) > 1 {reposNamesArr = strings.Split(srcReposNamesStr, ";")}
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
 	httpRequestHeadersMap = helpers.ParseHttpHeadersStrToMap(httpRequestHeadersStr)
