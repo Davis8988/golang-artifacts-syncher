@@ -12,6 +12,7 @@ var (
 	userToUse string
 	passToUse string
 	srcServersUrlsStr string
+	destServersUrlsStr string
 	reposNamesStr string
 	packagesNamesStr string
 	packagesVersionsStr string
@@ -34,6 +35,7 @@ func initVars() {
 	userToUse = helpers.Getenv("USER_TO_USE", "")
 	passToUse = helpers.Getenv("PASS_TO_USE", "")
 	srcServersUrlsStr = helpers.Getenv("SRC_SERVERS_URLS_STR", "")
+	destServersUrlsStr = helpers.Getenv("DEST_SERVERS_URLS_STR", "")
 	reposNamesStr = helpers.Getenv("REPOS_NAMES_STR", "")
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
