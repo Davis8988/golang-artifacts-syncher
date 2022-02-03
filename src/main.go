@@ -124,14 +124,22 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 	return searchUrlsArr
 } 
 
-func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct, requestedVersion string) [] helpers.NugetPackageDetailsStruct {
-	if len(requestedVersion) == 0 {return foundPackagesDetailsArr}  // If not requested version specified - no filtering is done
+func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct) [] helpers.NugetPackageDetailsStruct {
 	var filteredPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
+	resultArrPtr := foundPackagesDetailsArr
 	for _, pkgDetailStruct := range foundPackagesDetailsArr {
 		pkgVersion := pkgDetailStruct.Version
-		if pkgVersion == requestedVersion {filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)}  // This version is requested - Add pkg details obj to the result filtered array
+		pkgName := pkgDetailStruct.Name
+		versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)  // Use global var: packagesToDownloadMap
+		if len(versionsToSearchArr) == 0 {continue}
+		for _, requestedVersion := range versionsToSearchArr {
+			if pkgVersion == requestedVersion {
+				filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)  // This version is requested - Add pkg details obj to the result filtered array
+				resultArrPtr = filteredPackagesDetailsArr
+			} 
+		}
 	}
-	return filteredPackagesDetailsArr
+	return resultArrPtr
 }
 
 func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetailsStruct {
@@ -142,8 +150,6 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 	
 	// Ensure all routines finish before returning
 	defer wg.Wait()
-
-	versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
 
 	if len(searchUrlsArr) > 0 {
 		helpers.LogInfo.Printf("Checking %d URL addresses for pkgs versions", len(searchUrlsArr))
@@ -159,10 +165,8 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 					TimeoutSec: httpRequestTimeoutSecondsInt,
 					Method: "GET",
 				}
-				requestedVersion := ""
-				if i < len(versionsToSearchArr) {requestedVersion = versionsToSearchArr[i]}
 				foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
-				foundPackagesDetailsArr = filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr, requestedVersion)  // Filter by requested version - if any..
+				foundPackagesDetailsArr = filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr)  // Filter by requested version - if any version is specified..
 				helpers.Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
 			}(urlToCheck)
 		}
