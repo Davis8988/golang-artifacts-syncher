@@ -22,7 +22,7 @@ var (
 
 	srcServersUrlsArr [] string
 	destServersUrlsArr [] string
-	reposNamesArr [] string
+	srcReposNamesArr [] string
 	packagesNamesArr [] string
 	packagesVersionsArr [] string
 	httpRequestHeadersMap map[string] string
@@ -57,7 +57,7 @@ func printVars() {
 	
 	helpers.LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
 	helpers.LogInfo.Printf("destServersUrlsArr: %v", destServersUrlsArr)
-	helpers.LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
+	helpers.LogInfo.Printf("srcReposNamesArr: %v", srcReposNamesArr)
 	helpers.LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
 	helpers.LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
 	packagesToDownloadMapStr := helpers.Synched_ConvertSyncedMapToString(packagesToDownloadMap)
@@ -91,12 +91,12 @@ func updateVars() {
 	helpers.LogInfo.Print("Updating vars")
 	srcServersUrlsArr = make([]string, 0, 4)
 	destServersUrlsArr = make([]string, 0, 4)
-	reposNamesArr = make([]string, 0, 4)
+	srcReposNamesArr = make([]string, 0, 4)
 	packagesNamesArr = make([]string, 0, 10)
 	packagesVersionsArr = make([]string, 0, 10)
 	if len(srcServersUrlsStr) > 1 {srcServersUrlsArr = strings.Split(srcServersUrlsStr, ";")}
 	if len(destServersUrlsStr) > 1 {destServersUrlsArr = strings.Split(destServersUrlsStr, ";")}
-	if len(srcReposNamesStr) > 1 {reposNamesArr = strings.Split(srcReposNamesStr, ";")}
+	if len(srcReposNamesStr) > 1 {srcReposNamesArr = strings.Split(srcReposNamesStr, ";")}
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
 	httpRequestHeadersMap = helpers.ParseHttpHeadersStrToMap(httpRequestHeadersStr)
@@ -118,7 +118,7 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 	
 	helpers.LogInfo.Print("Preparing src search packages urls array")
 	for _, srcServerUrl := range srcServersUrlsArr {
-		for _, repoName := range reposNamesArr {
+		for _, repoName := range srcReposNamesArr {
 			for _, pkgName := range packagesNamesArr {
 				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
 				if len(versionsToSearchArr) == 0 {  // Either use search
