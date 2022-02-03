@@ -294,23 +294,36 @@ func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
     return resultArr
 }
 
+func ParseXmlDataToSinglePkgDetailsStruct(entryStruct nuget_packages_xml.SinglePackagesDetailsXmlStruct) NugetPackageDetailsStruct {
+    var pkgDetailsStruct NugetPackageDetailsStruct
+    pkgDetailsStruct.Checksum = entryStruct.Properties.PackageHash
+    pkgDetailsStruct.ChecksumType = entryStruct.Properties.PackageHashAlgorithm
+    pkgDetailsStruct.PkgDetailsUrl = entryStruct.ID
+    pkgDetailsStruct.PkgFileUrl = entryStruct.Content.Src
+    pkgDetailsStruct.Name = ""
+    pkgDetailsStruct.Version = ""
+    parsedNameAndVersionArr := ParsePkgNameAndVersionFromFileURL(pkgDetailsStruct.PkgDetailsUrl)
+    if parsedNameAndVersionArr != nil {
+        pkgDetailsStruct.Name = parsedNameAndVersionArr[0]
+        pkgDetailsStruct.Version = parsedNameAndVersionArr[1]
+    }
+    return pkgDetailsStruct
+}
+
 
 func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPackageDetailsStruct {
     parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 0)
     LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseMultipleNugetPackagesXmlData(responseBody)
+    if len(parsedPackagesDetailsStruct.Entry) == 0 {
+        entryStruct := nuget_packages_xml.ParseSingleNugetPackagesXmlData(responseBody)
+        pkgDetailsStruct := ParseXmlDataToSinglePkgDetailsStruct(entryStruct)
+        parsedPackagesVersionsArr = append(parsedPackagesVersionsArr, pkgDetailsStruct)
+        return parsedPackagesVersionsArr
+    }
     for _, entryStruct := range parsedPackagesDetailsStruct.Entry {
-        var pkgDetailsStruct NugetPackageDetailsStruct
-        pkgDetailsStruct.Checksum = entryStruct.Properties.PackageHash
-        pkgDetailsStruct.ChecksumType = entryStruct.Properties.PackageHashAlgorithm
-        pkgDetailsStruct.PkgDetailsUrl = entryStruct.ID
-        pkgDetailsStruct.PkgFileUrl = entryStruct.Content.Src
-        pkgDetailsStruct.Name = ""
-        pkgDetailsStruct.Version = ""
-        parsedNameAndVersionArr := ParsePkgNameAndVersionFromFileURL(pkgDetailsStruct.PkgDetailsUrl)
-        if parsedNameAndVersionArr == nil {continue}
-        pkgDetailsStruct.Name = parsedNameAndVersionArr[0]
-        pkgDetailsStruct.Version = parsedNameAndVersionArr[1]
+        pkgDetailsStruct := ParseXmlDataToSinglePkgDetailsStruct(entryStruct)
+        if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {continue}
         parsedPackagesVersionsArr = append(parsedPackagesVersionsArr, pkgDetailsStruct)
     }
     return parsedPackagesVersionsArr
