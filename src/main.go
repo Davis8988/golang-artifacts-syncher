@@ -112,7 +112,7 @@ func updateVars() {
 func prepareSearchAllPkgsVersionsUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
-	helpers.LogInfo.Print("Preparing search packages urls array")
+	helpers.LogInfo.Print("Preparing src search packages urls array")
 	searchOptionsUrl := "Search()?"
 	for _, srcServerUrl := range srcServersUrlsArr {
 		for _, repoName := range reposNamesArr {
