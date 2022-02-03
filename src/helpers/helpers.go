@@ -220,11 +220,8 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     
     // If got: downloadFilePath var, then Writer the body to file
     if len(downloadFilePath) > 0 {
-        downloadDir := filepath.Dir(downloadFilePath)
         LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
-        CreateDir(downloadDir)
-        // Create the file
-        fileHandle := CreateFile(downloadFilePath)
+        fileHandle := CreateFile(downloadFilePath)  // Create the file
         defer fileHandle.Close()
 
         _, err = io.Copy(fileHandle, response.Body)
