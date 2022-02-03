@@ -182,6 +182,7 @@ func CreateFile(filePath string) *os.File {
 func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     urlAddress := httpRequestArgs.UrlAddress
     downloadFilePath := httpRequestArgs.DownloadFilePath
+    downloadFileChecksum := httpRequestArgs.DownloadFileChecksum
     headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
     password := httpRequestArgs.PassToUse
@@ -224,6 +225,13 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     // If got: downloadFilePath var, then Writer the body to file
     if len(downloadFilePath) > 0 {
         LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
+        if len(downloadFileChecksum) > 0 {
+            currentFileChecksum := CalculateFileChecksum(downloadFilePath)
+            if currentFileChecksum == downloadFileChecksum {
+                LogDebug.Printf("File to download match existing file's checksum - skipping downloading..")
+                return "" // Finish here
+            }
+        }
         fileHandle := CreateFile(downloadFilePath)  // Create the file
         defer fileHandle.Close()
 
