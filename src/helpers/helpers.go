@@ -243,7 +243,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 }
 
 func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) [] DownloadPackageDetailsStruct {
-
+    return [] DownloadPackageDetailsStruct{downloadPkgDetailsStruct}
 }
 
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
