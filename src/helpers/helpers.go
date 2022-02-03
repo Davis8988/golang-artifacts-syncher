@@ -60,7 +60,7 @@ func Init() {
 func GetCurrentProgramDir() string {
     ex, err := os.Executable()
     if err != nil {
-        LogError.Panicln("%s\nFailed getting current program's dir", err)
+        LogError.Fatalf("%s\nFailed getting current program's dir", err)
     }
     return filepath.Dir(ex)
 }
