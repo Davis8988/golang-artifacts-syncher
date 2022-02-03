@@ -135,3 +135,10 @@ func ParseMultipleNugetPackagesXmlData(xmlDataStr string) PackagesDetailsXmlStru
     xml.Unmarshal(xmlDataByteArr, &result)
     return result
 }
+
+func ParseSingleNugetPackagesXmlData(xmlDataStr string) PackagesDetailsXmlStruct {
+    xmlDataByteArr := []byte(xmlDataStr)
+    var result PackagesDetailsXmlStruct
+    xml.Unmarshal(xmlDataByteArr, &result)
+    return result
+}
