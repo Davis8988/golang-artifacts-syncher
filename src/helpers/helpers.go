@@ -19,7 +19,9 @@ import (
 
 type HttpRequestArgsStruct struct {
 	UrlAddress  string
-	downloadFilePath  string
+	DownloadFilePath  string
+	DownloadFileChecksum  string
+	DownloadFileChecksumType  string
 	HeadersMap  map[string]string
     UserToUse  string
     PassToUse  string
@@ -179,7 +181,7 @@ func CreateFile(filePath string) *os.File {
 
 func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     urlAddress := httpRequestArgs.UrlAddress
-    downloadFilePath := httpRequestArgs.downloadFilePath
+    downloadFilePath := httpRequestArgs.DownloadFilePath
     headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
     password := httpRequestArgs.PassToUse
@@ -298,11 +300,13 @@ func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
     fileName := downloadPkgDetailsStruct.PkgDetailsStruct.Name + "." + downloadPkgDetailsStruct.PkgDetailsStruct.Version + ".nupkg"
     downloadFilePath := filepath.Join(downloadPkgDetailsStruct.DownloadPath, fileName)
+    fileChecksum := downloadPkgDetailsStruct.PkgDetailsStruct.Checksum
     MakeHttpRequest(
         HttpRequestArgsStruct{
             UrlAddress: fileUrl,
             Method: "GET",
-            downloadFilePath: downloadFilePath,
+            DownloadFilePath: downloadFilePath,
+            DownloadFileChecksum: fileChecksum,
         },
     )
 }
