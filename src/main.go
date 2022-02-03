@@ -177,8 +177,8 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 }
 
 func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsStruct) [] helpers.DownloadPackageDetailsStruct {
-	var totalDownloadedPackagesDetailsArr [] helpers.DownloadPackageDetailsStruct
 	helpers.LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
+	var totalDownloadedPackagesDetailsArr [] helpers.DownloadPackageDetailsStruct
 	
 	wg := sync.WaitGroup{}
 	// Ensure all routines finish before returning
@@ -207,8 +207,8 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 	return totalDownloadedPackagesDetailsArr
 }
 
-func uploadDownloadedPackages() {
-
+func uploadDownloadedPackages(downloadedPkgsArr [] helpers.DownloadPackageDetailsStruct) {
+	helpers.LogInfo.Printf("Uploading downloaded %d packages", len(downloadedPkgsArr))
 }
 
 func main() {
@@ -219,7 +219,7 @@ func main() {
 	printVars()
 	validateEnv()
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
-	downloadSpecifiedPackages(foundPackagesArr)
-	uploadDownloadedPackages()
+	downloadedPkgsArr := downloadSpecifiedPackages(foundPackagesArr)
+	uploadDownloadedPackages(downloadedPkgsArr)
 	helpers.LogInfo.Print("Finished")
 }
