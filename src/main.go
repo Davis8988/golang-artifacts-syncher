@@ -28,7 +28,6 @@ var (
 
 )
 
-
 func initVars() {
 	helpers.Init()
 	helpers.LogInfo.Print("Initializing from envs vars")
