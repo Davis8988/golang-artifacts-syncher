@@ -161,6 +161,7 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsStruct) {
 	var totalDownloadedPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
 	helpers.LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
+	
 	//line below is my question
 	wg := sync.WaitGroup{}
 	// Ensure all routines finish before returning
