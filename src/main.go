@@ -242,7 +242,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 				Method: "GET",
 			}
 
-			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 		}
 	}
 
@@ -250,7 +250,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 }
 
 func uploadDownloadedPackages(downloadedPkgsArr [] helpers.DownloadPackageDetailsStruct) {
-	helpers.LogInfo.Printf("Uploading downloaded %d packages", len(downloadedPkgsArr))
+	helpers.LogInfo.Printf("Uploading %d downloaded packages", len(downloadedPkgsArr))
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
 		uploadDownloadedPackage(downloadedPkgStruct)
 	}
