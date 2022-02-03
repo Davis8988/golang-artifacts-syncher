@@ -319,7 +319,7 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPa
         entryStruct := nuget_packages_xml.ParseSingleNugetPackagesXmlData(responseBody)
         pkgDetailsStruct := ParseXmlDataToSinglePkgDetailsStruct(entryStruct)
         parsedPackagesVersionsArr = append(parsedPackagesVersionsArr, pkgDetailsStruct)
-        return parsedPackagesVersionsArr
+        return parsedPackagesVersionsArr  
     }
     for _, entryStruct := range parsedPackagesDetailsStruct.Entry {
         pkgDetailsStruct := ParseXmlDataToSinglePkgDetailsStruct(entryStruct)
