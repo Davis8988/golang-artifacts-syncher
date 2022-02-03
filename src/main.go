@@ -14,6 +14,7 @@ var (
 	srcServersUrlsStr string
 	srcReposNamesStr string
 	destServersUrlsStr string
+	destReposNamesStr string
 	packagesNamesStr string
 	packagesVersionsStr string
 	httpRequestHeadersStr string
