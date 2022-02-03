@@ -181,7 +181,7 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 		go func(downloadPkgDetailsStruct helpers.DownloadPackageDetailsStruct) {
 			defer wg.Done()
 			downloadedPackagesDetailsArr := helpers.DownloadPkg(downloadPkgDetailsStruct)
-			helpers.Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
+			helpers.Synched_AppendPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadedPackagesDetailsArr)
 		}(downloadPkgDetailsStruct)
 	}
 }
