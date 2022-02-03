@@ -13,7 +13,6 @@ import (
 	"time"
 	"strconv"
 	"regexp"
-	"errors"
     "path/filepath"
 )
 
