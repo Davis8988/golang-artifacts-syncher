@@ -120,7 +120,7 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 				if len(versionsToSearchArr) == 0 {  // Either use search
 					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Search()?id='" + pkgName + "'")
 					continue
-				}                   // Or specific package details request
+				}                   // Or specific package details request for each specified requested version
 				for _, pkgVersion := range versionsToSearchArr {
 					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')")
 				}
