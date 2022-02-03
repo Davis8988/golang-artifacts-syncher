@@ -251,9 +251,10 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     return parsedPackagesDetailsArr
 }
 
-func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) [] DownloadPackageDetailsStruct {
+func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
-    return [] DownloadPackageDetailsStruct{downloadPkgDetailsStruct}
+    
+    
 }
 
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
@@ -269,8 +270,8 @@ func Synched_AppendPkgDetailsObj(arr_1 *[] NugetPackageDetailsStruct, arr_2 [] N
     appendPkgDetailsArr_Lock.Unlock()
 }
 
-func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] DownloadPackageDetailsStruct, arr_2 [] DownloadPackageDetailsStruct) {
+func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] DownloadPackageDetailsStruct, downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     appendDownloadedPkgDetailsArr_Lock.Lock()
-    *arr_1 = append(*arr_1, arr_2...)
+    *arr_1 = append(*arr_1, downloadPkgDetailsStruct)
     appendDownloadedPkgDetailsArr_Lock.Unlock()
 }
