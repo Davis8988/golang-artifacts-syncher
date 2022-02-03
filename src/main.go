@@ -118,7 +118,7 @@ func updateVars() {
 	}
 }
 
-func prepareSearchAllPkgsVersionsUrlsArray() []string {
+func prepareSearchPkgsVersionsUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
 	helpers.LogInfo.Print("Preparing src search packages urls array")
@@ -160,7 +160,7 @@ func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr [] helpers.Nu
 
 func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetailsStruct {
 	var totalFoundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
-	searchUrlsArr := prepareSearchAllPkgsVersionsUrlsArray()
+	searchUrlsArr := prepareSearchPkgsVersionsUrlsArray()
 	
 	wg := sync.WaitGroup{}
 	
