@@ -157,7 +157,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
 
 func CreateDir(dirPath string) {
     if _, err := os.Stat("/path/to/whatever"); err == nil {return}  // If dir already exists - finish here
-    LogInfo.Printf("Creating dir: %s", dirPath)
+    LogDebug.Printf("Creating dir: %s", dirPath)
     err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
 		LogError.Printf("%s\nFailed creating dir: \"%s\"", err, dirPath)
@@ -168,7 +168,7 @@ func CreateDir(dirPath string) {
 func CreateFile(filePath string) *os.File {
     dirPath := filepath.Dir(filePath)
     CreateDir(dirPath)
-    LogInfo.Printf("Creating file: %s", filePath)
+    LogDebug.Printf("Creating file: %s", filePath)
     // Create the file
     file, err := os.Create(filePath)
     if err != nil  {
