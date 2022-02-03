@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
     "log"
     "net/http"
-    "net/url"
 	"strings"
 	"time"
 	"strconv"
@@ -19,7 +18,7 @@ import (
 
 type HttpRequestArgsStruct struct {
 	UrlAddress  string
-	DownloadPath  string
+	downloadFilePath  string
 	HeadersMap  map[string]string
     UserToUse  string
     PassToUse  string
@@ -162,18 +161,9 @@ func CreateDir(dirPath string) {
 	}
 }
 
-func GetFileNameFromUrl(urlAddress string) string {
-    u, err := url.Parse(urlAddress)
-    if err != nil {
-        LogError.Printf("%s\nFailed getting file name from URL: \"%s\"", err, urlAddress)
-        panic(err)
-    }
-    return u.Path
-}
-
 func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     urlAddress := httpRequestArgs.UrlAddress
-    downloadPath := httpRequestArgs.DownloadPath
+    downloadFilePath := httpRequestArgs.downloadFilePath
     headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
     password := httpRequestArgs.PassToUse
@@ -213,12 +203,11 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
   
     defer response.Body.Close() // Finally step: close the body obj
     
-    // If got: DownloadPath then Writer the body to file
-    if len(downloadPath) > 0 {
-        fileName := GetFileNameFromUrl(urlAddress)
-        downloadPath = filepath.Join(downloadPath, fileName)
-        LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadPath)
-        CreateDir(downloadPath)
+    // If got: downloadFilePath var, then Writer the body to file
+    if len(downloadFilePath) > 0 {
+        downloadDir := filepath.Dir(downloadFilePath)
+        LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
+        CreateDir(downloadDir)
         // _, err = io.Copy(out, resp.Body)
         // if err != nil  {
         //     return err
@@ -287,12 +276,13 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
-    downloadPath := downloadPkgDetailsStruct.DownloadPath
+    fileName := downloadPkgDetailsStruct.PkgDetailsStruct.Name + "." + downloadPkgDetailsStruct.PkgDetailsStruct.Version + ".nupkg"
+    downloadFilePath := downloadPkgDetailsStruct.DownloadPath + "/" + fileName
     MakeHttpRequest(
         HttpRequestArgsStruct{
             UrlAddress: fileUrl,
             Method: "GET",
-            DownloadPath: downloadPath,
+            downloadFilePath: downloadFilePath,
         },
     )
 }
