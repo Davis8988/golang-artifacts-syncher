@@ -237,9 +237,26 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 
 func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsStruct) helpers.DownloadPackageDetailsStruct {
 	helpers.LogInfo.Printf("Uploading package: %s==%s", downloadedPkgStruct.PkgDetailsStruct.Name, downloadedPkgStruct.PkgDetailsStruct.Version)
-	for _, destServerUrl := range destServersUrlsArr {
-
+	pkgName := downloadedPkgStruct.PkgDetailsStruct.Name
+	pkgVersion := downloadedPkgStruct.PkgDetailsStruct.Version
+	searchUrlsArr := prepareDestSearchAllPkgsVersionsUrlsArray(pkgName, pkgVersion)
+	
+	if len(searchUrlsArr) > 0 {
+		helpers.LogInfo.Printf("Checking %d URL addresses for pkgs versions", len(searchUrlsArr))
+		for _, urlToCheck := range searchUrlsArr {
+			httpRequestArgs := helpers.HttpRequestArgsStruct {
+				UrlAddress: urlToCheck,
+				HeadersMap: httpRequestHeadersMap,
+				UserToUse: userToUse,
+				PassToUse: passToUse,
+				TimeoutSec: httpRequestTimeoutSecondsInt,
+				Method: "GET",
+			}
+			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			
+		}
 	}
+
 	return downloadedPkgStruct
 }
 
