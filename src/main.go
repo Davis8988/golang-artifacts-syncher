@@ -225,7 +225,9 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 
 func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsStruct) helpers.DownloadPackageDetailsStruct {
 	helpers.LogInfo.Printf("Uploading package: %s==%s", downloadedPkgStruct.PkgDetailsStruct.Name, downloadedPkgStruct.PkgDetailsStruct.Version)
-	for _, destServerUrl := range 
+	for _, destServerUrl := range destServersUrlsArr {
+
+	}
 	return downloadedPkgStruct
 }
 
