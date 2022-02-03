@@ -172,10 +172,15 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 		}
 
 		wg.Add(1)
-		go func() {
+		downloadPkgDetailsStruct := helpers.DownloadPackageDetailsStruct {
+			PkgDetailsStruct: pkgDetailsStruct,
+			DownloadPath: downloadPkgsDirPath,
+		}
+		
+		go func(downloadPkgDetailsStruct helpers.DownloadPackageDetailsStruct) {
 			defer wg.Done()
-			
-		}()
+			helpers.DownloadPkg(downloadPkgDetailsStruct)
+		}(downloadPkgDetailsStruct)
 	}
 }
 
