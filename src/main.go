@@ -113,11 +113,18 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
 	helpers.LogInfo.Print("Preparing src search packages urls array")
-	searchOptionsUrl := "Search()?"
 	for _, srcServerUrl := range srcServersUrlsArr {
 		for _, repoName := range reposNamesArr {
 			for _, pkgName := range packagesNamesArr {
-				searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
+				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
+				if len(versionsToSearchArr) == 0 {
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Search()?id='" + pkgName + "'")
+					continue
+				}
+				for _, pkgVersion := range versionsToSearchArr {
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages(Id='" + pkgName + ",Version='" + pkgVersion + "')")
+				}
+				
 			}
 		}
 	}
