@@ -13,7 +13,9 @@ import (
 	"time"
 	"strconv"
 	"regexp"
+	"errors"
     "path/filepath"
+    "crypto/sha512"
 )
 
 
@@ -177,6 +179,24 @@ func CreateFile(filePath string) *os.File {
         panic(err)
     }
     return file
+}
+
+func CalculateFileChecksum(filePath string) string {
+    if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {return ""}  // If missing file: return empty
+    LogDebug.Printf("Calculating sha512 checksum of file: %s", filePath)
+    f, err := os.Open(filePath)
+    if err != nil {
+        LogError.Printf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
+        panic(err)
+    }
+    defer f.Close()
+    h := sha512.New()
+    if _, err := io.Copy(h, f); err != nil {
+        LogError.Printf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
+        panic(err)
+    }
+
+    return string(h.Sum(nil))  // nil instead of a byte array to append to
 }
 
 func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
