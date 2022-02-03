@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
     "log"
+    "io"
     "net/http"
 	"strings"
 	"time"
@@ -31,6 +32,7 @@ type NugetPackageDetailsStruct struct {
     Version string
     Checksum string
     ChecksumType string
+    PkgDetailsUrl string
     PkgFileUrl string
 }
 
@@ -161,6 +163,19 @@ func CreateDir(dirPath string) {
 	}
 }
 
+func CreateFile(filePath string) *os.File {
+    LogInfo.Printf("Creating file: %s", filePath)
+    dirPath := filepath.Dir(filePath)
+    CreateDir(dirPath)
+    // Create the file
+    file, err := os.Create(filePath)
+    if err != nil  {
+        LogError.Printf("%s\nFailed creating file: \"%s\"", err, filePath)
+        panic(err)
+    }
+    return file
+}
+
 func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     urlAddress := httpRequestArgs.UrlAddress
     downloadFilePath := httpRequestArgs.downloadFilePath
@@ -208,10 +223,16 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
         downloadDir := filepath.Dir(downloadFilePath)
         LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
         CreateDir(downloadDir)
-        // _, err = io.Copy(out, resp.Body)
-        // if err != nil  {
-        //     return err
-        // }
+        // Create the file
+        fileHandle := CreateFile(downloadFilePath)
+        defer fileHandle.Close()
+
+        _, err = io.Copy(fileHandle, response.Body)
+        if err != nil  {
+            LogError.Printf("%s\nFailed writing response Body to file: %s", err, downloadFilePath)
+            panic(err)
+        }
+        return "" // Finish here
     }
 
     body, err := ioutil.ReadAll(response.Body)
@@ -230,12 +251,12 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     return bodyStr
 }
 
-func ParsePkgNameAndVersionFromFileURL(pkgFileUrl string) [] string {
-    LogDebug.Printf("Parsing URL for Name & Version: \"%s\"", pkgFileUrl)
+func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
+    LogDebug.Printf("Parsing URL for Name & Version: \"%s\"", pkgDetailsUrl)
     re := regexp.MustCompile("'(.*?)'")  // Find values in between quotes
-    resultArr := re.FindAllString(pkgFileUrl, -1)  // -1 = find ALL available matches
+    resultArr := re.FindAllString(pkgDetailsUrl, -1)  // -1 = find ALL available matches
     if len(resultArr) != 2 {
-        LogError.Printf("Failed to parse URL for pkg Name & Version:  \"%s\"", pkgFileUrl)
+        LogError.Printf("Failed to parse URL for pkg Name & Version:  \"%s\"", pkgDetailsUrl)
         LogError.Printf("Found regex result count is: %d different from 2", len(resultArr))
         return nil
     }
@@ -253,10 +274,11 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPa
         var pkgDetailsStruct NugetPackageDetailsStruct
         pkgDetailsStruct.Checksum = entryStruct.Properties.PackageHash
         pkgDetailsStruct.ChecksumType = entryStruct.Properties.PackageHashAlgorithm
+        pkgDetailsStruct.PkgDetailsUrl = entryStruct.ID
         pkgDetailsStruct.PkgFileUrl = entryStruct.Content.Src
         pkgDetailsStruct.Name = ""
         pkgDetailsStruct.Version = ""
-        parsedNameAndVersionArr := ParsePkgNameAndVersionFromFileURL(pkgDetailsStruct.PkgFileUrl)
+        parsedNameAndVersionArr := ParsePkgNameAndVersionFromFileURL(pkgDetailsStruct.PkgDetailsUrl)
         if parsedNameAndVersionArr == nil {continue}
         pkgDetailsStruct.Name = parsedNameAndVersionArr[0]
         pkgDetailsStruct.Version = parsedNameAndVersionArr[1]
@@ -277,7 +299,7 @@ func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
     fileName := downloadPkgDetailsStruct.PkgDetailsStruct.Name + "." + downloadPkgDetailsStruct.PkgDetailsStruct.Version + ".nupkg"
-    downloadFilePath := downloadPkgDetailsStruct.DownloadPath + "/" + fileName
+    downloadFilePath := filepath.Join(downloadPkgDetailsStruct.DownloadPath, fileName)
     MakeHttpRequest(
         HttpRequestArgsStruct{
             UrlAddress: fileUrl,
