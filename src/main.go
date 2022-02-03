@@ -158,8 +158,8 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 	return totalFoundPackagesDetailsArr 
 }
 
-func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsStruct) {
-	var totalDownloadedPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
+func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsStruct) [] helpers.DownloadPackageDetailsStruct {
+	var totalDownloadedPackagesDetailsArr [] helpers.DownloadPackageDetailsStruct
 	helpers.LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
 	
 	wg := sync.WaitGroup{}
@@ -181,9 +181,12 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 		go func(downloadPkgDetailsStruct helpers.DownloadPackageDetailsStruct) {
 			defer wg.Done()
 			downloadedPackagesDetailsArr := helpers.DownloadPkg(downloadPkgDetailsStruct)
-			helpers.Synched_AppendPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadedPackagesDetailsArr)
+			helpers.Synched_AppendDownalodedPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadedPackagesDetailsArr)
 		}(downloadPkgDetailsStruct)
 	}
+	wg.Wait()
+
+	return totalDownloadedPackagesDetailsArr
 }
 
 func uploadDownloadedPackages() {

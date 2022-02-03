@@ -243,7 +243,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
     return parsedPackagesDetailsArr
 }
 
-func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) [] NugetPackageDetailsStruct {
+func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) [] DownloadPackageDetailsStruct {
 
 }
 
