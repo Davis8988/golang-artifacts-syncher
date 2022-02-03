@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
     "log"
     "net/http"
+    "net/url"
 	"strings"
 	"time"
 	"strconv"
@@ -18,6 +19,7 @@ import (
 
 type HttpRequestArgsStruct struct {
 	UrlAddress  string
+	DownloadPath  string
 	HeadersMap  map[string]string
     UserToUse  string
     PassToUse  string
@@ -151,23 +153,42 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     return httpRequestHeadersMap
 }
 
-func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
-    urlToCheck := httpRequestArgs.UrlAddress
+func CreateDir(dirPath string) {
+    LogInfo.Printf("Creating dir: %s", dirPath)
+    err := os.MkdirAll(dirPath, os.ModePerm)
+	if err != nil {
+		LogError.Printf("%s\nFailed creating dir: \"%s\"", err, dirPath)
+        panic(err)
+	}
+}
+
+func GetFileNameFromUrl(urlAddress string) string {
+    u, err := url.Parse(urlAddress)
+    if err != nil {
+        LogError.Printf("%s\nFailed getting file name from URL: \"%s\"", err, urlAddress)
+        panic(err)
+    }
+    return u.Path
+}
+
+func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
+    urlAddress := httpRequestArgs.UrlAddress
+    downloadPath := httpRequestArgs.DownloadPath
     headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
     password := httpRequestArgs.PassToUse
     timeoutSec := httpRequestArgs.TimeoutSec
     method := httpRequestArgs.Method
 
-    LogInfo.Printf("Querying URL: \"%s\"", urlToCheck)
+    LogInfo.Printf("Querying URL: \"%s\"", urlAddress)
 
     client := http.Client{
         Timeout: time.Duration(timeoutSec) * time.Second,
     }
 
-    req, err := http.NewRequest(method, urlToCheck, nil)
+    req, err := http.NewRequest(method, urlAddress, nil)
     if err != nil {
-        LogError.Printf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlToCheck)
+        LogError.Printf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlAddress)
         return ""
     }
 
@@ -186,15 +207,27 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     // Make the http request
     response, err := client.Do(req)
     if err != nil {
-        LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
+        LogError.Printf("%s\nFailed querying: %s", err, urlAddress)
         return ""
     }
   
     defer response.Body.Close() // Finally step: close the body obj
     
+    // If got: DownloadPath then Writer the body to file
+    if len(downloadPath) > 0 {
+        fileName := GetFileNameFromUrl(urlAddress)
+        downloadPath = filepath.Join(downloadPath, fileName)
+        LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadPath)
+        CreateDir(downloadPath)
+        // _, err = io.Copy(out, resp.Body)
+        // if err != nil  {
+        //     return err
+        // }
+    }
+
     body, err := ioutil.ReadAll(response.Body)
     if err != nil {
-        LogError.Printf("%s\nFailed querying: %s", err, urlToCheck)
+        LogError.Printf("%s\nFailed querying: %s", err, urlAddress)
         return ""
     }
 
@@ -203,7 +236,7 @@ func MakeAnHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     if len(response.Status) > 0 {msgStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
     LogDebug.Printf(msgStr)
 
-    if response.StatusCode >= 400 {LogError.Printf("Failed querying: %s", urlToCheck)}
+    if response.StatusCode >= 400 {LogError.Printf("Failed querying: %s", urlAddress)}
 
     return bodyStr
 }
@@ -231,7 +264,7 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPa
         var pkgDetailsStruct NugetPackageDetailsStruct
         pkgDetailsStruct.Checksum = entryStruct.Properties.PackageHash
         pkgDetailsStruct.ChecksumType = entryStruct.Properties.PackageHashAlgorithm
-        pkgDetailsStruct.PkgFileUrl = entryStruct.ID
+        pkgDetailsStruct.PkgFileUrl = entryStruct.Content.Src
         pkgDetailsStruct.Name = ""
         pkgDetailsStruct.Version = ""
         parsedNameAndVersionArr := ParsePkgNameAndVersionFromFileURL(pkgDetailsStruct.PkgFileUrl)
@@ -244,7 +277,7 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPa
 }
 
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] NugetPackageDetailsStruct {
-    responseBody := MakeAnHttpRequest(httpRequestArgs)
+    responseBody := MakeHttpRequest(httpRequestArgs)
     if len(responseBody) == 0 {return nil}
     parsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
 
@@ -253,8 +286,15 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 
 func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
-    downloadUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
-    
+    fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
+    downloadPath := downloadPkgDetailsStruct.DownloadPath
+    MakeHttpRequest(
+        HttpRequestArgsStruct{
+            UrlAddress: fileUrl,
+            Method: "GET",
+            DownloadPath: downloadPath,
+        },
+    )
 }
 
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
