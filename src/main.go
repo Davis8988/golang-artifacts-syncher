@@ -117,14 +117,21 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 	for _, srcServerUrl := range srcServersUrlsArr {
 		for _, repoName := range reposNamesArr {
 			for _, pkgName := range packagesNamesArr {
-				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
-				if len(versionsToSearchArr) > 0 {continue}
 				searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
 			}
 		}
 	}
 	return searchUrlsArr
 } 
+
+func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct, requestedVersion string) [] helpers.NugetPackageDetailsStruct {
+	var filteredPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
+	for _, pkgDetailStruct := range foundPackagesDetailsArr {
+		pkgVersion := pkgDetailStruct.Version
+		if pkgVersion == requestedVersion {filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)}  // This version is requested - Add pkg details obj to the result filtered array
+	}
+	return filteredPackagesDetailsArr
+}
 
 func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetailsStruct {
 	var totalFoundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
@@ -135,10 +142,11 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 	// Ensure all routines finish before returning
 	defer wg.Wait()
 
+	versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
 
 	if len(searchUrlsArr) > 0 {
 		helpers.LogInfo.Printf("Checking %d URL addresses for pkgs versions", len(searchUrlsArr))
-		for _, urlToCheck := range searchUrlsArr {
+		for i, urlToCheck := range searchUrlsArr {
 			wg.Add(1)
 			go func(urlToCheck string) {
 				defer wg.Done()
@@ -150,7 +158,11 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 					TimeoutSec: httpRequestTimeoutSecondsInt,
 					Method: "GET",
 				}
+				requestedVersion := ""
+				if i < len(versionsToSearchArr) {requestedVersion = versionsToSearchArr[i]}
 				foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+				foundPackagesDetailsArr := filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr, requestedVersion)
+
 				helpers.Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
 			}(urlToCheck)
 		}
