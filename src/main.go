@@ -180,7 +180,7 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 	defer wg.Wait()
 
 	if len(searchUrlsArr) > 0 {
-		helpers.LogInfo.Printf("Checking %d URL addresses for pkgs versions", len(searchUrlsArr))
+		helpers.LogInfo.Printf("Checking %d src URL addresses for pkgs versions", len(searchUrlsArr))
 		for _, urlToCheck := range searchUrlsArr {
 			wg.Add(1)
 			go func(urlToCheck string) {
@@ -242,7 +242,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 	searchUrlsArr := prepareDestSearchAllPkgsVersionsUrlsArray(pkgName, pkgVersion)
 	
 	if len(searchUrlsArr) > 0 {
-		helpers.LogInfo.Printf("Checking %d URL addresses for pkgs versions", len(searchUrlsArr))
+		helpers.LogInfo.Printf("Checking %d dest URL addresses for pkgs versions", len(searchUrlsArr))
 		for _, urlToCheck := range searchUrlsArr {
 			httpRequestArgs := helpers.HttpRequestArgsStruct {
 				UrlAddress: urlToCheck,
