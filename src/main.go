@@ -21,6 +21,7 @@ var (
 	httpRequestTimeoutSecondsInt int
 
 	srcServersUrlsArr [] string
+	destServersUrlsArr [] string
 	reposNamesArr [] string
 	packagesNamesArr [] string
 	packagesVersionsArr [] string
@@ -55,6 +56,7 @@ func printVars() {
 	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSecondsInt)
 	
 	helpers.LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
+	helpers.LogInfo.Printf("destServersUrlsArr: %v", destServersUrlsArr)
 	helpers.LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
 	helpers.LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
 	helpers.LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
@@ -88,10 +90,12 @@ func parseArgs() {
 func updateVars() {
 	helpers.LogInfo.Print("Updating vars")
 	srcServersUrlsArr = make([]string, 0, 4)
+	destServersUrlsArr = make([]string, 0, 4)
 	reposNamesArr = make([]string, 0, 4)
 	packagesNamesArr = make([]string, 0, 10)
 	packagesVersionsArr = make([]string, 0, 10)
 	if len(srcServersUrlsStr) > 1 {srcServersUrlsArr = strings.Split(srcServersUrlsStr, ";")}
+	if len(destServersUrlsStr) > 1 {destServersUrlsArr = strings.Split(destServersUrlsStr, ";")}
 	if len(reposNamesStr) > 1 {reposNamesArr = strings.Split(reposNamesStr, ";")}
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
@@ -216,7 +220,7 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 
 func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsStruct) helpers.DownloadPackageDetailsStruct {
 	helpers.LogInfo.Printf("Uploading package: %s==%s", downloadedPkgStruct.PkgDetailsStruct.Name, downloadedPkgStruct.PkgDetailsStruct.Version)
-
+	for _, destServerUrl := range 
 	return downloadedPkgStruct
 }
 
