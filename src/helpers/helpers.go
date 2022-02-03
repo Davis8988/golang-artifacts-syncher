@@ -155,7 +155,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
 }
 
 func CreateDir(dirPath string) {
-    if _, err := os.Stat("/path/to/whatever"); err == nil {return}  // If dir already exists - finish here
+    if _, err := os.Stat(dirPath); err == nil {return}  // If dir already exists - finish here
     LogDebug.Printf("Creating dir: %s", dirPath)
     err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
