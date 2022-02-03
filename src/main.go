@@ -20,7 +20,7 @@ var (
 	downloadPkgsDirPath string
 	httpRequestTimeoutSecondsInt int
 
-	serversUrlsArr [] string
+	srcServersUrlsArr [] string
 	reposNamesArr [] string
 	packagesNamesArr [] string
 	packagesVersionsArr [] string
@@ -54,7 +54,7 @@ func printVars() {
 	helpers.LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", downloadPkgsDirPath)
 	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSecondsInt)
 	
-	helpers.LogInfo.Printf("serversUrlsArr: %v", serversUrlsArr)
+	helpers.LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
 	helpers.LogInfo.Printf("reposNamesArr: %v", reposNamesArr)
 	helpers.LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
 	helpers.LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
@@ -87,11 +87,11 @@ func parseArgs() {
 
 func updateVars() {
 	helpers.LogInfo.Print("Updating vars")
-	serversUrlsArr = make([]string, 0, 4)
+	srcServersUrlsArr = make([]string, 0, 4)
 	reposNamesArr = make([]string, 0, 4)
 	packagesNamesArr = make([]string, 0, 10)
 	packagesVersionsArr = make([]string, 0, 10)
-	if len(srcServersUrlsStr) > 1 {serversUrlsArr = strings.Split(srcServersUrlsStr, ";")}
+	if len(srcServersUrlsStr) > 1 {srcServersUrlsArr = strings.Split(srcServersUrlsStr, ";")}
 	if len(reposNamesStr) > 1 {reposNamesArr = strings.Split(reposNamesStr, ";")}
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
@@ -114,12 +114,12 @@ func prepareSearchAllPkgsVersionsUrlsArray() []string {
 	
 	helpers.LogInfo.Print("Preparing search packages urls array")
 	searchOptionsUrl := "Search()?"
-	for _, serverUrl := range serversUrlsArr {
+	for _, srcServerUrl := range srcServersUrlsArr {
 		for _, repoName := range reposNamesArr {
 			for _, pkgName := range packagesNamesArr {
 				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
 				if len(versionsToSearchArr) > 0 {continue}
-				searchUrlsArr = append(searchUrlsArr, serverUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
+				searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + searchOptionsUrl + "id='" + pkgName + "'")
 			}
 		}
 	}
