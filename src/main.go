@@ -12,8 +12,8 @@ var (
 	userToUse string
 	passToUse string
 	srcServersUrlsStr string
-	destServersUrlsStr string
 	srcReposNamesStr string
+	destServersUrlsStr string
 	packagesNamesStr string
 	packagesVersionsStr string
 	httpRequestHeadersStr string
@@ -21,8 +21,8 @@ var (
 	httpRequestTimeoutSecondsInt int
 
 	srcServersUrlsArr [] string
-	destServersUrlsArr [] string
 	srcReposNamesArr [] string
+	destServersUrlsArr [] string
 	packagesNamesArr [] string
 	packagesVersionsArr [] string
 	httpRequestHeadersMap map[string] string
