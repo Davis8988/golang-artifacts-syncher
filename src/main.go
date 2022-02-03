@@ -144,8 +144,8 @@ func prepareDestSearchAllPkgsVersionsUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
 	
 	helpers.LogInfo.Print("Preparing src search packages urls array")
-	for _, srcServerUrl := range srcServersUrlsArr {
-		for _, repoName := range srcReposNamesArr {
+	for _, srcServerUrl := range destServersUrlsArr {
+		for _, repoName := range destReposNamesArr {
 			for _, pkgName := range packagesNamesArr {
 				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
 				if len(versionsToSearchArr) == 0 {  // Either use search
