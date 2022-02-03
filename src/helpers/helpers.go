@@ -66,6 +66,15 @@ func Init() {
     appendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
 }
 
+func trimQuotes(s string) string {
+    if len(s) >= 2 {
+        if s[0] == '"' && s[len(s)-1] == '"' {
+            return s[1 : len(s)-1]
+        }
+    }
+    return s
+}
+
 func GetCurrentProgramDir() string {
     ex, err := os.Executable()
     if err != nil {
@@ -210,6 +219,8 @@ func ParsePkgNameAndVersionFromFileURL(pkgFileUrl string) [] string {
         LogError.Printf("Found regex result count is: %d different from 2", len(resultArr))
         return nil
     }
+    // Trim
+    for i, value := range resultArr {resultArr[i] = trimQuotes(value)}
     return resultArr
 }
 
