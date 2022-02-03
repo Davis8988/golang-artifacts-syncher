@@ -16,6 +16,7 @@ var (
 	packagesNamesStr string
 	packagesVersionsStr string
 	httpRequestHeadersStr string
+	downloadPkgsDirPath string
 	httpRequestTimeoutSecondsInt int
 
 	serversUrlsArr [] string
