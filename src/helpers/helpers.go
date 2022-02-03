@@ -252,7 +252,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 }
 
 func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) [] DownloadPackageDetailsStruct {
-    LogInfo.Printf("Downloading pkg: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
+    LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     return [] DownloadPackageDetailsStruct{downloadPkgDetailsStruct}
 }
 
