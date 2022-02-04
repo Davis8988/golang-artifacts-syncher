@@ -332,7 +332,7 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPa
 
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] NugetPackageDetailsStruct {
     responseBody := MakeHttpRequest(httpRequestArgs)
-    if len(responseBody) == 0 {return nil}
+    if len(responseBody) == 0 {return [] NugetPackageDetailsStruct {}}
     parsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
 
     return parsedPackagesDetailsArr
