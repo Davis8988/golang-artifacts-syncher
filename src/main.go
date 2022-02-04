@@ -243,8 +243,8 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 			httpRequestArgs := helpers.HttpRequestArgsStruct {
 				UrlAddress: checkDestServerPkgExistUrl,
 				HeadersMap: httpRequestHeadersMap,
-				UserToUse: srcServersUserToUse,
-				PassToUse: srcServersPassToUse,
+				UserToUse: destServersUserToUse,
+				PassToUse: destServersPassToUse,
 				TimeoutSec: httpRequestTimeoutSecondsInt,
 				Method: "GET",
 			}
