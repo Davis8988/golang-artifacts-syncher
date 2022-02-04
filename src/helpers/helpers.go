@@ -23,8 +23,6 @@ import (
 type HttpRequestArgsStruct struct {
 	UrlAddress  string
 	DownloadFilePath  string
-	DownloadFileChecksum  string
-	DownloadFileChecksumType  string
 	HeadersMap  map[string]string
     UserToUse  string
     PassToUse  string
@@ -205,7 +203,6 @@ func CalculateFileChecksum(filePath string) string {
 func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     urlAddress := httpRequestArgs.UrlAddress
     downloadFilePath := httpRequestArgs.DownloadFilePath
-    downloadFileChecksum := httpRequestArgs.DownloadFileChecksum
     headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
     password := httpRequestArgs.PassToUse
@@ -248,14 +245,6 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     // If got: downloadFilePath var, then Writer the body to file
     if len(downloadFilePath) > 0 {
         LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
-        if len(downloadFileChecksum) > 0 {
-            currentFileChecksum := CalculateFileChecksum(downloadFilePath)
-            if currentFileChecksum == downloadFileChecksum {
-                fileName := filepath.Base(downloadFilePath)
-                LogWarning.Printf("Checksum match: download target file already exists. Skipping download of: \"%s\"", fileName)
-                return "" // Finish here
-            }
-        }
         fileHandle := CreateFile(downloadFilePath)  // Create the file
         defer fileHandle.Close()
 
@@ -344,13 +333,18 @@ func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
     downloadFilePath := downloadPkgDetailsStruct.DownloadFilePath
+    downloadFileChecksum := downloadPkgDetailsStruct.DownloadFileChecksum
     fileChecksum := downloadPkgDetailsStruct.PkgDetailsStruct.Checksum
+    if fileChecksum == downloadFileChecksum {
+        fileName := filepath.Base(downloadFilePath)
+        LogWarning.Printf("Checksum match: download target file already exists. Skipping download of: \"%s\"", fileName)
+        return
+    }
     MakeHttpRequest(
         HttpRequestArgsStruct{
             UrlAddress: fileUrl,
             Method: "GET",
             DownloadFilePath: downloadFilePath,
-            DownloadFileChecksum: fileChecksum,
         },
     )
 }
