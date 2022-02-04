@@ -44,6 +44,8 @@ func initVars() {
 	srcReposNamesStr = helpers.Getenv("SRC_REPOS_NAMES_STR", "")
 	destServersUrlsStr = helpers.Getenv("DEST_SERVERS_URLS_STR", "")
 	destReposNamesStr = helpers.Getenv("DEST_REPOS_NAMES_STR", "")
+	destServersUserToUse = helpers.Getenv("DEST_SERVERS_USER_TO_USE", "")
+	destServersPassToUse = helpers.Getenv("DEST_SERVERS_PASS_TO_USE", "")
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")  // Example: "key=value;key1=value1;key2=value2"
