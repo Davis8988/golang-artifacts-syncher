@@ -43,7 +43,9 @@ type NugetPackageDetailsStruct struct {
 
 type DownloadPackageDetailsStruct struct {
     PkgDetailsStruct NugetPackageDetailsStruct
-    DownloadPath string
+    DownloadFilePath string
+    DownloadFileChecksum  string
+	DownloadFileChecksumType  string
 }
 
 
@@ -341,7 +343,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
-    downloadFilePath := downloadPkgDetailsStruct.DownloadPath
+    downloadFilePath := downloadPkgDetailsStruct.DownloadFilePath
     fileChecksum := downloadPkgDetailsStruct.PkgDetailsStruct.Checksum
     MakeHttpRequest(
         HttpRequestArgsStruct{

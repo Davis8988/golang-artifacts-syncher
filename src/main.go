@@ -221,11 +221,14 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 		downloadFilePath := filepath.Join(downloadPkgsDirPath, fileName)   // downloadPkgsDirPath == global var
 		downloadPkgDetailsStruct := helpers.DownloadPackageDetailsStruct {
 			PkgDetailsStruct: pkgDetailsStruct,
-			DownloadPath: downloadFilePath,
+			DownloadFilePath: downloadFilePath,
+			DownloadFileChecksum: helpers.CalculateFileChecksum(downloadFilePath), // Can by empty if file doesn't exist yet
+			DownloadFileChecksumType: "SHA512",  // Default checksum algorithm for Nuget pkgs
 		}
 
-		// Check if local file already exists - if so calculate it's checksum
-
+		
+		
+		
 		go func(downloadPkgDetailsStruct helpers.DownloadPackageDetailsStruct) {
 			defer wg.Done()
 			helpers.DownloadPkg(downloadPkgDetailsStruct)
