@@ -253,7 +253,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 				Method: "GET",
 			}
 
-			helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 		}
 	}
 
