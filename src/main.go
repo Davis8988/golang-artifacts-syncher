@@ -16,6 +16,8 @@ var (
 	srcReposNamesStr string
 	destServersUrlsStr string
 	destReposNamesStr string
+	destServersUserToUse string
+	destServersPassToUse string
 	packagesNamesStr string
 	packagesVersionsStr string
 	httpRequestHeadersStr string
