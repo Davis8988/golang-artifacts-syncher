@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	srcServerUserToUse string
-	srcServerPassToUse string
+	srcServersUserToUse string
+	srcServersPassToUse string
 	srcServersUrlsStr string
 	srcReposNamesStr string
 	destServersUrlsStr string
@@ -36,8 +36,8 @@ var (
 func initVars() {
 	helpers.Init()
 	helpers.LogInfo.Print("Initializing from envs vars")
-	srcServerUserToUse = helpers.Getenv("SRC_SERVERS_USER_TO_USE", "")
-	srcServerPassToUse = helpers.Getenv("SRC_SERVERS_PASS_TO_USE", "")
+	srcServersUserToUse = helpers.Getenv("SRC_SERVERS_USER_TO_USE", "")
+	srcServersPassToUse = helpers.Getenv("SRC_SERVERS_PASS_TO_USE", "")
 	srcServersUrlsStr = helpers.Getenv("SRC_SERVERS_URLS_STR", "")
 	srcReposNamesStr = helpers.Getenv("SRC_REPOS_NAMES_STR", "")
 	destServersUrlsStr = helpers.Getenv("DEST_SERVERS_URLS_STR", "")
@@ -177,8 +177,8 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 				httpRequestArgs := helpers.HttpRequestArgsStruct {
 					UrlAddress: urlToCheck,
 					HeadersMap: httpRequestHeadersMap,
-					UserToUse: srcServerUserToUse,
-					PassToUse: srcServerPassToUse,
+					UserToUse: srcServersUserToUse,
+					PassToUse: srcServersPassToUse,
 					TimeoutSec: httpRequestTimeoutSecondsInt,
 					Method: "GET",
 				}
@@ -239,8 +239,8 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 			httpRequestArgs := helpers.HttpRequestArgsStruct {
 				UrlAddress: checkDestServerPkgExistUrl,
 				HeadersMap: httpRequestHeadersMap,
-				UserToUse: srcServerUserToUse,
-				PassToUse: srcServerPassToUse,
+				UserToUse: srcServersUserToUse,
+				PassToUse: srcServersPassToUse,
 				TimeoutSec: httpRequestTimeoutSecondsInt,
 				Method: "GET",
 			}
