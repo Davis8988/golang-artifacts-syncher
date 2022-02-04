@@ -225,9 +225,6 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 			DownloadFileChecksum: helpers.CalculateFileChecksum(downloadFilePath), // Can by empty if file doesn't exist yet
 			DownloadFileChecksumType: "SHA512",  // Default checksum algorithm for Nuget pkgs
 		}
-
-		
-		
 		
 		go func(downloadPkgDetailsStruct helpers.DownloadPackageDetailsStruct) {
 			defer wg.Done()
