@@ -234,7 +234,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 	for _, destServerUrl := range destServersUrlsArr {
 		for _, repoName := range destReposNamesArr {
 			destServerRepo := destServerUrl + "/" + repoName
-			helpers.LogInfo.Printf("Checking if pkg: '%s' exists at dest server: %s", pkgPrintStr, destServerRepo)
+			helpers.LogInfo.Printf("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerRepo)
 			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
 			httpRequestArgs := helpers.HttpRequestArgsStruct {
 				UrlAddress: checkDestServerPkgExistUrl,
