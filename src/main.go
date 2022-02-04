@@ -266,7 +266,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 			fileToUploadChecksum := downloadedPkgStruct.DownloadFileChecksum
 			if foundPackageChecksum == fileToUploadChecksum {
 				fileName := filepath.Base(downloadedPkgStruct.DownloadFilePath)
-				helpers.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s'" +
+				helpers.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n" +
 										  "Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
 				return downloadedPkgStruct
 			}
