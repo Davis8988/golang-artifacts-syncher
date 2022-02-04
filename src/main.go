@@ -36,8 +36,8 @@ var (
 func initVars() {
 	helpers.Init()
 	helpers.LogInfo.Print("Initializing from envs vars")
-	srcServerUserToUse = helpers.Getenv("SRC_SERVER_USER_TO_USE", "")
-	passToUse = helpers.Getenv("PASS_TO_USE", "")
+	srcServerUserToUse = helpers.Getenv("SRC_SERVERS_USER_TO_USE", "")
+	srcServerPassToUse = helpers.Getenv("SRC_SERVERS_PASS_TO_USE", "")
 	srcServersUrlsStr = helpers.Getenv("SRC_SERVERS_URLS_STR", "")
 	srcReposNamesStr = helpers.Getenv("SRC_REPOS_NAMES_STR", "")
 	destServersUrlsStr = helpers.Getenv("DEST_SERVERS_URLS_STR", "")
@@ -178,7 +178,7 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 					UrlAddress: urlToCheck,
 					HeadersMap: httpRequestHeadersMap,
 					UserToUse: srcServerUserToUse,
-					PassToUse: passToUse,
+					PassToUse: srcServerPassToUse,
 					TimeoutSec: httpRequestTimeoutSecondsInt,
 					Method: "GET",
 				}
@@ -240,7 +240,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 				UrlAddress: checkDestServerPkgExistUrl,
 				HeadersMap: httpRequestHeadersMap,
 				UserToUse: srcServerUserToUse,
-				PassToUse: passToUse,
+				PassToUse: srcServerPassToUse,
 				TimeoutSec: httpRequestTimeoutSecondsInt,
 				Method: "GET",
 			}
