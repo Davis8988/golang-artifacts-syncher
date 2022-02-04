@@ -249,7 +249,8 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
         if len(downloadFileChecksum) > 0 {
             currentFileChecksum := CalculateFileChecksum(downloadFilePath)
             if currentFileChecksum == downloadFileChecksum {
-                LogWarning.Printf("Checksum match: download target file already exists. Skipping download..")
+                fileName := filepath.Base(downloadFilePath)
+                LogWarning.Printf("Checksum match: download target file already exists. Skipping download of: \"%s\"", fileName)
                 return "" // Finish here
             }
         }
