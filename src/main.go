@@ -254,6 +254,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 			}
 
 			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			if len(foundPackagesDetailsArr) == 0 {continue}
 			
 		}
 	}
