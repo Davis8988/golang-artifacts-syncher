@@ -341,8 +341,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgs
 func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
-    fileName := downloadPkgDetailsStruct.PkgDetailsStruct.Name + "." + downloadPkgDetailsStruct.PkgDetailsStruct.Version + ".nupkg"
-    downloadFilePath := filepath.Join(downloadPkgDetailsStruct.DownloadPath, fileName)
+    downloadFilePath := downloadPkgDetailsStruct.DownloadPath
     fileChecksum := downloadPkgDetailsStruct.PkgDetailsStruct.Checksum
     MakeHttpRequest(
         HttpRequestArgsStruct{

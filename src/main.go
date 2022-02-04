@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"golang-artifacts-syncher/src/helpers"
 	"golang-artifacts-syncher/src/nexus3_adapter"
+	"path/filepath"
 	"strings"
 	"sync"
 )
@@ -216,10 +217,14 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 		}
 
 		wg.Add(1)
+		fileName := pkgDetailsStruct.Name + "." + pkgDetailsStruct.Version + ".nupkg"
+		downloadFilePath := filepath.Join(downloadPkgsDirPath, fileName)   // downloadPkgsDirPath == global var
 		downloadPkgDetailsStruct := helpers.DownloadPackageDetailsStruct {
 			PkgDetailsStruct: pkgDetailsStruct,
-			DownloadPath: downloadPkgsDirPath,
+			DownloadPath: downloadFilePath,
 		}
+
+		// Check if local file already exists - if so calculate it's checksum
 
 		go func(downloadPkgDetailsStruct helpers.DownloadPackageDetailsStruct) {
 			defer wg.Done()
