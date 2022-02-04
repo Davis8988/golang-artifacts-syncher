@@ -230,7 +230,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 	pkgName := downloadedPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := downloadedPkgStruct.PkgDetailsStruct.Version
 	
-	// Check if package already exists - if so compare checksum and skip on matching
+	// Check if package already exists. If so, then compare it's checksum and skip on matching
 	for _, destServerUrl := range destServersUrlsArr {
 		for _, repoName := range destReposNamesArr {
 			destServerRepo := destServerUrl + "/" + repoName
