@@ -292,11 +292,23 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
 func ReadFileContentsIntoPartsForUpload(uploadFilePath string) io.Reader {
     var body io.Reader
+    LogInfo.Printf("Reading file content for upload: \"%s\"", uploadFilePath)
+    
     // If missing file: return empty body
     if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
         LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
-        return body
-    } 
+        return nil
+    }
+
+    file, err := os.Open(uploadFilePath)
+	if err != nil {
+		return body
+	}
+    fileContents, err := ioutil.ReadAll(file)
+    if err != nil {
+		return nil, err
+	}
+    return body
 }
 
 func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
