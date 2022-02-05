@@ -48,9 +48,9 @@ type DownloadPackageDetailsStruct struct {
 
 type UploadPackageDetailsStruct struct {
     PkgDetailsStruct NugetPackageDetailsStruct
-    DownloadFilePath string
-    DownloadFileChecksum  string
-	DownloadFileChecksumType  string
+    UploadFilePath string
+    UploadFileChecksum  string
+	UploadFileChecksumType  string
 }
 
 
