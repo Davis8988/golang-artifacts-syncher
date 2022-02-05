@@ -231,8 +231,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
     // Upload file (PUT requests):
     if method == "PUT" && len(uploadFilePath) > 0 {
-         
-
+        body = ReadFileContentsIntoPartsForUpload()
     }
 
     req, err := http.NewRequest(method, urlAddress, body)
@@ -324,8 +323,12 @@ func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName s
 		return nil
 	}
 	part.Write(fileContents)
-
     
+    err = writer.Close()
+	if err != nil {
+		return nil
+	}
+
     return body
 }
 
