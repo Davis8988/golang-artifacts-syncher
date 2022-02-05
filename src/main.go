@@ -237,7 +237,7 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 	return totalDownloadedPackagesDetailsArr
 }
 
-func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsStruct) helpers.DownloadPackageDetailsStruct {
+func uploadDownloadedPackage(downloadedPkgStruct helpers.UploadPackageDetailsStruct) helpers.UploadPackageDetailsStruct {
 	pkgPrintStr := fmt.Sprintf("%s==%s", downloadedPkgStruct.PkgDetailsStruct.Name, downloadedPkgStruct.PkgDetailsStruct.Version)
 	helpers.LogInfo.Printf("Uploading package: %s", pkgPrintStr)
 	pkgName := downloadedPkgStruct.PkgDetailsStruct.Name
@@ -265,9 +265,9 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 			helpers.LogInfo.Printf("Found 1 existing pkg: '%s' at dest server: %s \n" +
 									"Comparing it's checksum to know if should upload or not", pkgPrintStr, destServerRepo)
 			foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
-			fileToUploadChecksum := downloadedPkgStruct.DownloadFileChecksum
+			fileToUploadChecksum := downloadedPkgStruct.UploadFileChecksum
 			if foundPackageChecksum == fileToUploadChecksum {
-				fileName := filepath.Base(downloadedPkgStruct.DownloadFilePath)
+				fileName := filepath.Base(downloadedPkgStruct.UploadFilePath)
 				helpers.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n" +
 										  "Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
 				return downloadedPkgStruct
@@ -284,7 +284,12 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 func uploadDownloadedPackages(downloadedPkgsArr [] helpers.DownloadPackageDetailsStruct) {
 	helpers.LogInfo.Printf("Uploading %d downloaded packages", len(downloadedPkgsArr))
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
-		uploadDownloadedPackage(downloadedPkgStruct)
+		uploadDownloadedPackage(helpers.UploadPackageDetailsStruct{
+			PkgDetailsStruct: downloadedPkgStruct.PkgDetailsStruct,
+			UploadFilePath: downloadedPkgStruct.DownloadFilePath,
+			UploadFileChecksum: downloadedPkgStruct.DownloadFileChecksum,
+			UploadFileChecksumType: downloadedPkgStruct.DownloadFileChecksumType,
+		})
 	}
 }
 
