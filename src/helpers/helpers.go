@@ -23,6 +23,7 @@ import (
 type HttpRequestArgsStruct struct {
 	UrlAddress  string
 	DownloadFilePath  string
+	UploadFilePath  string
 	HeadersMap  map[string]string
     UserToUse  string
     PassToUse  string
@@ -210,11 +211,12 @@ func CalculateFileChecksum(filePath string) string {
 func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     urlAddress := httpRequestArgs.UrlAddress
     downloadFilePath := httpRequestArgs.DownloadFilePath
+    uploadFilePath := httpRequestArgs.UploadFilePath
     headersMap := httpRequestArgs.HeadersMap
     username := httpRequestArgs.UserToUse
     password := httpRequestArgs.PassToUse
     timeoutSec := httpRequestArgs.TimeoutSec
-    method := httpRequestArgs.Method
+    method := strings.ToUpper(httpRequestArgs.Method)
 
     LogInfo.Printf("Querying URL: \"%s\"", urlAddress)
 
@@ -222,7 +224,18 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
         Timeout: time.Duration(timeoutSec) * time.Second,
     }
 
-    req, err := http.NewRequest(method, urlAddress, nil)
+    
+    var body io.Reader
+
+    // Upload file (PUT requests):
+    if method == "PUT" && len(uploadFilePath) > 0 {
+        if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
+            LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
+            return ""
+        }  // If missing file: return empty
+    }
+
+    req, err := http.NewRequest(method, urlAddress, body)
     if err != nil {
         LogError.Printf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlAddress)
         return ""
@@ -360,7 +373,7 @@ func UploadPkg(uploadPkgStruct UploadPackageDetailsStruct) {
     pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	LogInfo.Printf("Uploading package: %s", pkgPrintStr)
 
-    
+
 }
 
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
