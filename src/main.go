@@ -260,6 +260,8 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 
 			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 			if len(foundPackagesDetailsArr) != 1 {continue}
+
+			// Check the checksum:
 			helpers.LogInfo.Printf("Found 1 existing pkg: '%s' at dest server: %s \n" +
 									"Comparing it's checksum to know if should upload or not", pkgPrintStr, destServerRepo)
 			foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
@@ -270,6 +272,8 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.DownloadPackageDetailsS
 										  "Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
 				return downloadedPkgStruct
 			}
+
+
 		}
 	}
 
