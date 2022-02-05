@@ -237,11 +237,11 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 	return totalDownloadedPackagesDetailsArr
 }
 
-func uploadDownloadedPackage(downloadedPkgStruct helpers.UploadPackageDetailsStruct) helpers.UploadPackageDetailsStruct {
-	pkgPrintStr := fmt.Sprintf("%s==%s", downloadedPkgStruct.PkgDetailsStruct.Name, downloadedPkgStruct.PkgDetailsStruct.Version)
+func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct) helpers.UploadPackageDetailsStruct {
+	pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	helpers.LogInfo.Printf("Uploading package: %s", pkgPrintStr)
-	pkgName := downloadedPkgStruct.PkgDetailsStruct.Name
-	pkgVersion := downloadedPkgStruct.PkgDetailsStruct.Version
+	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
+	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
 	
 	// Check if package already exists. If so, then compare it's checksum and skip on matching
 	for _, destServerUrl := range destServersUrlsArr {
@@ -265,12 +265,12 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.UploadPackageDetailsStr
 			helpers.LogInfo.Printf("Found 1 existing pkg: '%s' at dest server: %s \n" +
 									"Comparing it's checksum to know if should upload or not", pkgPrintStr, destServerRepo)
 			foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
-			fileToUploadChecksum := downloadedPkgStruct.UploadFileChecksum
+			fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
 			if foundPackageChecksum == fileToUploadChecksum {
-				fileName := filepath.Base(downloadedPkgStruct.UploadFilePath)
+				fileName := filepath.Base(uploadPkgStruct.UploadFilePath)
 				helpers.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n" +
 										  "Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
-				return downloadedPkgStruct
+				return uploadPkgStruct
 			}
 
 			// Upload the package file
@@ -278,7 +278,7 @@ func uploadDownloadedPackage(downloadedPkgStruct helpers.UploadPackageDetailsStr
 		}
 	}
 
-	return downloadedPkgStruct
+	return uploadPkgStruct
 }
 
 func uploadDownloadedPackages(downloadedPkgsArr [] helpers.DownloadPackageDetailsStruct) {
