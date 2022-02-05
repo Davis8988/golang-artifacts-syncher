@@ -137,7 +137,7 @@ func prepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 			for _, pkgName := range packagesNamesArr {
 				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
 				if len(versionsToSearchArr) == 0 {  // Either use search
-					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Search()?id='" + pkgName + "'")
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages()?$filter=tolower(Id)%20eq%20'" + pkgName + "'")
 					continue
 				}                   // Or specific package details request for each specified requested version
 				for _, pkgVersion := range versionsToSearchArr {
