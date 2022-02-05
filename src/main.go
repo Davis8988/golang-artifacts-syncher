@@ -239,7 +239,6 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 
 func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct) helpers.UploadPackageDetailsStruct {
 	pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
-	helpers.LogInfo.Printf("Uploading package: %s", pkgPrintStr)
 	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
 	

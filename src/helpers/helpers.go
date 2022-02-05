@@ -357,7 +357,10 @@ func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
 }
 
 func UploadPkg(uploadPkgStruct UploadPackageDetailsStruct) {
+    pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
+	LogInfo.Printf("Uploading package: %s", pkgPrintStr)
 
+    
 }
 
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
