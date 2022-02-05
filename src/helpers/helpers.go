@@ -229,10 +229,12 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
     // Upload file (PUT requests):
     if method == "PUT" && len(uploadFilePath) > 0 {
+        // If missing file: return empty
         if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
             LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
             return ""
-        }  // If missing file: return empty
+        }  
+        
     }
 
     req, err := http.NewRequest(method, urlAddress, body)
