@@ -349,6 +349,10 @@ func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     )
 }
 
+func UploadPkg() {
+
+}
+
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
 	convertSyncedMapToString_Lock.Lock()
 	result := ConvertSyncedMapToString(synchedMap)
