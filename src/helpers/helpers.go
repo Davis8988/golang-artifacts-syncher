@@ -3,9 +3,11 @@ package helpers
 import (
     "golang-artifacts-syncher/src/nuget_packages_xml"
 	"os"
+    "bytes"
 	"sync"
 	"fmt"
 	"io/ioutil"
+    "mime/multipart"
     "log"
     "io"
     "net/http"
@@ -290,10 +292,9 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     return bodyStr
 }
 
-func ReadFileContentsIntoPartsForUpload(uploadFilePath string) io.Reader {
-    var body io.Reader
+func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName string) io.Reader {
     LogInfo.Printf("Reading file content for upload: \"%s\"", uploadFilePath)
-    
+
     // If missing file: return empty body
     if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
         LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
@@ -302,12 +303,29 @@ func ReadFileContentsIntoPartsForUpload(uploadFilePath string) io.Reader {
 
     file, err := os.Open(uploadFilePath)
 	if err != nil {
-		return body
+		return nil
 	}
+
     fileContents, err := ioutil.ReadAll(file)
     if err != nil {
-		return nil, err
+		return nil
 	}
+
+    fi, err := file.Stat()
+	if err != nil {
+		return nil
+	}
+    file.Close()
+
+    body := new(bytes.Buffer)
+    writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(headerFieldName, fi.Name())  // Use package as headerFieldName for Nuget packages files upload
+	if err != nil {
+		return nil
+	}
+	part.Write(fileContents)
+
+    
     return body
 }
 
