@@ -229,12 +229,8 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
     // Upload file (PUT requests):
     if method == "PUT" && len(uploadFilePath) > 0 {
-        // If missing file: return empty
-        if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
-            LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
-            return ""
-        }  
-        
+         
+
     }
 
     req, err := http.NewRequest(method, urlAddress, body)
@@ -292,6 +288,15 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     if response.StatusCode >= 400 {LogError.Printf("Failed querying: %s", urlAddress)}
 
     return bodyStr
+}
+
+func ReadFileContentsIntoPartsForUpload(uploadFilePath string) io.Reader {
+    var body io.Reader
+    // If missing file: return empty body
+    if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
+        LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
+        return body
+    } 
 }
 
 func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
