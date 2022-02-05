@@ -274,7 +274,7 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 			}
 
 			// Upload the package file
-			helpers.UploadPkg()
+			helpers.UploadPkg(uploadPkgStruct)
 		}
 	}
 

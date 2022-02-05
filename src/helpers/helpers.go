@@ -356,7 +356,7 @@ func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     )
 }
 
-func UploadPkg() {
+func UploadPkg(uploadPkgStruct UploadPackageDetailsStruct) {
 
 }
 
