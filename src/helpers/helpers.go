@@ -231,7 +231,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
     // Upload file (PUT requests):
     if method == "PUT" && len(uploadFilePath) > 0 {
-        body = ReadFileContentsIntoPartsForUpload()
+        body = ReadFileContentsIntoPartsForUpload(uploadFilePath, "package")
     }
 
     req, err := http.NewRequest(method, urlAddress, body)
