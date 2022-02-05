@@ -46,6 +46,13 @@ type DownloadPackageDetailsStruct struct {
 	DownloadFileChecksumType  string
 }
 
+type UploadPackageDetailsStruct struct {
+    PkgDetailsStruct NugetPackageDetailsStruct
+    DownloadFilePath string
+    DownloadFileChecksum  string
+	DownloadFileChecksumType  string
+}
+
 
 
 var (
