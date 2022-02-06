@@ -281,9 +281,9 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 				return uploadPkgStruct
 				}
 			}
-
+			
 			// Upload the package file
-			helpers.UploadPkg(uploadPkgStruct)
+			helpers.UploadPkg(uploadPkgStruct, httpRequestArgs)
 		}
 	}
 

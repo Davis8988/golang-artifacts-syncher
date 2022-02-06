@@ -221,7 +221,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     timeoutSec := httpRequestArgs.TimeoutSec
     method := strings.ToUpper(httpRequestArgs.Method)
 
-    LogInfo.Printf("Querying URL: \"%s\"", urlAddress)
+    LogInfo.Printf("Querying %s on URL: \"%s\"", method, urlAddress)
 
     client := http.Client{
         Timeout: time.Duration(timeoutSec) * time.Second,
@@ -410,10 +410,12 @@ func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     )
 }
 
-func UploadPkg(uploadPkgStruct UploadPackageDetailsStruct) {
+func UploadPkg(uploadPkgStruct UploadPackageDetailsStruct, httpRequestArgsStruct HttpRequestArgsStruct) {
     pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
-	LogInfo.Printf("Uploading package: %s", pkgPrintStr)
-
+	LogInfo.Printf("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
+    httpRequestArgsStruct.Method = "PUT"
+    httpRequestArgsStruct.UploadFilePath = uploadPkgStruct.UploadFilePath
+    MakeHttpRequest(httpRequestArgsStruct)
 
 }
 
