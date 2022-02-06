@@ -275,13 +275,13 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
         return "" // Finish here
     }
 
-    body, err := ioutil.ReadAll(response.Body)
+    responseBody, err := ioutil.ReadAll(response.Body)
     if err != nil {
         LogError.Printf("%s\nFailed querying: %s", err, urlAddress)
         return ""
     }
 
-    bodyStr := string(body)
+    bodyStr := string(responseBody)
     /* msgStr := bodyStr
     if len(response.Status) > 0 {msgStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
     LogDebug.Printf(msgStr) */
