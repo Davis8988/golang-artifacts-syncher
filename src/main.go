@@ -280,11 +280,11 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 }
 
 func uploadDownloadedPackages(downloadedPkgsArr []helpers.DownloadPackageDetailsStruct) {
-	helpers.LogInfo.Printf("Uploading %d downloaded packages", len(downloadedPkgsArr))
 	if len(destServersUrlsArr) == 0 {
-		helpers.LogInfo.Printf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
+		helpers.LogWarning.Printf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
 		return
 	}
+	helpers.LogInfo.Printf("Uploading %d downloaded packages to servers: %v", len(downloadedPkgsArr), destServersUrlsArr)
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
 		uploadDownloadedPackage(helpers.UploadPackageDetailsStruct{
 			PkgDetailsStruct:       downloadedPkgStruct.PkgDetailsStruct,
