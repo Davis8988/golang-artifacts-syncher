@@ -253,7 +253,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     // Make the http request
     response, err := client.Do(req)
     if err != nil {
-        LogError.Printf("%s\nFailed querying: %s", err, urlAddress)
+        LogError.Printf("%s\nFailed while making the request: %s", err, urlAddress)
         return ""
     }
   
