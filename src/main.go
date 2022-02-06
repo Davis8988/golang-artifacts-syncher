@@ -282,6 +282,7 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 				}
 			}
 			
+			httpRequestArgs.UrlAddress = destServerRepo
 			// Upload the package file
 			helpers.UploadPkg(uploadPkgStruct, httpRequestArgs)
 		}
