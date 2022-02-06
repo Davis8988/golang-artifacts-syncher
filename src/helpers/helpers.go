@@ -221,7 +221,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     timeoutSec := httpRequestArgs.TimeoutSec
     method := strings.ToUpper(httpRequestArgs.Method)
 
-    LogInfo.Printf("Querying %s on URL: \"%s\"", method, urlAddress)
+    LogInfo.Printf("Making an HTTP '%s' request to URL: \"%s\"", method, urlAddress)
 
     client := http.Client{Timeout: time.Duration(timeoutSec) * time.Second,}
     
