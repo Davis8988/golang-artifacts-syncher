@@ -258,12 +258,12 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 
 			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 			if len(foundPackagesDetailsArr) != 1 {
-				helpers.LogInfo.Printf("Found multiple or none packages: %d - Should be only 1. Skipping this result", len(foundPackagesDetailsArr))
+				helpers.LogInfo.Printf("Found multiple or none packages: %d - Should be only 1. Skipping this result. Continuing..", len(foundPackagesDetailsArr))
 				continue
 			}
 			emptyNugetPackageDetailsStruct := helpers.NugetPackageDetailsStruct{}
 			if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
-				helpers.LogInfo.Print("No package found")
+				helpers.LogInfo.Print("No package found. Continuing..")
 				continue
 			}
 			helpers.LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
