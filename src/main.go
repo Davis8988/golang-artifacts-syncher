@@ -271,8 +271,7 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 			
 			if shouldCompareChecksum {
 				// Check the checksum:
-				helpers.LogInfo.Printf("Found 1 existing pkg: '%s' at dest server: %s \n"+
-				"Comparing it's checksum to know if should upload or not", pkgPrintStr, destServerRepo)
+				helpers.LogInfo.Printf("Comparing found package's checksum to know if should upload to: %s or not", destServerRepo)
 				foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
 				fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
 				if foundPackageChecksum == fileToUploadChecksum {
