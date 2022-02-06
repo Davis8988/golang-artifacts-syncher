@@ -11,29 +11,28 @@ import (
 )
 
 var (
-	srcServersUserToUse string
-	srcServersPassToUse string
-	srcServersUrlsStr string
-	srcReposNamesStr string
-	destServersUrlsStr string
-	destReposNamesStr string
-	destServersUserToUse string
-	destServersPassToUse string
-	packagesNamesStr string
-	packagesVersionsStr string
-	httpRequestHeadersStr string
-	downloadPkgsDirPath string
+	srcServersUserToUse          string
+	srcServersPassToUse          string
+	srcServersUrlsStr            string
+	srcReposNamesStr             string
+	destServersUrlsStr           string
+	destReposNamesStr            string
+	destServersUserToUse         string
+	destServersPassToUse         string
+	packagesNamesStr             string
+	packagesVersionsStr          string
+	httpRequestHeadersStr        string
+	downloadPkgsDirPath          string
 	httpRequestTimeoutSecondsInt int
 
-	srcServersUrlsArr [] string
-	srcReposNamesArr [] string
-	destServersUrlsArr [] string
-	destReposNamesArr [] string
-	packagesNamesArr [] string
-	packagesVersionsArr [] string
-	httpRequestHeadersMap map[string] string
+	srcServersUrlsArr     []string
+	srcReposNamesArr      []string
+	destServersUrlsArr    []string
+	destReposNamesArr     []string
+	packagesNamesArr      []string
+	packagesVersionsArr   []string
+	httpRequestHeadersMap map[string]string
 	packagesToDownloadMap sync.Map
-
 )
 
 func initVars() {
@@ -49,7 +48,7 @@ func initVars() {
 	destServersPassToUse = helpers.Getenv("DEST_SERVERS_PASS_TO_USE", "")
 	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
-	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "")  // Example: "key=value;key1=value1;key2=value2"
+	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
 	downloadPkgsDirPath = helpers.Getenv("DOWNLOAD_PKGS_DIR_PATH", helpers.GetCurrentProgramDir())
 	httpRequestTimeoutSecondsInt = helpers.StrToInt(helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
@@ -68,7 +67,7 @@ func printVars() {
 	helpers.LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
 	helpers.LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", downloadPkgsDirPath)
 	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSecondsInt)
-	
+
 	helpers.LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
 	helpers.LogInfo.Printf("destServersUrlsArr: %v", destServersUrlsArr)
 	helpers.LogInfo.Printf("srcReposNamesArr: %v", srcReposNamesArr)
@@ -82,7 +81,7 @@ func validateEnv() {
 	helpers.LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
-	if ! nexus3_adapter.IsStrArrayEmpty(packagesVersionsArr) {
+	if !nexus3_adapter.IsStrArrayEmpty(packagesVersionsArr) {
 		helpers.LogInfo.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
@@ -92,7 +91,7 @@ func validateEnv() {
 			helpers.LogError.Fatal(errMsg)
 		}
 	}
-	
+
 	helpers.LogInfo.Print("All Good")
 }
 
@@ -118,7 +117,7 @@ func updateVars() {
 
 	for i, pkgName := range packagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
-		packagesToDownloadMap.LoadOrStore(pkgName, make([] string, 0, 10))
+		packagesToDownloadMap.LoadOrStore(pkgName, make([]string, 0, 10))
 		// If received a version array for it - add it to the list
 		if len(packagesVersionsArr) > i {
 			pkgVersion := packagesVersionsArr[i]
@@ -129,51 +128,51 @@ func updateVars() {
 }
 
 func prepareSrcSearchAllPkgsVersionsUrlsArray() []string {
-	var searchUrlsArr = make([]string, 0, 10)  // Create a slice with length=0 and capacity=10
-	
+	var searchUrlsArr = make([]string, 0, 10) // Create a slice with length=0 and capacity=10
+
 	helpers.LogInfo.Print("Preparing src search packages urls array")
 	for _, srcServerUrl := range srcServersUrlsArr {
 		for _, repoName := range srcReposNamesArr {
 			for _, pkgName := range packagesNamesArr {
 				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
-				if len(versionsToSearchArr) == 0 {  // Either use search
-					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages()?$filter=tolower(Id)%20eq%20'" + pkgName + "'")
+				if len(versionsToSearchArr) == 0 { // Either use search
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl+"/"+repoName+"/"+"Packages()?$filter=tolower(Id)%20eq%20'"+pkgName+"'")
 					continue
-				}                   // Or specific package details request for each specified requested version
+				} // Or specific package details request for each specified requested version
 				for _, pkgVersion := range versionsToSearchArr {
-					searchUrlsArr = append(searchUrlsArr, srcServerUrl + "/" + repoName + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')")
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl+"/"+repoName+"/"+"Packages(Id='"+pkgName+"',Version='"+pkgVersion+"')")
 				}
-				
+
 			}
 		}
 	}
 	return searchUrlsArr
-} 
+}
 
-func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct) [] helpers.NugetPackageDetailsStruct {
+func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []helpers.NugetPackageDetailsStruct) []helpers.NugetPackageDetailsStruct {
 	helpers.LogInfo.Printf("Filtering found pkgs by requested versions")
-	var filteredPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
+	var filteredPackagesDetailsArr []helpers.NugetPackageDetailsStruct
 	for _, pkgDetailStruct := range foundPackagesDetailsArr {
 		pkgVersion := pkgDetailStruct.Version
 		pkgName := pkgDetailStruct.Name
-		versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)  // Use global var: packagesToDownloadMap
+		versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName) // Use global var: packagesToDownloadMap
 		if len(versionsToSearchArr) == 0 {
 			filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)
 			continue
 		}
 		for _, requestedVersion := range versionsToSearchArr {
-			if pkgVersion == requestedVersion {filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)}  // This version is requested - Add pkg details obj to the result filtered array
+			if pkgVersion == requestedVersion {filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)} // This version is requested - Add pkg details obj to the result filtered array
 		}
 	}
 	return filteredPackagesDetailsArr
 }
 
-func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetailsStruct {
-	var totalFoundPackagesDetailsArr [] helpers.NugetPackageDetailsStruct
+func searchAvailableVersionsOfSpecifiedPackages() []helpers.NugetPackageDetailsStruct {
+	var totalFoundPackagesDetailsArr []helpers.NugetPackageDetailsStruct
 	searchUrlsArr := prepareSrcSearchAllPkgsVersionsUrlsArray()
-	
+
 	wg := sync.WaitGroup{}
-	
+
 	// Ensure all routines finish before returning
 	defer wg.Wait()
 
@@ -183,29 +182,29 @@ func searchAvailableVersionsOfSpecifiedPackages() [] helpers.NugetPackageDetails
 			wg.Add(1)
 			go func(urlToCheck string) {
 				defer wg.Done()
-				httpRequestArgs := helpers.HttpRequestArgsStruct {
+				httpRequestArgs := helpers.HttpRequestArgsStruct{
 					UrlAddress: urlToCheck,
 					HeadersMap: httpRequestHeadersMap,
-					UserToUse: srcServersUserToUse,
-					PassToUse: srcServersPassToUse,
+					UserToUse:  srcServersUserToUse,
+					PassToUse:  srcServersPassToUse,
 					TimeoutSec: httpRequestTimeoutSecondsInt,
-					Method: "GET",
+					Method:     "GET",
 				}
 				foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
-				foundPackagesDetailsArr = filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr)  // Filter by requested version - if any version is specified..
+				foundPackagesDetailsArr = filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr) // Filter by requested version - if any version is specified..
 				helpers.Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
 			}(urlToCheck)
 		}
 	}
 	wg.Wait()
 
-	return totalFoundPackagesDetailsArr 
+	return totalFoundPackagesDetailsArr
 }
 
-func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsStruct) [] helpers.DownloadPackageDetailsStruct {
+func downloadSpecifiedPackages(foundPackagesArr []helpers.NugetPackageDetailsStruct) []helpers.DownloadPackageDetailsStruct {
 	helpers.LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
-	var totalDownloadedPackagesDetailsArr [] helpers.DownloadPackageDetailsStruct
-	
+	var totalDownloadedPackagesDetailsArr []helpers.DownloadPackageDetailsStruct
+
 	wg := sync.WaitGroup{}
 	// Ensure all routines finish before returning
 	defer wg.Wait()
@@ -218,14 +217,14 @@ func downloadSpecifiedPackages(foundPackagesArr [] helpers.NugetPackageDetailsSt
 
 		wg.Add(1)
 		fileName := pkgDetailsStruct.Name + "." + pkgDetailsStruct.Version + ".nupkg"
-		downloadFilePath := filepath.Join(downloadPkgsDirPath, fileName)   // downloadPkgsDirPath == global var
-		downloadPkgDetailsStruct := helpers.DownloadPackageDetailsStruct {
-			PkgDetailsStruct: pkgDetailsStruct,
-			DownloadFilePath: downloadFilePath,
-			DownloadFileChecksum: helpers.CalculateFileChecksum(downloadFilePath), // Can by empty if file doesn't exist yet
-			DownloadFileChecksumType: "SHA512",  // Default checksum algorithm for Nuget pkgs
+		downloadFilePath := filepath.Join(downloadPkgsDirPath, fileName) // downloadPkgsDirPath == global var
+		downloadPkgDetailsStruct := helpers.DownloadPackageDetailsStruct{
+			PkgDetailsStruct:         pkgDetailsStruct,
+			DownloadFilePath:         downloadFilePath,
+			DownloadFileChecksum:     helpers.CalculateFileChecksum(downloadFilePath), // Can by empty if file doesn't exist yet
+			DownloadFileChecksumType: "SHA512",                                        // Default checksum algorithm for Nuget pkgs
 		}
-		
+
 		go func(downloadPkgDetailsStruct helpers.DownloadPackageDetailsStruct) {
 			defer wg.Done()
 			helpers.DownloadPkg(downloadPkgDetailsStruct)
@@ -241,34 +240,34 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 	pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
-	
+
 	// Check if package already exists. If so, then compare it's checksum and skip on matching
 	for _, destServerUrl := range destServersUrlsArr {
 		for _, repoName := range destReposNamesArr {
 			destServerRepo := destServerUrl + "/" + repoName
 			helpers.LogInfo.Printf("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerRepo)
 			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
-			httpRequestArgs := helpers.HttpRequestArgsStruct {
+			httpRequestArgs := helpers.HttpRequestArgsStruct{
 				UrlAddress: checkDestServerPkgExistUrl,
 				HeadersMap: httpRequestHeadersMap,
-				UserToUse: destServersUserToUse,
-				PassToUse: destServersPassToUse,
+				UserToUse:  destServersUserToUse,
+				PassToUse:  destServersPassToUse,
 				TimeoutSec: httpRequestTimeoutSecondsInt,
-				Method: "GET",
+				Method:     "GET",
 			}
 
 			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 			if len(foundPackagesDetailsArr) != 1 {continue}
 
 			// Check the checksum:
-			helpers.LogInfo.Printf("Found 1 existing pkg: '%s' at dest server: %s \n" +
-									"Comparing it's checksum to know if should upload or not", pkgPrintStr, destServerRepo)
+			helpers.LogInfo.Printf("Found 1 existing pkg: '%s' at dest server: %s \n"+
+				"Comparing it's checksum to know if should upload or not", pkgPrintStr, destServerRepo)
 			foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
 			fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
 			if foundPackageChecksum == fileToUploadChecksum {
 				fileName := filepath.Base(uploadPkgStruct.UploadFilePath)
-				helpers.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n" +
-										  "Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
+				helpers.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n"+
+					"Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
 				return uploadPkgStruct
 			}
 
@@ -280,13 +279,13 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 	return uploadPkgStruct
 }
 
-func uploadDownloadedPackages(downloadedPkgsArr [] helpers.DownloadPackageDetailsStruct) {
+func uploadDownloadedPackages(downloadedPkgsArr []helpers.DownloadPackageDetailsStruct) {
 	helpers.LogInfo.Printf("Uploading %d downloaded packages", len(downloadedPkgsArr))
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
 		uploadDownloadedPackage(helpers.UploadPackageDetailsStruct{
-			PkgDetailsStruct: downloadedPkgStruct.PkgDetailsStruct,
-			UploadFilePath: downloadedPkgStruct.DownloadFilePath,
-			UploadFileChecksum: downloadedPkgStruct.DownloadFileChecksum,
+			PkgDetailsStruct:       downloadedPkgStruct.PkgDetailsStruct,
+			UploadFilePath:         downloadedPkgStruct.DownloadFilePath,
+			UploadFileChecksum:     downloadedPkgStruct.DownloadFileChecksum,
 			UploadFileChecksumType: downloadedPkgStruct.DownloadFileChecksumType,
 		})
 	}
