@@ -257,16 +257,17 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 			}
 
 			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			emptyNugetPackageDetailsStruct := helpers.NugetPackageDetailsStruct{}
 			shouldUploadPkg := false
 			if len(foundPackagesDetailsArr) != 1 {
 				helpers.LogInfo.Printf("Found multiple or none packages: %d - Should be only 1. Skipping checksum comparison. Continuing with the upload..", len(foundPackagesDetailsArr))
-				shouldUploadPkg := true
+				shouldUploadPkg = true
+			} else if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
+				helpers.LogInfo.Print("No package found. Continuing with the upload..")
+				shouldUploadPkg = true
 			}
-			emptyNugetPackageDetailsStruct := helpers.NugetPackageDetailsStruct{}
-			if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
-				helpers.LogInfo.Print("No package found. Continuing..")
-				continue
-			}
+			
+
 			helpers.LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
 
 			// Check the checksum:
