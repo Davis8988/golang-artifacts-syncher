@@ -1,6 +1,7 @@
 # VsCode
 .vscode
 slnx.sqlite
+launch.json
 
 # Visual Studio
 .vs
