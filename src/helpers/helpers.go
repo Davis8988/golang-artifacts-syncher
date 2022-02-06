@@ -284,7 +284,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     if len(response.Status) > 0 {msgStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
     LogDebug.Printf(msgStr) */
 
-    if response.StatusCode >= 400 {LogError.Printf("Returned code: %d is >= 400. HTTP request failure: %s", response.StatusCode, urlAddress)}
+    if response.StatusCode >= 400 {LogError.Printf("Returned code: %d. HTTP request failure: %s", response.StatusCode, urlAddress)}
 
     return bodyStr
 }
