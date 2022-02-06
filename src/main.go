@@ -257,7 +257,12 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 			}
 
 			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			helpers.LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
 			if len(foundPackagesDetailsArr) != 1 {continue}
+			emptyNugetPackageDetailsStruct := helpers.NugetPackageDetailsStruct{}
+			if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
+				helpers.LogInfo.Printf("Found NILLL package: %s", foundPackagesDetailsArr)
+			}
 
 			// Check the checksum:
 			helpers.LogInfo.Printf("Found 1 existing pkg: '%s' at dest server: %s \n"+
