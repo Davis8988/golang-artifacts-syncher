@@ -126,6 +126,7 @@ func IsStrArrayEmpty(arrToCheck []string) bool {
 
 func LoadStringArrValueFromSynchedMap(synchedMap sync.Map, key string) [] string {
     currentInterfaceValue, _ := synchedMap.Load(key)
+    if currentInterfaceValue == nil {return []string{}}  // Return empty
     var currentStrArr []string = currentInterfaceValue.([]string)
     return currentStrArr
 }
