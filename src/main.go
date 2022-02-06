@@ -263,7 +263,8 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 			}
 			emptyNugetPackageDetailsStruct := helpers.NugetPackageDetailsStruct{}
 			if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
-				helpers.LogInfo.Printf("Found NILLL package: %s", foundPackagesDetailsArr)
+				helpers.LogInfo.Print("No package found")
+				continue
 			}
 			helpers.LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
 
