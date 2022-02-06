@@ -275,7 +275,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
     responseBody, err := ioutil.ReadAll(response.Body)
     if err != nil {
-        LogError.Printf("%s\nFailed querying: %s", err, urlAddress)
+        LogError.Printf("%s\nFailed reading request's response body: %s", err, urlAddress)
         return ""
     }
 
