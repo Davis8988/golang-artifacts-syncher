@@ -223,10 +223,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
     LogInfo.Printf("Querying %s on URL: \"%s\"", method, urlAddress)
 
-    client := http.Client{
-        Timeout: time.Duration(timeoutSec) * time.Second,
-    }
-
+    client := http.Client{Timeout: time.Duration(timeoutSec) * time.Second,}
     
     var body io.Reader
 
