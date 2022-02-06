@@ -257,29 +257,30 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 			}
 
 			foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			helpers.LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
+
 			emptyNugetPackageDetailsStruct := helpers.NugetPackageDetailsStruct{}
 			shouldCompareChecksum := true
 			if len(foundPackagesDetailsArr) != 1 {
 				helpers.LogInfo.Printf("Found multiple or no packages: \"%d\" - Should be only 1. Skipping checksum comparison. Continuing with the upload..", len(foundPackagesDetailsArr))
-				shouldUploadPkg = false
+				shouldCompareChecksum = false
 			} else if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
 				helpers.LogInfo.Print("No package found. Continuing with the upload..")
-				shouldUploadPkg = false
+				shouldCompareChecksum = false
 			}
 			
-
-			helpers.LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
-
-			// Check the checksum:
-			helpers.LogInfo.Printf("Found 1 existing pkg: '%s' at dest server: %s \n"+
+			if shouldCompareChecksum {
+				// Check the checksum:
+				helpers.LogInfo.Printf("Found 1 existing pkg: '%s' at dest server: %s \n"+
 				"Comparing it's checksum to know if should upload or not", pkgPrintStr, destServerRepo)
-			foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
-			fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
-			if foundPackageChecksum == fileToUploadChecksum {
+				foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
+				fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
+				if foundPackageChecksum == fileToUploadChecksum {
 				fileName := filepath.Base(uploadPkgStruct.UploadFilePath)
 				helpers.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n"+
 					"Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
 				return uploadPkgStruct
+				}
 			}
 
 			// Upload the package file
