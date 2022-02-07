@@ -229,7 +229,42 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
     // Upload file (PUT requests):
     if method == "PUT" && len(uploadFilePath) > 0 {
-        body = ReadFileContentsIntoPartsForUpload(uploadFilePath, "package")
+        LogInfo.Printf("Reading file content for upload: \"%s\"", uploadFilePath)
+
+        // If missing file: return empty body
+        if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
+            LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
+            return ""
+        }
+
+        file, err := os.Open(uploadFilePath)
+        if err != nil {
+            return ""
+        }
+
+        fileContents, err := ioutil.ReadAll(file)
+        if err != nil {
+            return ""
+        }
+
+        fi, err := file.Stat()
+        if err != nil {
+            return ""
+        }
+        file.Close()
+
+        body := new(bytes.Buffer)
+        writer := multipart.NewWriter(body)
+        part, err := writer.CreateFormFile(headerFieldName, fi.Name())  // Use package as headerFieldName for Nuget packages files upload
+        if err != nil {
+            return ""
+        }
+        part.Write(fileContents)
+        
+        err = writer.Close()
+        if err != nil {
+            return ""
+        }
     }
 
     req, err := http.NewRequest(method, urlAddress, body)
