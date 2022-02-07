@@ -1,24 +1,26 @@
 package helpers
 
 import (
-    "golang-artifacts-syncher/src/nuget_packages_xml"
-	"os"
-    "bytes"
-	"sync"
-	"fmt"
-	"io/ioutil"
-    "mime/multipart"
-    "log"
-    "io"
-    "net/http"
-	"strings"
-	"time"
-	"strconv"
-	"regexp"
+	"bytes"
+	"crypto/sha512"
+	"encoding/base64"
 	"errors"
-    "path/filepath"
-    "crypto/sha512"
-    "encoding/base64"
+	"fmt"
+	"golang-artifacts-syncher/src/nuget_packages_xml"
+	"io"
+	"io/ioutil"
+	"log"
+	"mime/multipart"
+	"net/http"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/sirupsen/logrus/hooks/writer"
 )
 
 
@@ -226,6 +228,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     client := http.Client{Timeout: time.Duration(timeoutSec) * time.Second,}
     
     var body io.Reader
+    var writer multipart.Writer
 
     // Upload file (PUT requests):
     if method == "PUT" && len(uploadFilePath) > 0 {
@@ -255,7 +258,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
         body := new(bytes.Buffer)
         writer := multipart.NewWriter(body)
-        part, err := writer.CreateFormFile(headerFieldName, fi.Name())  // Use package as headerFieldName for Nuget packages files upload
+        part, err := writer.CreateFormFile("package", fi.Name())  // Use "package" as headerFieldName for Nuget packages files upload
         if err != nil {
             return ""
         }
@@ -271,6 +274,12 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     if err != nil {
         LogError.Printf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlAddress)
         return ""
+    }
+
+    // Incase pushing a file, then add the Content Type header from the reader (includes boundary)
+    if method == "PUT" && len(uploadFilePath) > 0 {
+        LogError.Printf("Adding header:  'Content-Type'")
+        req.Header.Add("Content-Type", writer.FormDataContentType())
     }
 
     // Adding headers:
