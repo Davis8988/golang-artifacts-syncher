@@ -11,3 +11,7 @@ func pushNugetPackage() {
 func downloadNugetPackage() {
 
 }
+
+func searchForAvailableNugetPackages() []helpers.NugetPackageDetailsStruct {
+
+}
