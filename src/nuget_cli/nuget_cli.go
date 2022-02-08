@@ -31,10 +31,10 @@ func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruc
 				defer wg.Done()
 				httpRequestArgs := global_structs.HttpRequestArgsStruct{
 					UrlAddress: urlToCheck,
-					HeadersMap: httpRequestHeadersMap,
-					UserToUse:  srcServersUserToUse,
-					PassToUse:  srcServersPassToUse,
-					TimeoutSec: httpRequestTimeoutSecondsInt,
+					HeadersMap: helpers.HttpRequestHeadersMap,
+					UserToUse:  helpers.SrcServersUserToUse,
+					PassToUse:  helpers.SrcServersPassToUse,
+					TimeoutSec: helpers.HttpRequestTimeoutSecondsInt,
 					Method:     "GET",
 				}
 				foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)

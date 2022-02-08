@@ -35,8 +35,8 @@ var (
     appendPkgDetailsArr_Lock sync.RWMutex
     appendDownloadedPkgDetailsArr_Lock sync.RWMutex
 
-    srcServersUserToUse          string
-    srcServersPassToUse          string
+    SrcServersUserToUse          string
+    SrcServersPassToUse          string
     srcServersUrlsStr            string
     srcReposNamesStr             string
     destServersUrlsStr           string
@@ -47,7 +47,7 @@ var (
     packagesVersionsStr          string
     httpRequestHeadersStr        string
     DownloadPkgsDirPath          string
-    httpRequestTimeoutSecondsInt int
+    HttpRequestTimeoutSecondsInt int
 
     srcServersUrlsArr     []string
     srcReposNamesArr      []string
@@ -66,8 +66,8 @@ func Init() {
     appendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
 
     LogInfo.Print("Initializing from envs vars")
-    srcServersUserToUse = Getenv("SRC_SERVERS_USER_TO_USE", "")
-	srcServersPassToUse = Getenv("SRC_SERVERS_PASS_TO_USE", "")
+    SrcServersUserToUse = Getenv("SRC_SERVERS_USER_TO_USE", "")
+	SrcServersPassToUse = Getenv("SRC_SERVERS_PASS_TO_USE", "")
 	srcServersUrlsStr = Getenv("SRC_SERVERS_URLS_STR", "")
 	srcReposNamesStr = Getenv("SRC_REPOS_NAMES_STR", "")
 	destServersUrlsStr = Getenv("DEST_SERVERS_URLS_STR", "")
@@ -78,14 +78,14 @@ func Init() {
 	packagesVersionsStr = Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
 	DownloadPkgsDirPath = Getenv("DOWNLOAD_PKGS_DIR_PATH", GetCurrentProgramDir())
-	httpRequestTimeoutSecondsInt = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
+	HttpRequestTimeoutSecondsInt = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
 
 func PrintVars() {
     LogInfo.Printf("SRC_SERVERS_URLS_STR: '%s'", srcServersUrlsStr)
 	LogInfo.Printf("SRC_REPOS_NAMES_STR: '%s'", srcReposNamesStr)
-	LogInfo.Printf("SRC_SERVERS_USER_TO_USE: '%s'", srcServersUserToUse)
-	LogInfo.Printf("SRC_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(srcServersPassToUse)))
+	LogInfo.Printf("SRC_SERVERS_USER_TO_USE: '%s'", SrcServersUserToUse)
+	LogInfo.Printf("SRC_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(SrcServersPassToUse)))
 	LogInfo.Printf("DEST_SERVERS_URLS_STR: '%s'", destServersUrlsStr)
 	LogInfo.Printf("DEST_REPOS_NAMES_STR: '%s'", destReposNamesStr)
 	LogInfo.Printf("DEST_SERVERS_USER_TO_USE: '%s'", destServersUserToUse)
@@ -94,7 +94,7 @@ func PrintVars() {
 	LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
 	LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
 	LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", DownloadPkgsDirPath)
-	LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSecondsInt)
+	LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", HttpRequestTimeoutSecondsInt)
 
 	LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
 	LogInfo.Printf("DestServersUrlsArr: %v", DestServersUrlsArr)
@@ -207,7 +207,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 				HeadersMap: HttpRequestHeadersMap,
 				UserToUse:  destServersUserToUse,
 				PassToUse:  destServersPassToUse,
-				TimeoutSec: httpRequestTimeoutSecondsInt,
+				TimeoutSec: HttpRequestTimeoutSecondsInt,
 				Method:     "GET",
 			}
 
