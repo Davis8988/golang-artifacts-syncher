@@ -52,7 +52,7 @@ func downloadSpecifiedPackages(foundPackagesArr []helpers.NugetPackageDetailsStr
 
 		wg.Add(1)
 		fileName := pkgDetailsStruct.Name + "." + pkgDetailsStruct.Version + ".nupkg"
-		downloadFilePath := filepath.Join(helpers.downloadPkgsDirPath, fileName) // downloadPkgsDirPath == global var
+		downloadFilePath := filepath.Join(helpers.DownloadPkgsDirPath, fileName) // downloadPkgsDirPath == global var
 		downloadPkgDetailsStruct := helpers.DownloadPackageDetailsStruct{
 			PkgDetailsStruct:         pkgDetailsStruct,
 			DownloadFilePath:         downloadFilePath,

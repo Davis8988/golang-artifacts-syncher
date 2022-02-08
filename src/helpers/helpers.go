@@ -82,7 +82,7 @@ var (
     packagesNamesStr             string
     packagesVersionsStr          string
     httpRequestHeadersStr        string
-    downloadPkgsDirPath          string
+    DownloadPkgsDirPath          string
     httpRequestTimeoutSecondsInt int
 
     srcServersUrlsArr     []string
@@ -113,7 +113,7 @@ func Init() {
 	packagesNamesStr = Getenv("PACKAGES_NAMES_STR", "")
 	packagesVersionsStr = Getenv("PACKAGES_VERSIONS_STR", "")
 	httpRequestHeadersStr = Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
-	downloadPkgsDirPath = Getenv("DOWNLOAD_PKGS_DIR_PATH", GetCurrentProgramDir())
+	DownloadPkgsDirPath = Getenv("DOWNLOAD_PKGS_DIR_PATH", GetCurrentProgramDir())
 	httpRequestTimeoutSecondsInt = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
 
@@ -129,7 +129,7 @@ func PrintVars() {
 	LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
 	LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
 	LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
-	LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", downloadPkgsDirPath)
+	LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", DownloadPkgsDirPath)
 	LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSecondsInt)
 
 	LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
