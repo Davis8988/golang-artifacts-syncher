@@ -1,7 +1,6 @@
 package nuget_cli
 
 import (
-	"golang-artifacts-syncher/src/helpers"
 	"golang-artifacts-syncher/src/global_structs"
 )
 
