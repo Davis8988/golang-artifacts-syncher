@@ -4,11 +4,11 @@ import (
 	"golang-artifacts-syncher/src/global_structs"
 )
 
-func pushNugetPackage() {
+func PushNugetPackage() {
 
 }
 
-func downloadNugetPackage() {
+func DownloadNugetPackage() {
 
 }
 
