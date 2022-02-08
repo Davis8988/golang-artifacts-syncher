@@ -1,7 +1,7 @@
 package nuget_cli
 
 import (
-	"os"
+	"golang-artifacts-syncher/src/helpers"
 )
 
 func pushNugetPackage() {
