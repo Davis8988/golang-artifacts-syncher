@@ -13,5 +13,5 @@ func downloadNugetPackage() {
 }
 
 func searchForAvailableNugetPackages() []helpers.NugetPackageDetailsStruct {
-
+    return []helpers.NugetPackageDetailsStruct{}
 }
