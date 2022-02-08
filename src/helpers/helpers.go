@@ -55,7 +55,7 @@ var (
     destReposNamesArr     []string
     packagesNamesArr      []string
     packagesVersionsArr   []string
-    httpRequestHeadersMap map[string]string
+    HttpRequestHeadersMap map[string]string
     packagesToDownloadMap sync.Map
 )
 
@@ -136,7 +136,7 @@ func UpdateVars() {
 	if len(destReposNamesStr) > 1 {destReposNamesArr = strings.Split(destReposNamesStr, ";")}
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
-	httpRequestHeadersMap = ParseHttpHeadersStrToMap(httpRequestHeadersStr)
+	HttpRequestHeadersMap = ParseHttpHeadersStrToMap(httpRequestHeadersStr)
 
 	for i, pkgName := range packagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
@@ -150,7 +150,7 @@ func UpdateVars() {
 	}
 }
 
-func prepareSrcSearchAllPkgsVersionsUrlsArray() []string {
+func PrepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10) // Create a slice with length=0 and capacity=10
 
 	LogInfo.Print("Preparing src search packages urls array")
@@ -190,40 +190,6 @@ func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []global_stru
 	return filteredPackagesDetailsArr
 }
 
-func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruct {
-	var totalFoundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
-	searchUrlsArr := prepareSrcSearchAllPkgsVersionsUrlsArray()
-
-	wg := sync.WaitGroup{}
-
-	// Ensure all routines finish before returning
-	defer wg.Wait()
-
-	if len(searchUrlsArr) > 0 {
-		LogInfo.Printf("Checking %d src URL addresses for pkgs versions", len(searchUrlsArr))
-		for _, urlToCheck := range searchUrlsArr {
-			wg.Add(1)
-			go func(urlToCheck string) {
-				defer wg.Done()
-				httpRequestArgs := global_structs.HttpRequestArgsStruct{
-					UrlAddress: urlToCheck,
-					HeadersMap: httpRequestHeadersMap,
-					UserToUse:  srcServersUserToUse,
-					PassToUse:  srcServersPassToUse,
-					TimeoutSec: httpRequestTimeoutSecondsInt,
-					Method:     "GET",
-				}
-				foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
-				foundPackagesDetailsArr = filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr) // Filter by requested version - if any version is specified..
-				Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
-			}(urlToCheck)
-		}
-	}
-	wg.Wait()
-
-	return totalFoundPackagesDetailsArr
-}
-
 
 func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetailsStruct) global_structs.UploadPackageDetailsStruct {
 	pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
@@ -238,7 +204,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
 			httpRequestArgs := global_structs.HttpRequestArgsStruct{
 				UrlAddress: checkDestServerPkgExistUrl,
-				HeadersMap: httpRequestHeadersMap,
+				HeadersMap: HttpRequestHeadersMap,
 				UserToUse:  destServersUserToUse,
 				PassToUse:  destServersPassToUse,
 				TimeoutSec: httpRequestTimeoutSecondsInt,
@@ -357,7 +323,7 @@ func ConvertSyncedMapToString(synchedMap sync.Map) string {
 func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     if len(httpRequestHeadersStr) <= 1 {return nil}
     
-    httpRequestHeadersMap := make(map[string] string)
+    HttpRequestHeadersMap := make(map[string] string)
     tempHeadersPairsArr := strings.Split(httpRequestHeadersStr, ";")
     LogInfo.Printf("Looping on headers values to init headers map")
     for _, headersPairStr := range tempHeadersPairsArr {
@@ -368,9 +334,9 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
         }
         headerKey := tempPairArr[0]
         headerValue := tempPairArr[1]
-        httpRequestHeadersMap[headerKey] = headerValue
+        HttpRequestHeadersMap[headerKey] = headerValue
     }
-    return httpRequestHeadersMap
+    return HttpRequestHeadersMap
 }
 
 func CreateDir(dirPath string) {
