@@ -12,10 +12,10 @@ func downloadNugetPackage() {
 
 }
 
-func searchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruct {
+func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruct {
 
 
 
-    
+
     return []global_structs.NugetPackageDetailsStruct{}
 }
