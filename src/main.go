@@ -20,21 +20,7 @@ func printVars() {
 }
 
 func validateEnv() {
-	helpers.LogInfo.Print("Validating envs")
-
-	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
-	if ! helpers.IsStrArrayEmpty(packagesVersionsArr) {
-		helpers.LogInfo.Print("Comparing packages names & versions arrays lengths")
-		if len(packagesVersionsArr) != len(packagesNamesArr) {
-			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
-			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
-			errMsg += "When passing packages versions to search - the versions count must be of the same count of packages names to search.\n"
-			errMsg += "A version for each package name to search"
-			helpers.LogError.Fatal(errMsg)
-		}
-	}
-
-	helpers.LogInfo.Print("All Good")
+	helpers.ValidateEnvironment()
 }
 
 func parseArgs() {

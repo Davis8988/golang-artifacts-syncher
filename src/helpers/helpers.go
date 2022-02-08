@@ -141,6 +141,24 @@ func PrintVars() {
 	LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
 }
 
+func ValidateEnvironment() {
+    LogInfo.Print("Validating envs")
+
+	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
+	if ! IsStrArrayEmpty(packagesVersionsArr) {
+		LogInfo.Print("Comparing packages names & versions arrays lengths")
+		if len(packagesVersionsArr) != len(packagesNamesArr) {
+			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
+			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
+			errMsg += "When passing packages versions to search - the versions count must be of the same count of packages names to search.\n"
+			errMsg += "A version for each package name to search"
+			LogError.Fatal(errMsg)
+		}
+	}
+
+	LogInfo.Print("All Good")
+}
+
 func TrimQuotes(s string) string {
     if len(s) >= 2 {
         if c := s[len(s)-1]; s[0] == c && (c == '"' || c == '\'') {
