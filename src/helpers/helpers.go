@@ -1,12 +1,13 @@
 package helpers
 
 import (
+	"golang-artifacts-syncher/src/nuget_packages_xml"
+	"golang-artifacts-syncher/src/global_structs"
 	"bytes"
 	"crypto/sha512"
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"golang-artifacts-syncher/src/nuget_packages_xml"
 	"io"
 	"io/ioutil"
 	"log"
@@ -20,43 +21,6 @@ import (
 	"sync"
 	"time"
 )
-
-
-type HttpRequestArgsStruct struct {
-	UrlAddress  string
-	DownloadFilePath  string
-	UploadFilePath  string
-	HeadersMap  map[string]string
-    UserToUse  string
-    PassToUse  string
-    TimeoutSec  int
-    Method  string
-}
-
-type NugetPackageDetailsStruct struct {
-    Name string
-    Version string
-    Checksum string
-    ChecksumType string
-    PkgDetailsUrl string
-    PkgFileUrl string
-}
-
-type DownloadPackageDetailsStruct struct {
-    PkgDetailsStruct NugetPackageDetailsStruct
-    DownloadFilePath string
-    DownloadFileChecksum  string
-	DownloadFileChecksumType  string
-}
-
-type UploadPackageDetailsStruct struct {
-    PkgDetailsStruct NugetPackageDetailsStruct
-    UploadFilePath string
-    UploadFileChecksum  string
-	UploadFileChecksumType  string
-}
-
-
 
 var (
     // Log
