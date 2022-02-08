@@ -87,7 +87,7 @@ var (
 
     srcServersUrlsArr     []string
     srcReposNamesArr      []string
-    destServersUrlsArr    []string
+    DestServersUrlsArr    []string
     destReposNamesArr     []string
     packagesNamesArr      []string
     packagesVersionsArr   []string
@@ -133,7 +133,7 @@ func PrintVars() {
 	LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSecondsInt)
 
 	LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
-	LogInfo.Printf("destServersUrlsArr: %v", destServersUrlsArr)
+	LogInfo.Printf("DestServersUrlsArr: %v", DestServersUrlsArr)
 	LogInfo.Printf("srcReposNamesArr: %v", srcReposNamesArr)
 	LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
 	LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
@@ -162,13 +162,13 @@ func ValidateEnvironment() {
 func UpdateVars() {
     LogInfo.Print("Updating vars")
 	srcServersUrlsArr = make([]string, 0, 4)
-	destServersUrlsArr = make([]string, 0, 4)
+	DestServersUrlsArr = make([]string, 0, 4)
 	srcReposNamesArr = make([]string, 0, 4)
 	packagesNamesArr = make([]string, 0, 10)
 	packagesVersionsArr = make([]string, 0, 10)
 	if len(srcServersUrlsStr) > 1 {srcServersUrlsArr = strings.Split(srcServersUrlsStr, ";")}
 	if len(srcReposNamesStr) > 1 {srcReposNamesArr = strings.Split(srcReposNamesStr, ";")}
-	if len(destServersUrlsStr) > 1 {destServersUrlsArr = strings.Split(destServersUrlsStr, ";")}
+	if len(destServersUrlsStr) > 1 {DestServersUrlsArr = strings.Split(destServersUrlsStr, ";")}
 	if len(destReposNamesStr) > 1 {destReposNamesArr = strings.Split(destReposNamesStr, ";")}
 	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
 	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
@@ -259,6 +259,104 @@ func SearchForAvailableNugetPackages() []NugetPackageDetailsStruct {
 
 	return totalFoundPackagesDetailsArr
 }
+
+func downloadSpecifiedPackages(foundPackagesArr []NugetPackageDetailsStruct) []DownloadPackageDetailsStruct {
+	LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
+	var totalDownloadedPackagesDetailsArr []DownloadPackageDetailsStruct
+
+	wg := sync.WaitGroup{}
+	// Ensure all routines finish before returning
+	defer wg.Wait()
+
+	for _, pkgDetailsStruct := range foundPackagesArr {
+		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
+			LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
+			continue
+		}
+
+		wg.Add(1)
+		fileName := pkgDetailsStruct.Name + "." + pkgDetailsStruct.Version + ".nupkg"
+		downloadFilePath := filepath.Join(downloadPkgsDirPath, fileName) // downloadPkgsDirPath == global var
+		downloadPkgDetailsStruct := DownloadPackageDetailsStruct{
+			PkgDetailsStruct:         pkgDetailsStruct,
+			DownloadFilePath:         downloadFilePath,
+			DownloadFileChecksum:     CalculateFileChecksum(downloadFilePath), // Can by empty if file doesn't exist yet
+			DownloadFileChecksumType: "SHA512",                                        // Default checksum algorithm for Nuget pkgs
+		}
+
+		go func(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
+			defer wg.Done()
+			DownloadPkg(downloadPkgDetailsStruct)
+			Synched_AppendDownloadedPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadPkgDetailsStruct)
+		}(downloadPkgDetailsStruct)
+	}
+	wg.Wait()
+
+	return totalDownloadedPackagesDetailsArr
+}
+
+
+func UploadDownloadedPackage(uploadPkgStruct UploadPackageDetailsStruct) UploadPackageDetailsStruct {
+	pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
+	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
+	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
+
+	// Check if package already exists. If so, then compare it's checksum and skip on matching
+	for _, destServerUrl := range DestServersUrlsArr {
+		for _, repoName := range destReposNamesArr {
+			destServerRepo := destServerUrl + "/" + repoName
+			LogInfo.Printf("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerRepo)
+			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
+			httpRequestArgs := HttpRequestArgsStruct{
+				UrlAddress: checkDestServerPkgExistUrl,
+				HeadersMap: httpRequestHeadersMap,
+				UserToUse:  destServersUserToUse,
+				PassToUse:  destServersPassToUse,
+				TimeoutSec: httpRequestTimeoutSecondsInt,
+				Method:     "GET",
+			}
+
+			foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
+
+			emptyNugetPackageDetailsStruct := NugetPackageDetailsStruct{}
+			shouldCompareChecksum := true
+			if len(foundPackagesDetailsArr) != 1 {
+				LogInfo.Printf("Found multiple or no packages: \"%d\" - Should be only 1. Skipping checksum comparison. Continuing with the upload..", len(foundPackagesDetailsArr))
+				shouldCompareChecksum = false
+			} else if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
+				LogInfo.Print("No package found. Continuing with the upload..")
+				shouldCompareChecksum = false
+			}
+			
+			if shouldCompareChecksum {
+				// Check the checksum:
+				LogInfo.Printf("Comparing found package's checksum to know if should upload to: %s or not", destServerRepo)
+				foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
+				fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
+				if foundPackageChecksum == fileToUploadChecksum {
+				fileName := filepath.Base(uploadPkgStruct.UploadFilePath)
+				LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n"+
+					"Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
+				return uploadPkgStruct
+				}
+			}
+			
+			if len(destServerRepo) > 1 {
+				lastChar := destServerRepo[len(destServerRepo)-1:]
+				LogInfo.Printf("Adding '/' char to dest server repo url: \"%s\"", destServerRepo)
+				if lastChar != "/" {destServerRepo += "/"}
+			}
+			httpRequestArgs.UrlAddress = destServerRepo
+			// Upload the package file
+			UploadPkg(uploadPkgStruct, httpRequestArgs)
+		}
+	}
+
+	return uploadPkgStruct
+}
+
+
 
 func TrimQuotes(s string) string {
     if len(s) >= 2 {
