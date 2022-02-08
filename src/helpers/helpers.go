@@ -172,9 +172,9 @@ func prepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 	return searchUrlsArr
 }
 
-func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []NugetPackageDetailsStruct) []NugetPackageDetailsStruct {
+func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct) []global_structs.NugetPackageDetailsStruct {
 	LogInfo.Printf("Filtering found pkgs by requested versions")
-	var filteredPackagesDetailsArr []NugetPackageDetailsStruct
+	var filteredPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
 	for _, pkgDetailStruct := range foundPackagesDetailsArr {
 		pkgVersion := pkgDetailStruct.Version
 		pkgName := pkgDetailStruct.Name
@@ -190,8 +190,8 @@ func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []NugetPackag
 	return filteredPackagesDetailsArr
 }
 
-func SearchForAvailableNugetPackages() []NugetPackageDetailsStruct {
-	var totalFoundPackagesDetailsArr []NugetPackageDetailsStruct
+func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruct {
+	var totalFoundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
 	searchUrlsArr := prepareSrcSearchAllPkgsVersionsUrlsArray()
 
 	wg := sync.WaitGroup{}
@@ -205,7 +205,7 @@ func SearchForAvailableNugetPackages() []NugetPackageDetailsStruct {
 			wg.Add(1)
 			go func(urlToCheck string) {
 				defer wg.Done()
-				httpRequestArgs := HttpRequestArgsStruct{
+				httpRequestArgs := global_structs.HttpRequestArgsStruct{
 					UrlAddress: urlToCheck,
 					HeadersMap: httpRequestHeadersMap,
 					UserToUse:  srcServersUserToUse,
@@ -225,7 +225,7 @@ func SearchForAvailableNugetPackages() []NugetPackageDetailsStruct {
 }
 
 
-func UploadDownloadedPackage(uploadPkgStruct UploadPackageDetailsStruct) UploadPackageDetailsStruct {
+func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetailsStruct) global_structs.UploadPackageDetailsStruct {
 	pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
@@ -236,7 +236,7 @@ func UploadDownloadedPackage(uploadPkgStruct UploadPackageDetailsStruct) UploadP
 			destServerRepo := destServerUrl + "/" + repoName
 			LogInfo.Printf("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerRepo)
 			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
-			httpRequestArgs := HttpRequestArgsStruct{
+			httpRequestArgs := global_structs.HttpRequestArgsStruct{
 				UrlAddress: checkDestServerPkgExistUrl,
 				HeadersMap: httpRequestHeadersMap,
 				UserToUse:  destServersUserToUse,
@@ -248,7 +248,7 @@ func UploadDownloadedPackage(uploadPkgStruct UploadPackageDetailsStruct) UploadP
 			foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 			LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
 
-			emptyNugetPackageDetailsStruct := NugetPackageDetailsStruct{}
+			emptyNugetPackageDetailsStruct := global_structs.NugetPackageDetailsStruct{}
 			shouldCompareChecksum := true
 			if len(foundPackagesDetailsArr) != 1 {
 				LogInfo.Printf("Found multiple or no packages: \"%d\" - Should be only 1. Skipping checksum comparison. Continuing with the upload..", len(foundPackagesDetailsArr))
@@ -414,7 +414,7 @@ func CalculateFileChecksum(filePath string) string {
     return base64.StdEncoding.EncodeToString(h.Sum(nil))  // nil instead of a byte array to append to
 }
 
-func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
+func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) string {
     urlAddress := httpRequestArgs.UrlAddress
     downloadFilePath := httpRequestArgs.DownloadFilePath
     uploadFilePath := httpRequestArgs.UploadFilePath
@@ -557,8 +557,8 @@ func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
     return resultArr
 }
 
-func ParseXmlDataToSinglePkgDetailsStruct(entryStruct nuget_packages_xml.SinglePackagesDetailsXmlStruct) NugetPackageDetailsStruct {
-    var pkgDetailsStruct NugetPackageDetailsStruct
+func ParseXmlDataToSinglePkgDetailsStruct(entryStruct nuget_packages_xml.SinglePackagesDetailsXmlStruct) global_structs.NugetPackageDetailsStruct {
+    var pkgDetailsStruct global_structs.NugetPackageDetailsStruct
     pkgDetailsStruct.Checksum = entryStruct.Properties.PackageHash
     pkgDetailsStruct.ChecksumType = entryStruct.Properties.PackageHashAlgorithm
     pkgDetailsStruct.PkgDetailsUrl = entryStruct.ID
@@ -574,8 +574,8 @@ func ParseXmlDataToSinglePkgDetailsStruct(entryStruct nuget_packages_xml.SingleP
 }
 
 
-func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPackageDetailsStruct {
-    parsedPackagesVersionsArr := make([] NugetPackageDetailsStruct, 0)
+func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] global_structs.NugetPackageDetailsStruct {
+    parsedPackagesVersionsArr := make([] global_structs.NugetPackageDetailsStruct, 0)
     LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseMultipleNugetPackagesXmlData(responseBody)
     if len(parsedPackagesDetailsStruct.Entry) == 0 {  // If failed to parse entries, it might be only a single entry and in that case attempt to parse it
@@ -592,15 +592,15 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] NugetPa
     return parsedPackagesVersionsArr
 }
 
-func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs HttpRequestArgsStruct) [] NugetPackageDetailsStruct {
+func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) [] global_structs.NugetPackageDetailsStruct {
     responseBody := MakeHttpRequest(httpRequestArgs)
-    if len(responseBody) == 0 {return [] NugetPackageDetailsStruct {}}
+    if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
     parsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
 
     return parsedPackagesDetailsArr
 }
 
-func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
+func DownloadPkg(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
     LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
     downloadFilePath := downloadPkgDetailsStruct.DownloadFilePath
@@ -612,7 +612,7 @@ func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
         return
     }
     MakeHttpRequest(
-        HttpRequestArgsStruct{
+        global_structs.HttpRequestArgsStruct{
             UrlAddress: fileUrl,
             Method: "GET",
             DownloadFilePath: downloadFilePath,
@@ -620,7 +620,7 @@ func DownloadPkg(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
     )
 }
 
-func UploadPkg(uploadPkgStruct UploadPackageDetailsStruct, httpRequestArgsStruct HttpRequestArgsStruct) {
+func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRequestArgsStruct global_structs.HttpRequestArgsStruct) {
     pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	LogInfo.Printf("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
     httpRequestArgsStruct.Method = "PUT"
@@ -636,13 +636,13 @@ func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
 	return result
 }
 
-func Synched_AppendPkgDetailsObj(arr_1 *[] NugetPackageDetailsStruct, arr_2 [] NugetPackageDetailsStruct) {
+func Synched_AppendPkgDetailsObj(arr_1 *[] global_structs.NugetPackageDetailsStruct, arr_2 [] global_structs.NugetPackageDetailsStruct) {
     appendPkgDetailsArr_Lock.Lock()
     *arr_1 = append(*arr_1, arr_2...)
     appendPkgDetailsArr_Lock.Unlock()
 }
 
-func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] DownloadPackageDetailsStruct, downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
+func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] global_structs.DownloadPackageDetailsStruct, downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
     appendDownloadedPkgDetailsArr_Lock.Lock()
     *arr_1 = append(*arr_1, downloadPkgDetailsStruct)
     appendDownloadedPkgDetailsArr_Lock.Unlock()
