@@ -230,42 +230,7 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
 
     // Upload file (PUT requests):
     if method == "PUT" && len(uploadFilePath) > 0 {
-        LogInfo.Printf("Reading file content for upload: \"%s\"", uploadFilePath)
-
-        // If missing file: return empty body
-        if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
-            LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
-            return ""
-        }
-
-        file, err := os.Open(uploadFilePath)
-        if err != nil {
-            return ""
-        }
-
-        fileContents, err := ioutil.ReadAll(file)
-        if err != nil {
-            return ""
-        }
-
-        fi, err := file.Stat()
-        if err != nil {
-            return ""
-        }
-        file.Close()
-
-        body := new(bytes.Buffer)
-        writer := multipart.NewWriter(body)
-        part, err := writer.CreateFormFile("package", fi.Name())  // Use "package" as headerFieldName for Nuget packages files upload
-        if err != nil {
-            return ""
-        }
-        part.Write(fileContents)
-        
-        err = writer.Close()
-        if err != nil {
-            return ""
-        }
+        body = ReadFileContentsIntoPartsForUpload(uploadFilePath, "package")
     }
 
     req, err := http.NewRequest(method, urlAddress, body)
@@ -334,28 +299,28 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     return bodyStr
 }
 
-func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName string) io.Reader {
+func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName string) (io.Reader, *multipart.Writer) {
     LogInfo.Printf("Reading file content for upload: \"%s\"", uploadFilePath)
 
     // If missing file: return empty body
     if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
         LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
-        return nil
+        return nil, nil
     }
 
     file, err := os.Open(uploadFilePath)
 	if err != nil {
-		return nil
+		return nil, nil
 	}
 
     fileContents, err := ioutil.ReadAll(file)
     if err != nil {
-		return nil
+		return nil, nil
 	}
 
     fi, err := file.Stat()
 	if err != nil {
-		return nil
+		return nil, nil
 	}
     file.Close()
 
@@ -363,16 +328,16 @@ func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName s
     writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile(headerFieldName, fi.Name())  // Use package as headerFieldName for Nuget packages files upload
 	if err != nil {
-		return nil
+		return nil, nil
 	}
 	part.Write(fileContents)
     
     err = writer.Close()
 	if err != nil {
-		return nil
+		return nil, nil
 	}
 
-    return body
+    return body, writer
 }
 
 func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
