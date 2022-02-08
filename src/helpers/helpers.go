@@ -159,6 +159,33 @@ func ValidateEnvironment() {
 	LogInfo.Print("All Good")
 }
 
+func UpdateVars() {
+    LogInfo.Print("Updating vars")
+	srcServersUrlsArr = make([]string, 0, 4)
+	destServersUrlsArr = make([]string, 0, 4)
+	srcReposNamesArr = make([]string, 0, 4)
+	packagesNamesArr = make([]string, 0, 10)
+	packagesVersionsArr = make([]string, 0, 10)
+	if len(srcServersUrlsStr) > 1 {srcServersUrlsArr = strings.Split(srcServersUrlsStr, ";")}
+	if len(srcReposNamesStr) > 1 {srcReposNamesArr = strings.Split(srcReposNamesStr, ";")}
+	if len(destServersUrlsStr) > 1 {destServersUrlsArr = strings.Split(destServersUrlsStr, ";")}
+	if len(destReposNamesStr) > 1 {destReposNamesArr = strings.Split(destReposNamesStr, ";")}
+	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
+	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
+	httpRequestHeadersMap = ParseHttpHeadersStrToMap(httpRequestHeadersStr)
+
+	for i, pkgName := range packagesNamesArr {
+		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
+		packagesToDownloadMap.LoadOrStore(pkgName, make([]string, 0, 10))
+		// If received a version array for it - add it to the list
+		if len(packagesVersionsArr) > i {
+			pkgVersion := packagesVersionsArr[i]
+			currentVersionsArr := LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
+			packagesToDownloadMap.Store(pkgName, append(currentVersionsArr, pkgVersion))
+		}
+	}
+}
+
 func TrimQuotes(s string) string {
     if len(s) >= 2 {
         if c := s[len(s)-1]; s[0] == c && (c == '"' || c == '\'') {
