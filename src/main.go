@@ -282,6 +282,11 @@ func uploadDownloadedPackage(uploadPkgStruct helpers.UploadPackageDetailsStruct)
 				}
 			}
 			
+			if len(destServerRepo) > 1 {
+				lastChar := destServerRepo[len(destServerRepo)-1:]
+				helpers.LogInfo.Printf("Adding '/' char to dest server repo url: \"%s\"", destServerRepo)
+				if lastChar != "/" {destServerRepo += "/"}
+			}
 			httpRequestArgs.UrlAddress = destServerRepo
 			// Upload the package file
 			helpers.UploadPkg(uploadPkgStruct, httpRequestArgs)
