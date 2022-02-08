@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
-	"golang-artifacts-syncher/src/helpers"
 	"golang-artifacts-syncher/src/global_structs"
+	"golang-artifacts-syncher/src/helpers"
+	"golang-artifacts-syncher/src/nuget_cli"
+
 	// "golang-artifacts-syncher/src/nuget_cli"
 	"path/filepath"
 	"sync"
@@ -32,7 +34,7 @@ func updateVars() {
 }
 
 func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageDetailsStruct {
-	return helpers.SearchForAvailableNugetPackages()
+	return nuget_cli.SearchForAvailableNugetPackages()
 }
 
 func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
