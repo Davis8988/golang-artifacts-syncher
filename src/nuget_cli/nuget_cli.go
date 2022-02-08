@@ -37,9 +37,9 @@ func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruc
 					TimeoutSec: helpers.HttpRequestTimeoutSecondsInt,
 					Method:     "GET",
 				}
-				foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
-				foundPackagesDetailsArr = filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr) // Filter by requested version - if any version is specified..
-				Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
+				foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+				foundPackagesDetailsArr = helpers.FilterFoundPackagesByRequestedVersion(foundPackagesDetailsArr) // Filter by requested version - if any version is specified..
+				helpers.Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
 			}(urlToCheck)
 		}
 	}

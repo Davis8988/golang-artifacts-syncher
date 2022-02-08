@@ -172,7 +172,7 @@ func PrepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 	return searchUrlsArr
 }
 
-func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct) []global_structs.NugetPackageDetailsStruct {
+func FilterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct) []global_structs.NugetPackageDetailsStruct {
 	LogInfo.Printf("Filtering found pkgs by requested versions")
 	var filteredPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
 	for _, pkgDetailStruct := range foundPackagesDetailsArr {
