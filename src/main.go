@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"golang-artifacts-syncher/src/helpers"
-	"golang-artifacts-syncher/src/nexus3_adapter"
+	"golang-artifacts-syncher/src/nuget_cli"
 	"path/filepath"
 	"strings"
 	"sync"
