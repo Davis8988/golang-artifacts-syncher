@@ -16,27 +16,7 @@ func initVars() {
 }
 
 func printVars() {
-	helpers.LogInfo.Printf("SRC_SERVERS_URLS_STR: '%s'", srcServersUrlsStr)
-	helpers.LogInfo.Printf("SRC_REPOS_NAMES_STR: '%s'", srcReposNamesStr)
-	helpers.LogInfo.Printf("SRC_SERVERS_USER_TO_USE: '%s'", srcServersUserToUse)
-	helpers.LogInfo.Printf("SRC_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(srcServersPassToUse)))
-	helpers.LogInfo.Printf("DEST_SERVERS_URLS_STR: '%s'", destServersUrlsStr)
-	helpers.LogInfo.Printf("DEST_REPOS_NAMES_STR: '%s'", destReposNamesStr)
-	helpers.LogInfo.Printf("DEST_SERVERS_USER_TO_USE: '%s'", destServersUserToUse)
-	helpers.LogInfo.Printf("DEST_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(destServersPassToUse)))
-	helpers.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
-	helpers.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
-	helpers.LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
-	helpers.LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", downloadPkgsDirPath)
-	helpers.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSecondsInt)
-
-	helpers.LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
-	helpers.LogInfo.Printf("destServersUrlsArr: %v", destServersUrlsArr)
-	helpers.LogInfo.Printf("srcReposNamesArr: %v", srcReposNamesArr)
-	helpers.LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
-	helpers.LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
-	packagesToDownloadMapStr := helpers.Synched_ConvertSyncedMapToString(packagesToDownloadMap)
-	helpers.LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
+	helpers.PrintVars()
 }
 
 func validateEnv() {

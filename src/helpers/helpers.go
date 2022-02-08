@@ -117,6 +117,30 @@ func Init() {
 	httpRequestTimeoutSecondsInt = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
 
+func PrintVars() {
+    LogInfo.Printf("SRC_SERVERS_URLS_STR: '%s'", srcServersUrlsStr)
+	LogInfo.Printf("SRC_REPOS_NAMES_STR: '%s'", srcReposNamesStr)
+	LogInfo.Printf("SRC_SERVERS_USER_TO_USE: '%s'", srcServersUserToUse)
+	LogInfo.Printf("SRC_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(srcServersPassToUse)))
+	LogInfo.Printf("DEST_SERVERS_URLS_STR: '%s'", destServersUrlsStr)
+	LogInfo.Printf("DEST_REPOS_NAMES_STR: '%s'", destReposNamesStr)
+	LogInfo.Printf("DEST_SERVERS_USER_TO_USE: '%s'", destServersUserToUse)
+	LogInfo.Printf("DEST_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(destServersPassToUse)))
+	LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
+	LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
+	LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
+	LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", downloadPkgsDirPath)
+	LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", httpRequestTimeoutSecondsInt)
+
+	LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
+	LogInfo.Printf("destServersUrlsArr: %v", destServersUrlsArr)
+	LogInfo.Printf("srcReposNamesArr: %v", srcReposNamesArr)
+	LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
+	LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
+	packagesToDownloadMapStr := Synched_ConvertSyncedMapToString(packagesToDownloadMap)
+	LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
+}
+
 func TrimQuotes(s string) string {
     if len(s) >= 2 {
         if c := s[len(s)-1]; s[0] == c && (c == '"' || c == '\'') {
