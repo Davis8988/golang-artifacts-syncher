@@ -260,41 +260,6 @@ func SearchForAvailableNugetPackages() []NugetPackageDetailsStruct {
 	return totalFoundPackagesDetailsArr
 }
 
-func downloadSpecifiedPackages(foundPackagesArr []NugetPackageDetailsStruct) []DownloadPackageDetailsStruct {
-	LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
-	var totalDownloadedPackagesDetailsArr []DownloadPackageDetailsStruct
-
-	wg := sync.WaitGroup{}
-	// Ensure all routines finish before returning
-	defer wg.Wait()
-
-	for _, pkgDetailsStruct := range foundPackagesArr {
-		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
-			LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
-			continue
-		}
-
-		wg.Add(1)
-		fileName := pkgDetailsStruct.Name + "." + pkgDetailsStruct.Version + ".nupkg"
-		downloadFilePath := filepath.Join(downloadPkgsDirPath, fileName) // downloadPkgsDirPath == global var
-		downloadPkgDetailsStruct := DownloadPackageDetailsStruct{
-			PkgDetailsStruct:         pkgDetailsStruct,
-			DownloadFilePath:         downloadFilePath,
-			DownloadFileChecksum:     CalculateFileChecksum(downloadFilePath), // Can by empty if file doesn't exist yet
-			DownloadFileChecksumType: "SHA512",                                        // Default checksum algorithm for Nuget pkgs
-		}
-
-		go func(downloadPkgDetailsStruct DownloadPackageDetailsStruct) {
-			defer wg.Done()
-			DownloadPkg(downloadPkgDetailsStruct)
-			Synched_AppendDownloadedPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadPkgDetailsStruct)
-		}(downloadPkgDetailsStruct)
-	}
-	wg.Wait()
-
-	return totalDownloadedPackagesDetailsArr
-}
-
 
 func UploadDownloadedPackage(uploadPkgStruct UploadPackageDetailsStruct) UploadPackageDetailsStruct {
 	pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
