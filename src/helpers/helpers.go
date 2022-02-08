@@ -226,11 +226,11 @@ func MakeHttpRequest(httpRequestArgs HttpRequestArgsStruct) string {
     client := http.Client{Timeout: time.Duration(timeoutSec) * time.Second,}
     
     var body io.Reader
-    var writer multipart.Writer
+    var writer *multipart.Writer
 
     // Upload file (PUT requests):
     if method == "PUT" && len(uploadFilePath) > 0 {
-        body = ReadFileContentsIntoPartsForUpload(uploadFilePath, "package")
+        body, writer = ReadFileContentsIntoPartsForUpload(uploadFilePath, "package")
     }
 
     req, err := http.NewRequest(method, urlAddress, body)
