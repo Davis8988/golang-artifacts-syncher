@@ -81,7 +81,7 @@ func validateEnv() {
 	helpers.LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
-	if !nexus3_adapter.IsStrArrayEmpty(packagesVersionsArr) {
+	if ! helpers.IsStrArrayEmpty(packagesVersionsArr) {
 		helpers.LogInfo.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
