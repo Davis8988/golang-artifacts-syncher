@@ -105,6 +105,21 @@ func Init() {
     convertSyncedMapToString_Lock = sync.RWMutex{}
     appendPkgDetailsArr_Lock = sync.RWMutex{}
     appendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
+
+    LogInfo.Print("Initializing from envs vars")
+    srcServersUserToUse = Getenv("SRC_SERVERS_USER_TO_USE", "")
+	srcServersPassToUse = Getenv("SRC_SERVERS_PASS_TO_USE", "")
+	srcServersUrlsStr = Getenv("SRC_SERVERS_URLS_STR", "")
+	srcReposNamesStr = Getenv("SRC_REPOS_NAMES_STR", "")
+	destServersUrlsStr = Getenv("DEST_SERVERS_URLS_STR", "")
+	destReposNamesStr = Getenv("DEST_REPOS_NAMES_STR", "")
+	destServersUserToUse = Getenv("DEST_SERVERS_USER_TO_USE", "")
+	destServersPassToUse = Getenv("DEST_SERVERS_PASS_TO_USE", "")
+	packagesNamesStr = Getenv("PACKAGES_NAMES_STR", "")
+	packagesVersionsStr = Getenv("PACKAGES_VERSIONS_STR", "")
+	httpRequestHeadersStr = Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
+	downloadPkgsDirPath = Getenv("DOWNLOAD_PKGS_DIR_PATH", GetCurrentProgramDir())
+	httpRequestTimeoutSecondsInt = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
 
 func TrimQuotes(s string) string {

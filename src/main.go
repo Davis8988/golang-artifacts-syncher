@@ -13,20 +13,6 @@ import (
 
 func initVars() {
 	helpers.Init()
-	helpers.LogInfo.Print("Initializing from envs vars")
-	srcServersUserToUse = helpers.Getenv("SRC_SERVERS_USER_TO_USE", "")
-	srcServersPassToUse = helpers.Getenv("SRC_SERVERS_PASS_TO_USE", "")
-	srcServersUrlsStr = helpers.Getenv("SRC_SERVERS_URLS_STR", "")
-	srcReposNamesStr = helpers.Getenv("SRC_REPOS_NAMES_STR", "")
-	destServersUrlsStr = helpers.Getenv("DEST_SERVERS_URLS_STR", "")
-	destReposNamesStr = helpers.Getenv("DEST_REPOS_NAMES_STR", "")
-	destServersUserToUse = helpers.Getenv("DEST_SERVERS_USER_TO_USE", "")
-	destServersPassToUse = helpers.Getenv("DEST_SERVERS_PASS_TO_USE", "")
-	packagesNamesStr = helpers.Getenv("PACKAGES_NAMES_STR", "")
-	packagesVersionsStr = helpers.Getenv("PACKAGES_VERSIONS_STR", "")
-	httpRequestHeadersStr = helpers.Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
-	downloadPkgsDirPath = helpers.Getenv("DOWNLOAD_PKGS_DIR_PATH", helpers.GetCurrentProgramDir())
-	httpRequestTimeoutSecondsInt = helpers.StrToInt(helpers.Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
 
 func printVars() {
