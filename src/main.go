@@ -32,79 +32,11 @@ func updateVars() {
 	helpers.UpdateVars()
 }
 
-func prepareSrcSearchAllPkgsVersionsUrlsArray() []string {
-	var searchUrlsArr = make([]string, 0, 10) // Create a slice with length=0 and capacity=10
-
-	helpers.LogInfo.Print("Preparing src search packages urls array")
-	for _, srcServerUrl := range srcServersUrlsArr {
-		for _, repoName := range srcReposNamesArr {
-			for _, pkgName := range packagesNamesArr {
-				versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
-				if len(versionsToSearchArr) == 0 { // Either use search
-					searchUrlsArr = append(searchUrlsArr, srcServerUrl+"/"+repoName+"/"+"Packages()?$filter=tolower(Id)%20eq%20'"+pkgName+"'")
-					continue
-				} // Or specific package details request for each specified requested version
-				for _, pkgVersion := range versionsToSearchArr {
-					searchUrlsArr = append(searchUrlsArr, srcServerUrl+"/"+repoName+"/"+"Packages(Id='"+pkgName+"',Version='"+pkgVersion+"')")
-				}
-
-			}
-		}
-	}
-	return searchUrlsArr
+func searchAvailableVersionsOfSpecifiedPackages() {
+	helpers.SearchForAvailableNugetPackages()
 }
 
-func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []helpers.NugetPackageDetailsStruct) []helpers.NugetPackageDetailsStruct {
-	helpers.LogInfo.Printf("Filtering found pkgs by requested versions")
-	var filteredPackagesDetailsArr []helpers.NugetPackageDetailsStruct
-	for _, pkgDetailStruct := range foundPackagesDetailsArr {
-		pkgVersion := pkgDetailStruct.Version
-		pkgName := pkgDetailStruct.Name
-		versionsToSearchArr := helpers.LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName) // Use global var: packagesToDownloadMap
-		if len(versionsToSearchArr) == 0 {
-			filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)
-			continue
-		}
-		for _, requestedVersion := range versionsToSearchArr {
-			if pkgVersion == requestedVersion {filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)} // This version is requested - Add pkg details obj to the result filtered array
-		}
-	}
-	return filteredPackagesDetailsArr
-}
 
-func searchAvailableVersionsOfSpecifiedPackages() []helpers.NugetPackageDetailsStruct {
-	var totalFoundPackagesDetailsArr []helpers.NugetPackageDetailsStruct
-	searchUrlsArr := prepareSrcSearchAllPkgsVersionsUrlsArray()
-
-	wg := sync.WaitGroup{}
-
-	// Ensure all routines finish before returning
-	defer wg.Wait()
-
-	if len(searchUrlsArr) > 0 {
-		helpers.LogInfo.Printf("Checking %d src URL addresses for pkgs versions", len(searchUrlsArr))
-		for _, urlToCheck := range searchUrlsArr {
-			wg.Add(1)
-			go func(urlToCheck string) {
-				defer wg.Done()
-				httpRequestArgs := helpers.HttpRequestArgsStruct{
-					UrlAddress: urlToCheck,
-					HeadersMap: httpRequestHeadersMap,
-					UserToUse:  srcServersUserToUse,
-					PassToUse:  srcServersPassToUse,
-					TimeoutSec: httpRequestTimeoutSecondsInt,
-					Method:     "GET",
-				}
-				foundPackagesDetailsArr := helpers.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
-				foundPackagesDetailsArr = filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr) // Filter by requested version - if any version is specified..
-				helpers.Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
-			}(urlToCheck)
-		}
-	}
-	wg.Wait()
-
-	return totalFoundPackagesDetailsArr
-}
 
 func downloadSpecifiedPackages(foundPackagesArr []helpers.NugetPackageDetailsStruct) []helpers.DownloadPackageDetailsStruct {
 	helpers.LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))

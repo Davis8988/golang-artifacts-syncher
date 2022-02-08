@@ -186,6 +186,80 @@ func UpdateVars() {
 	}
 }
 
+func prepareSrcSearchAllPkgsVersionsUrlsArray() []string {
+	var searchUrlsArr = make([]string, 0, 10) // Create a slice with length=0 and capacity=10
+
+	LogInfo.Print("Preparing src search packages urls array")
+	for _, srcServerUrl := range srcServersUrlsArr {
+		for _, repoName := range srcReposNamesArr {
+			for _, pkgName := range packagesNamesArr {
+				versionsToSearchArr := LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
+				if len(versionsToSearchArr) == 0 { // Either use search
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl+"/"+repoName+"/"+"Packages()?$filter=tolower(Id)%20eq%20'"+pkgName+"'")
+					continue
+				} // Or specific package details request for each specified requested version
+				for _, pkgVersion := range versionsToSearchArr {
+					searchUrlsArr = append(searchUrlsArr, srcServerUrl+"/"+repoName+"/"+"Packages(Id='"+pkgName+"',Version='"+pkgVersion+"')")
+				}
+
+			}
+		}
+	}
+	return searchUrlsArr
+}
+
+func filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []NugetPackageDetailsStruct) []NugetPackageDetailsStruct {
+	LogInfo.Printf("Filtering found pkgs by requested versions")
+	var filteredPackagesDetailsArr []NugetPackageDetailsStruct
+	for _, pkgDetailStruct := range foundPackagesDetailsArr {
+		pkgVersion := pkgDetailStruct.Version
+		pkgName := pkgDetailStruct.Name
+		versionsToSearchArr := LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName) // Use global var: packagesToDownloadMap
+		if len(versionsToSearchArr) == 0 {
+			filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)
+			continue
+		}
+		for _, requestedVersion := range versionsToSearchArr {
+			if pkgVersion == requestedVersion {filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)} // This version is requested - Add pkg details obj to the result filtered array
+		}
+	}
+	return filteredPackagesDetailsArr
+}
+
+func SearchForAvailableNugetPackages() []NugetPackageDetailsStruct {
+	var totalFoundPackagesDetailsArr []NugetPackageDetailsStruct
+	searchUrlsArr := prepareSrcSearchAllPkgsVersionsUrlsArray()
+
+	wg := sync.WaitGroup{}
+
+	// Ensure all routines finish before returning
+	defer wg.Wait()
+
+	if len(searchUrlsArr) > 0 {
+		LogInfo.Printf("Checking %d src URL addresses for pkgs versions", len(searchUrlsArr))
+		for _, urlToCheck := range searchUrlsArr {
+			wg.Add(1)
+			go func(urlToCheck string) {
+				defer wg.Done()
+				httpRequestArgs := HttpRequestArgsStruct{
+					UrlAddress: urlToCheck,
+					HeadersMap: httpRequestHeadersMap,
+					UserToUse:  srcServersUserToUse,
+					PassToUse:  srcServersPassToUse,
+					TimeoutSec: httpRequestTimeoutSecondsInt,
+					Method:     "GET",
+				}
+				foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+				foundPackagesDetailsArr = filterFoundPackagesByRequestedVersion(foundPackagesDetailsArr) // Filter by requested version - if any version is specified..
+				Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
+			}(urlToCheck)
+		}
+	}
+	wg.Wait()
+
+	return totalFoundPackagesDetailsArr
+}
+
 func TrimQuotes(s string) string {
     if len(s) >= 2 {
         if c := s[len(s)-1]; s[0] == c && (c == '"' || c == '\'') {
