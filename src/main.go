@@ -10,30 +10,6 @@ import (
 	"sync"
 )
 
-var (
-	srcServersUserToUse          string
-	srcServersPassToUse          string
-	srcServersUrlsStr            string
-	srcReposNamesStr             string
-	destServersUrlsStr           string
-	destReposNamesStr            string
-	destServersUserToUse         string
-	destServersPassToUse         string
-	packagesNamesStr             string
-	packagesVersionsStr          string
-	httpRequestHeadersStr        string
-	downloadPkgsDirPath          string
-	httpRequestTimeoutSecondsInt int
-
-	srcServersUrlsArr     []string
-	srcReposNamesArr      []string
-	destServersUrlsArr    []string
-	destReposNamesArr     []string
-	packagesNamesArr      []string
-	packagesVersionsArr   []string
-	httpRequestHeadersMap map[string]string
-	packagesToDownloadMap sync.Map
-)
 
 func initVars() {
 	helpers.Init()
