@@ -24,12 +24,12 @@ import (
 )
 
 func InitVars() {
-    mylog.mylog.LogInfo.Print("Initializing helpers pkg vars")
+    mylog.LogInfo.Print("Initializing helpers pkg vars")
     global_vars.ConvertSyncedMapToString_Lock = sync.RWMutex{}
     global_vars.AppendPkgDetailsArr_Lock = sync.RWMutex{}
     global_vars.AppendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
 
-    mylog.mylog.LogInfo.Print("Initializing from envs vars")
+    mylog.LogInfo.Print("Initializing from envs vars")
     global_vars.SrcServersUserToUse = Getenv("SRC_SERVERS_USER_TO_USE", "")
 	global_vars.SrcServersPassToUse = Getenv("SRC_SERVERS_PASS_TO_USE", "")
 	global_vars.SrcServersUrlsStr = Getenv("SRC_SERVERS_URLS_STR", "")
