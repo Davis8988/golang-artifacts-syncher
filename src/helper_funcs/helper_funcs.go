@@ -3,6 +3,7 @@ package helper_funcs
 import (
 	"golang-artifacts-syncher/src/nuget_packages_xml"
 	"golang-artifacts-syncher/src/global_structs"
+	"golang-artifacts-syncher/src/global_vars"
 	"bytes"
 	"crypto/sha512"
 	"encoding/base64"
