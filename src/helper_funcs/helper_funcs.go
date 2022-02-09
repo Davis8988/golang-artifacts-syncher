@@ -195,7 +195,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 				fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
 				if foundPackageChecksum == fileToUploadChecksum {
 				fileName := filepath.Base(uploadPkgStruct.UploadFilePath)
-				LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n"+
+				mylog.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n"+
 					"Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
 				return uploadPkgStruct
 				}
@@ -305,7 +305,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
 
 func CreateDir(dirPath string) {
     if _, err := os.Stat(dirPath); err == nil {return}  // If dir already exists - finish here
-    LogDebug.Printf("Creating dir: %s", dirPath)
+    mylog.LogDebug.Printf("Creating dir: %s", dirPath)
     err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
 		mylog.LogError.Printf("%s\nFailed creating dir: \"%s\"", err, dirPath)
@@ -316,7 +316,7 @@ func CreateDir(dirPath string) {
 func CreateFile(filePath string) *os.File {
     dirPath := filepath.Dir(filePath)
     CreateDir(dirPath)
-    LogDebug.Printf("Creating file: %s", filePath)
+    mylog.LogDebug.Printf("Creating file: %s", filePath)
     // Create the file
     file, err := os.Create(filePath)
     if err != nil  {
@@ -328,7 +328,7 @@ func CreateFile(filePath string) *os.File {
 
 func CalculateFileChecksum(filePath string) string {
     if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {return ""}  // If missing file: return empty
-    LogDebug.Printf("Calculating sha512 checksum of file: %s", filePath)
+    mylog.LogDebug.Printf("Calculating sha512 checksum of file: %s", filePath)
     f, err := os.Open(filePath)
     if err != nil {
         mylog.LogError.Printf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
@@ -422,7 +422,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     bodyStr := string(responseBody)
     msgStr := bodyStr
     if len(response.Status) > 0 {msgStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
-    // LogDebug.Printf(msgStr)
+    // mylog.LogDebug.Printf(msgStr)
 
     if response.StatusCode >= 400 {
         mylog.LogError.Printf("%s", msgStr)
@@ -474,7 +474,7 @@ func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName s
 }
 
 func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
-    LogDebug.Printf("Parsing URL for Name & Version: \"%s\"", pkgDetailsUrl)
+    mylog.LogDebug.Printf("Parsing URL for Name & Version: \"%s\"", pkgDetailsUrl)
     re := regexp.MustCompile("'(.*?)'")  // Find values in between quotes
     resultArr := re.FindAllString(pkgDetailsUrl, -1)  // -1 = find ALL available matches
     if len(resultArr) != 2 {
