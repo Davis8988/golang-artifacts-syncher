@@ -102,14 +102,14 @@ func UpdateVars() {
 	if len(global_vars.PackagesVersionsStr) > 1 {global_vars.PackagesVersionsArr = strings.Split(global_vars.PackagesVersionsStr, ";")}
 	global_vars.HttpRequestHeadersMap = ParseHttpHeadersStrToMap(global_vars.HttpRequestHeadersStr)
 
-	for i, pkgName := range packagesNamesArr {
+	for i, pkgName := range global_vars.PackagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
-		packagesToDownloadMap.LoadOrStore(pkgName, make([]string, 0, 10))
+		global_vars.PackagesToDownloadMap.LoadOrStore(pkgName, make([]string, 0, 10))
 		// If received a version array for it - add it to the list
-		if len(packagesVersionsArr) > i {
-			pkgVersion := packagesVersionsArr[i]
-			currentVersionsArr := LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
-			packagesToDownloadMap.Store(pkgName, append(currentVersionsArr, pkgVersion))
+		if len(global_vars.PackagesVersionsArr) > i {
+			pkgVersion := global_vars.PackagesVersionsArr[i]
+			currentVersionsArr := LoadStringArrValueFromSynchedMap(global_vars.PackagesToDownloadMap, pkgName)
+			global_vars.PackagesToDownloadMap.Store(pkgName, append(currentVersionsArr, pkgVersion))
 		}
 	}
 }
