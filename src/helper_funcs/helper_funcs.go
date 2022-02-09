@@ -73,9 +73,9 @@ func ValidateEnvironment() {
     mylog.LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
-	if ! IsStrArrayEmpty(packagesVersionsArr) {
+	if ! IsStrArrayEmpty(global_vars.PackagesVersionsArr) {
 		mylog.LogInfo.Print("Comparing packages names & versions arrays lengths")
-		if len(packagesVersionsArr) != len(packagesNamesArr) {
+		if len(global_vars.PackagesVersionsArr) != len(global_vars.PackagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
 			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
 			errMsg += "When passing packages versions to search - the versions count must be of the same count of packages names to search.\n"
@@ -89,18 +89,18 @@ func ValidateEnvironment() {
 
 func UpdateVars() {
     mylog.LogInfo.Print("Updating vars")
-	srcServersUrlsArr = make([]string, 0, 4)
-	DestServersUrlsArr = make([]string, 0, 4)
-	srcReposNamesArr = make([]string, 0, 4)
-	packagesNamesArr = make([]string, 0, 10)
-	packagesVersionsArr = make([]string, 0, 10)
-	if len(srcServersUrlsStr) > 1 {srcServersUrlsArr = strings.Split(srcServersUrlsStr, ";")}
-	if len(srcReposNamesStr) > 1 {srcReposNamesArr = strings.Split(srcReposNamesStr, ";")}
-	if len(destServersUrlsStr) > 1 {DestServersUrlsArr = strings.Split(destServersUrlsStr, ";")}
-	if len(destReposNamesStr) > 1 {destReposNamesArr = strings.Split(destReposNamesStr, ";")}
-	if len(packagesNamesStr) > 1 {packagesNamesArr = strings.Split(packagesNamesStr, ";")}
-	if len(packagesVersionsStr) > 1 {packagesVersionsArr = strings.Split(packagesVersionsStr, ";")}
-	HttpRequestHeadersMap = ParseHttpHeadersStrToMap(httpRequestHeadersStr)
+	global_vars.SrcServersUrlsArr = make([]string, 0, 4)
+	global_vars.DestServersUrlsArr = make([]string, 0, 4)
+	global_vars.SrcReposNamesArr = make([]string, 0, 4)
+	global_vars.PackagesNamesArr = make([]string, 0, 10)
+	global_vars.PackagesVersionsArr = make([]string, 0, 10)
+	if len(global_vars.SrcServersUrlsStr) > 1 {global_vars.SrcServersUrlsArr = strings.Split(global_vars.SrcServersUrlsStr, ";")}
+	if len(global_vars.SrcReposNamesStr) > 1 {global_vars.SrcReposNamesArr = strings.Split(global_vars.SrcReposNamesStr, ";")}
+	if len(global_vars.DestServersUrlsStr) > 1 {global_vars.DestServersUrlsArr = strings.Split(global_vars.DestServersUrlsStr, ";")}
+	if len(global_vars.DestReposNamesStr) > 1 {global_vars.DestReposNamesArr = strings.Split(global_vars.DestReposNamesStr, ";")}
+	if len(global_vars.PackagesNamesStr) > 1 {global_vars.PackagesNamesArr = strings.Split(global_vars.PackagesNamesStr, ";")}
+	if len(global_vars.PackagesVersionsStr) > 1 {global_vars.PackagesVersionsArr = strings.Split(global_vars.PackagesVersionsStr, ";")}
+	global_vars.HttpRequestHeadersMap = ParseHttpHeadersStrToMap(global_vars.HttpRequestHeadersStr)
 
 	for i, pkgName := range packagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
