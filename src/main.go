@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"golang-artifacts-syncher/src/mylog"
 	"golang-artifacts-syncher/src/global_structs"
+	"golang-artifacts-syncher/src/global_vars"
 	"golang-artifacts-syncher/src/helper_funcs"
+	"golang-artifacts-syncher/src/mylog"
 	"golang-artifacts-syncher/src/nuget_cli"
 
 	// "golang-artifacts-syncher/src/nuget_cli"
@@ -54,7 +55,7 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 
 		wg.Add(1)
 		fileName := pkgDetailsStruct.Name + "." + pkgDetailsStruct.Version + ".nupkg"
-		downloadFilePath := filepath.Join(helper_funcs.DownloadPkgsDirPath, fileName) // downloadPkgsDirPath == global var
+		downloadFilePath := filepath.Join(global_vars.DownloadPkgsDirPath, fileName) // downloadPkgsDirPath == global var
 		downloadPkgDetailsStruct := global_structs.DownloadPackageDetailsStruct{
 			PkgDetailsStruct:         pkgDetailsStruct,
 			DownloadFilePath:         downloadFilePath,
@@ -75,8 +76,8 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 
 func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
 	mylog.LogInfo.Printf("Uploading %d downloaded packages to servers: %v", len(downloadedPkgsArr), helper_funcs.DestServersUrlsArr)
-	if len(helper_funcs.DestServersUrlsArr) == 0 {
-		helper_funcs.LogWarning.Printf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
+	if len(global_vars.DestServersUrlsArr) == 0 {
+		mylog.LogWarning.Printf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
 		return
 	}
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
