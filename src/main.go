@@ -15,7 +15,7 @@ import (
 
 
 func initVars() {
-	helper_funcs.Init()
+	helper_funcs.InitVars()
 }
 
 func printVars() {
