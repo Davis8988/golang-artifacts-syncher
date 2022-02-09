@@ -23,24 +23,24 @@ import (
 
 func InitVars() {
     mylog.LogInfo.Print("Initializing helpers pkg vars")
-    ConvertSyncedMapToString_Lock = sync.RWMutex{}
-    AppendPkgDetailsArr_Lock = sync.RWMutex{}
-    AppendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
+    global_vars.ConvertSyncedMapToString_Lock = sync.RWMutex{}
+    global_vars.AppendPkgDetailsArr_Lock = sync.RWMutex{}
+    global_vars.AppendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
 
     mylog.LogInfo.Print("Initializing from envs vars")
-    SrcServersUserToUse = Getenv("SRC_SERVERS_USER_TO_USE", "")
-	SrcServersPassToUse = Getenv("SRC_SERVERS_PASS_TO_USE", "")
-	SrcServersUrlsStr = Getenv("SRC_SERVERS_URLS_STR", "")
-	SrcReposNamesStr = Getenv("SRC_REPOS_NAMES_STR", "")
-	DestServersUrlsStr = Getenv("DEST_SERVERS_URLS_STR", "")
-	DestReposNamesStr = Getenv("DEST_REPOS_NAMES_STR", "")
-	DestServersUserToUse = Getenv("DEST_SERVERS_USER_TO_USE", "")
-	DestServersPassToUse = Getenv("DEST_SERVERS_PASS_TO_USE", "")
-	PackagesNamesStr = Getenv("PACKAGES_NAMES_STR", "")
-	PackagesVersionsStr = Getenv("PACKAGES_VERSIONS_STR", "")
-	HttpRequestHeadersStr = Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
-	DownloadPkgsDirPath = Getenv("DOWNLOAD_PKGS_DIR_PATH", GetCurrentProgramDir())
-	HttpRequestTimeoutSecondsInt = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
+    global_vars.SrcServersUserToUse = Getenv("SRC_SERVERS_USER_TO_USE", "")
+	global_vars.SrcServersPassToUse = Getenv("SRC_SERVERS_PASS_TO_USE", "")
+	global_vars.SrcServersUrlsStr = Getenv("SRC_SERVERS_URLS_STR", "")
+	global_vars.SrcReposNamesStr = Getenv("SRC_REPOS_NAMES_STR", "")
+	global_vars.DestServersUrlsStr = Getenv("DEST_SERVERS_URLS_STR", "")
+	global_vars.DestReposNamesStr = Getenv("DEST_REPOS_NAMES_STR", "")
+	global_vars.DestServersUserToUse = Getenv("DEST_SERVERS_USER_TO_USE", "")
+	global_vars.DestServersPassToUse = Getenv("DEST_SERVERS_PASS_TO_USE", "")
+	global_vars.PackagesNamesStr = Getenv("PACKAGES_NAMES_STR", "")
+	global_vars.PackagesVersionsStr = Getenv("PACKAGES_VERSIONS_STR", "")
+	global_vars.HttpRequestHeadersStr = Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
+	global_vars.DownloadPkgsDirPath = Getenv("DOWNLOAD_PKGS_DIR_PATH", GetCurrentProgramDir())
+	global_vars.HttpRequestTimeoutSecondsInt = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
 
 func PrintVars() {
