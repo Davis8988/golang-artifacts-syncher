@@ -118,10 +118,10 @@ func PrepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10) // Create a slice with length=0 and capacity=10
 
 	mylog.LogInfo.Print("Preparing src search packages urls array")
-	for _, srcServerUrl := range srcServersUrlsArr {
-		for _, repoName := range srcReposNamesArr {
-			for _, pkgName := range packagesNamesArr {
-				versionsToSearchArr := LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName)
+	for _, srcServerUrl := range global_vars.SrcServersUrlsArr {
+		for _, repoName := range global_vars.SrcReposNamesArr {
+			for _, pkgName := range global_vars.PackagesNamesArr {
+				versionsToSearchArr := LoadStringArrValueFromSynchedMap(global_vars.PackagesToDownloadMap, pkgName)
 				if len(versionsToSearchArr) == 0 { // Either use search
 					searchUrlsArr = append(searchUrlsArr, srcServerUrl+"/"+repoName+"/"+"Packages()?$filter=tolower(Id)%20eq%20'"+pkgName+"'")
 					continue
