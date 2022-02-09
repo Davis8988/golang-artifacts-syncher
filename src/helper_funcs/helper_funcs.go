@@ -1,4 +1,4 @@
-package helpers_funcs
+package helper_funcs
 
 import (
 	"golang-artifacts-syncher/src/nuget_packages_xml"
