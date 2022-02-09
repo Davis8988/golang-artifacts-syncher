@@ -2,7 +2,6 @@ package global_vars
 
 import (
 	"sync"
-    "log"
 )
 
 var (
