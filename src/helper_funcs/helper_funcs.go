@@ -303,6 +303,10 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     return HttpRequestHeadersMap
 }
 
+func GetFileName(filePath string) string {
+    return filepath.Base(filePath)
+}
+
 func CreateDir(dirPath string) {
     if _, err := os.Stat(dirPath); err == nil {return}  // If dir already exists - finish here
     mylog.LogDebug.Printf("Creating dir: %s", dirPath)

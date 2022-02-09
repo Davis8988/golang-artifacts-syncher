@@ -12,8 +12,24 @@ func PushNugetPackage() {
 
 }
 
-func DownloadNugetPackage() {
-
+func DownloadNugetPackage(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
+	mylog.LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
+    fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
+    downloadFilePath := downloadPkgDetailsStruct.DownloadFilePath
+    downloadFileChecksum := downloadPkgDetailsStruct.DownloadFileChecksum
+    fileChecksum := downloadPkgDetailsStruct.PkgDetailsStruct.Checksum
+    if fileChecksum == downloadFileChecksum {
+        fileName := helper_funcs.GetFileName(downloadFilePath)
+        mylog.LogWarning.Printf("Checksum match: download target file already exists. Skipping download of: \"%s\"", fileName)
+        return
+    }
+    helper_funcs.MakeHttpRequest(
+        global_structs.HttpRequestArgsStruct{
+            UrlAddress: fileUrl,
+            Method: "GET",
+            DownloadFilePath: downloadFilePath,
+        },
+    )
 }
 
 func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruct {
