@@ -538,7 +538,7 @@ func DownloadPkg(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsS
     fileChecksum := downloadPkgDetailsStruct.PkgDetailsStruct.Checksum
     if fileChecksum == downloadFileChecksum {
         fileName := filepath.Base(downloadFilePath)
-        LogWarning.Printf("Checksum match: download target file already exists. Skipping download of: \"%s\"", fileName)
+        mylog.LogWarning.Printf("Checksum match: download target file already exists. Skipping download of: \"%s\"", fileName)
         return
     }
     MakeHttpRequest(
@@ -560,20 +560,20 @@ func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRe
 }
 
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
-	convertSyncedMapToString_Lock.Lock()
+	global_vars.ConvertSyncedMapToString_Lock.Lock()
 	result := ConvertSyncedMapToString(synchedMap)
-	defer convertSyncedMapToString_Lock.Unlock()
+	defer global_vars.ConvertSyncedMapToString_Lock.Unlock()
 	return result
 }
 
 func Synched_AppendPkgDetailsObj(arr_1 *[] global_structs.NugetPackageDetailsStruct, arr_2 [] global_structs.NugetPackageDetailsStruct) {
-    appendPkgDetailsArr_Lock.Lock()
+    global_vars.AppendPkgDetailsArr_Lock.Lock()
     *arr_1 = append(*arr_1, arr_2...)
-    appendPkgDetailsArr_Lock.Unlock()
+    global_vars.AppendPkgDetailsArr_Lock.Unlock()
 }
 
 func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] global_structs.DownloadPackageDetailsStruct, downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
-    appendDownloadedPkgDetailsArr_Lock.Lock()
+    global_vars.AppendDownloadedPkgDetailsArr_Lock.Lock()
     *arr_1 = append(*arr_1, downloadPkgDetailsStruct)
-    appendDownloadedPkgDetailsArr_Lock.Unlock()
+    global_vars.AppendDownloadedPkgDetailsArr_Lock.Unlock()
 }
