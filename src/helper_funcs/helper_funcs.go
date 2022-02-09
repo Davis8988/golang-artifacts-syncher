@@ -24,12 +24,12 @@ import (
 )
 
 func InitVars() {
-    mylog.LogInfo.Print("Initializing helpers pkg vars")
+    mylog.mylog.LogInfo.Print("Initializing helpers pkg vars")
     global_vars.ConvertSyncedMapToString_Lock = sync.RWMutex{}
     global_vars.AppendPkgDetailsArr_Lock = sync.RWMutex{}
     global_vars.AppendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
 
-    mylog.LogInfo.Print("Initializing from envs vars")
+    mylog.mylog.LogInfo.Print("Initializing from envs vars")
     global_vars.SrcServersUserToUse = Getenv("SRC_SERVERS_USER_TO_USE", "")
 	global_vars.SrcServersPassToUse = Getenv("SRC_SERVERS_PASS_TO_USE", "")
 	global_vars.SrcServersUrlsStr = Getenv("SRC_SERVERS_URLS_STR", "")
@@ -46,49 +46,49 @@ func InitVars() {
 }
 
 func PrintVars() {
-    LogInfo.Printf("SRC_SERVERS_URLS_STR: '%s'", srcServersUrlsStr)
-	LogInfo.Printf("SRC_REPOS_NAMES_STR: '%s'", srcReposNamesStr)
-	LogInfo.Printf("SRC_SERVERS_USER_TO_USE: '%s'", SrcServersUserToUse)
-	LogInfo.Printf("SRC_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(SrcServersPassToUse)))
-	LogInfo.Printf("DEST_SERVERS_URLS_STR: '%s'", destServersUrlsStr)
-	LogInfo.Printf("DEST_REPOS_NAMES_STR: '%s'", destReposNamesStr)
-	LogInfo.Printf("DEST_SERVERS_USER_TO_USE: '%s'", destServersUserToUse)
-	LogInfo.Printf("DEST_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(destServersPassToUse)))
-	LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
-	LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
-	LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
-	LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", DownloadPkgsDirPath)
-	LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", HttpRequestTimeoutSecondsInt)
+    mylog.LogInfo.Printf("SRC_SERVERS_URLS_STR: '%s'", srcServersUrlsStr)
+	mylog.LogInfo.Printf("SRC_REPOS_NAMES_STR: '%s'", srcReposNamesStr)
+	mylog.LogInfo.Printf("SRC_SERVERS_USER_TO_USE: '%s'", SrcServersUserToUse)
+	mylog.LogInfo.Printf("SRC_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(SrcServersPassToUse)))
+	mylog.LogInfo.Printf("DEST_SERVERS_URLS_STR: '%s'", destServersUrlsStr)
+	mylog.LogInfo.Printf("DEST_REPOS_NAMES_STR: '%s'", destReposNamesStr)
+	mylog.LogInfo.Printf("DEST_SERVERS_USER_TO_USE: '%s'", destServersUserToUse)
+	mylog.LogInfo.Printf("DEST_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(destServersPassToUse)))
+	mylog.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", packagesNamesStr)
+	mylog.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", packagesVersionsStr)
+	mylog.LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", httpRequestHeadersStr)
+	mylog.LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", DownloadPkgsDirPath)
+	mylog.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", HttpRequestTimeoutSecondsInt)
 
-	LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
-	LogInfo.Printf("DestServersUrlsArr: %v", DestServersUrlsArr)
-	LogInfo.Printf("srcReposNamesArr: %v", srcReposNamesArr)
-	LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
-	LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
+	mylog.LogInfo.Printf("srcServersUrlsArr: %v", srcServersUrlsArr)
+	mylog.LogInfo.Printf("DestServersUrlsArr: %v", DestServersUrlsArr)
+	mylog.LogInfo.Printf("srcReposNamesArr: %v", srcReposNamesArr)
+	mylog.LogInfo.Printf("packagesNamesArr: %v", packagesNamesArr)
+	mylog.LogInfo.Printf("packagesVersionsArr: %v", packagesVersionsArr)
 	packagesToDownloadMapStr := Synched_ConvertSyncedMapToString(packagesToDownloadMap)
-	LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
+	mylog.LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
 }
 
 func ValidateEnvironment() {
-    LogInfo.Print("Validating envs")
+    mylog.LogInfo.Print("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
 	if ! IsStrArrayEmpty(packagesVersionsArr) {
-		LogInfo.Print("Comparing packages names & versions arrays lengths")
+		mylog.LogInfo.Print("Comparing packages names & versions arrays lengths")
 		if len(packagesVersionsArr) != len(packagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
 			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
 			errMsg += "When passing packages versions to search - the versions count must be of the same count of packages names to search.\n"
 			errMsg += "A version for each package name to search"
-			LogError.Fatal(errMsg)
+			mylog.LogError.Fatal(errMsg)
 		}
 	}
 
-	LogInfo.Print("All Good")
+	mylog.LogInfo.Print("All Good")
 }
 
 func UpdateVars() {
-    LogInfo.Print("Updating vars")
+    mylog.LogInfo.Print("Updating vars")
 	srcServersUrlsArr = make([]string, 0, 4)
 	DestServersUrlsArr = make([]string, 0, 4)
 	srcReposNamesArr = make([]string, 0, 4)
@@ -117,7 +117,7 @@ func UpdateVars() {
 func PrepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10) // Create a slice with length=0 and capacity=10
 
-	LogInfo.Print("Preparing src search packages urls array")
+	mylog.LogInfo.Print("Preparing src search packages urls array")
 	for _, srcServerUrl := range srcServersUrlsArr {
 		for _, repoName := range srcReposNamesArr {
 			for _, pkgName := range packagesNamesArr {
@@ -137,7 +137,7 @@ func PrepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 }
 
 func FilterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct) []global_structs.NugetPackageDetailsStruct {
-	LogInfo.Printf("Filtering found pkgs by requested versions")
+	mylog.LogInfo.Printf("Filtering found pkgs by requested versions")
 	var filteredPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
 	for _, pkgDetailStruct := range foundPackagesDetailsArr {
 		pkgVersion := pkgDetailStruct.Version
@@ -164,7 +164,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 	for _, destServerUrl := range DestServersUrlsArr {
 		for _, repoName := range destReposNamesArr {
 			destServerRepo := destServerUrl + "/" + repoName
-			LogInfo.Printf("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerRepo)
+			mylog.LogInfo.Printf("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerRepo)
 			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
 			httpRequestArgs := global_structs.HttpRequestArgsStruct{
 				UrlAddress: checkDestServerPkgExistUrl,
@@ -176,21 +176,21 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 			}
 
 			foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
-			LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
+			mylog.LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
 
 			emptyNugetPackageDetailsStruct := global_structs.NugetPackageDetailsStruct{}
 			shouldCompareChecksum := true
 			if len(foundPackagesDetailsArr) != 1 {
-				LogInfo.Printf("Found multiple or no packages: \"%d\" - Should be only 1. Skipping checksum comparison. Continuing with the upload..", len(foundPackagesDetailsArr))
+				mylog.LogInfo.Printf("Found multiple or no packages: \"%d\" - Should be only 1. Skipping checksum comparison. Continuing with the upload..", len(foundPackagesDetailsArr))
 				shouldCompareChecksum = false
 			} else if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
-				LogInfo.Print("No package found. Continuing with the upload..")
+				mylog.LogInfo.Print("No package found. Continuing with the upload..")
 				shouldCompareChecksum = false
 			}
 			
 			if shouldCompareChecksum {
 				// Check the checksum:
-				LogInfo.Printf("Comparing found package's checksum to know if should upload to: %s or not", destServerRepo)
+				mylog.LogInfo.Printf("Comparing found package's checksum to know if should upload to: %s or not", destServerRepo)
 				foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
 				fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
 				if foundPackageChecksum == fileToUploadChecksum {
@@ -203,7 +203,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 			
 			if len(destServerRepo) > 1 {
 				lastChar := destServerRepo[len(destServerRepo)-1:]
-				LogInfo.Printf("Adding '/' char to dest server repo url: \"%s\"", destServerRepo)
+				mylog.LogInfo.Printf("Adding '/' char to dest server repo url: \"%s\"", destServerRepo)
 				if lastChar != "/" {destServerRepo += "/"}
 			}
 			httpRequestArgs.UrlAddress = destServerRepo
@@ -229,7 +229,7 @@ func TrimQuotes(s string) string {
 func GetCurrentProgramDir() string {
     ex, err := os.Executable()
     if err != nil {
-        LogError.Fatalf("%s\nFailed getting current program's dir", err)
+        mylog.LogError.Fatalf("%s\nFailed getting current program's dir", err)
     }
     return filepath.Dir(ex)
 }
@@ -247,7 +247,7 @@ func Getenv(key, fallback string) string {
 func StrToInt(strVar string) int {
 	intVar, err := strconv.Atoi(strVar)
     if err != nil {
-        LogError.Printf("%s\nFailed converting string: \"%s\" to integer", err, strVar)
+        mylog.LogError.Printf("%s\nFailed converting string: \"%s\" to integer", err, strVar)
         panic(err)
     }
     return intVar
@@ -289,11 +289,11 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     
     HttpRequestHeadersMap := make(map[string] string)
     tempHeadersPairsArr := strings.Split(httpRequestHeadersStr, ";")
-    LogInfo.Printf("Looping on headers values to init headers map")
+    mylog.LogInfo.Printf("Looping on headers values to init headers map")
     for _, headersPairStr := range tempHeadersPairsArr {
         tempPairArr := strings.Split(headersPairStr, "=")
         if len(tempPairArr) != 2 {
-            LogError.Printf("Found header pair: \"%v\"  that is not in the right format of: \"key=value\"", tempPairArr)
+            mylog.LogError.Printf("Found header pair: \"%v\"  that is not in the right format of: \"key=value\"", tempPairArr)
             return nil
         }
         headerKey := tempPairArr[0]
@@ -308,7 +308,7 @@ func CreateDir(dirPath string) {
     LogDebug.Printf("Creating dir: %s", dirPath)
     err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
-		LogError.Printf("%s\nFailed creating dir: \"%s\"", err, dirPath)
+		mylog.LogError.Printf("%s\nFailed creating dir: \"%s\"", err, dirPath)
         panic(err)
 	}
 }
@@ -320,7 +320,7 @@ func CreateFile(filePath string) *os.File {
     // Create the file
     file, err := os.Create(filePath)
     if err != nil  {
-        LogError.Printf("%s\nFailed creating file: \"%s\"", err, filePath)
+        mylog.LogError.Printf("%s\nFailed creating file: \"%s\"", err, filePath)
         panic(err)
     }
     return file
@@ -331,13 +331,13 @@ func CalculateFileChecksum(filePath string) string {
     LogDebug.Printf("Calculating sha512 checksum of file: %s", filePath)
     f, err := os.Open(filePath)
     if err != nil {
-        LogError.Printf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
+        mylog.LogError.Printf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
         panic(err)
     }
     defer f.Close()
     h := sha512.New()
     if _, err := io.Copy(h, f); err != nil {
-        LogError.Printf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
+        mylog.LogError.Printf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
         panic(err)
     }
 
@@ -354,7 +354,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     timeoutSec := httpRequestArgs.TimeoutSec
     method := strings.ToUpper(httpRequestArgs.Method)
 
-    LogInfo.Printf("Making an HTTP '%s' request to URL: \"%s\"", method, urlAddress)
+    mylog.LogInfo.Printf("Making an HTTP '%s' request to URL: \"%s\"", method, urlAddress)
 
     client := http.Client{Timeout: time.Duration(timeoutSec) * time.Second,}
     
@@ -368,32 +368,32 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
     req, err := http.NewRequest(method, urlAddress, body)
     if err != nil {
-        LogError.Printf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlAddress)
+        mylog.LogError.Printf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlAddress)
         return ""
     }
 
     // Incase pushing a file, then add the Content Type header from the reader (includes boundary)
     if method == "PUT" && len(uploadFilePath) > 0 {
-        LogInfo.Printf("Adding header:  'Content-Type'")
+        mylog.LogInfo.Printf("Adding header:  'Content-Type'")
         req.Header.Add("Content-Type", writer.FormDataContentType())
     }
 
     // Adding headers:
     for k := range headersMap {
-        LogInfo.Printf("Adding header:  '%s'=\"%s\"", k, headersMap[k])
+        mylog.LogInfo.Printf("Adding header:  '%s'=\"%s\"", k, headersMap[k])
         req.Header.Add(k, headersMap[k])
     }
 
     // Adding creds
     if len(username) > 0 && len(password) > 0 {
-        LogInfo.Printf("Adding creds of user:  '%s'", username)
+        mylog.LogInfo.Printf("Adding creds of user:  '%s'", username)
         req.SetBasicAuth(username, password)
     }
 
     // Make the http request
     response, err := client.Do(req)
     if err != nil {
-        LogError.Printf("%s\nFailed while making the request: %s", err, urlAddress)
+        mylog.LogError.Printf("%s\nFailed while making the request: %s", err, urlAddress)
         return ""
     }
   
@@ -401,13 +401,13 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     
     // If got: downloadFilePath var, then Writer the body to file
     if len(downloadFilePath) > 0 {
-        LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
+        mylog.LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
         fileHandle := CreateFile(downloadFilePath)  // Create the file
         defer fileHandle.Close()
 
         _, err = io.Copy(fileHandle, response.Body)
         if err != nil  {
-            LogError.Printf("%s\nFailed writing response Body to file: %s", err, downloadFilePath)
+            mylog.LogError.Printf("%s\nFailed writing response Body to file: %s", err, downloadFilePath)
             panic(err)
         }
         return "" // Finish here
@@ -415,7 +415,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
     responseBody, err := ioutil.ReadAll(response.Body)
     if err != nil {
-        LogError.Printf("%s\nFailed reading request's response body: %s", err, urlAddress)
+        mylog.LogError.Printf("%s\nFailed reading request's response body: %s", err, urlAddress)
         return ""
     }
 
@@ -425,19 +425,19 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     // LogDebug.Printf(msgStr)
 
     if response.StatusCode >= 400 {
-        LogError.Printf("%s", msgStr)
-        LogError.Printf("Returned code: %d. HTTP request failure: %s", response.StatusCode, urlAddress)
+        mylog.LogError.Printf("%s", msgStr)
+        mylog.LogError.Printf("Returned code: %d. HTTP request failure: %s", response.StatusCode, urlAddress)
     }
 
     return bodyStr
 }
 
 func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName string) (io.Reader, *multipart.Writer) {
-    LogInfo.Printf("Reading file content for upload: \"%s\"", uploadFilePath)
+    mylog.LogInfo.Printf("Reading file content for upload: \"%s\"", uploadFilePath)
 
     // If missing file: return empty body
     if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
-        LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
+        mylog.LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
         return nil, nil
     }
 
@@ -478,8 +478,8 @@ func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
     re := regexp.MustCompile("'(.*?)'")  // Find values in between quotes
     resultArr := re.FindAllString(pkgDetailsUrl, -1)  // -1 = find ALL available matches
     if len(resultArr) != 2 {
-        LogError.Printf("Failed to parse URL for pkg Name & Version:  \"%s\"", pkgDetailsUrl)
-        LogError.Printf("Found regex result count is: %d different from 2", len(resultArr))
+        mylog.LogError.Printf("Failed to parse URL for pkg Name & Version:  \"%s\"", pkgDetailsUrl)
+        mylog.LogError.Printf("Found regex result count is: %d different from 2", len(resultArr))
         return nil
     }
     // Trim
@@ -506,7 +506,7 @@ func ParseXmlDataToSinglePkgDetailsStruct(entryStruct nuget_packages_xml.SingleP
 
 func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] global_structs.NugetPackageDetailsStruct {
     parsedPackagesVersionsArr := make([] global_structs.NugetPackageDetailsStruct, 0)
-    LogInfo.Printf("Parsing http request response for packages details")
+    mylog.LogInfo.Printf("Parsing http request response for packages details")
     parsedPackagesDetailsStruct := nuget_packages_xml.ParseMultipleNugetPackagesXmlData(responseBody)
     if len(parsedPackagesDetailsStruct.Entry) == 0 {  // If failed to parse entries, it might be only a single entry and in that case attempt to parse it
         entryStruct := nuget_packages_xml.ParseSingleNugetPackagesXmlData(responseBody)
@@ -531,7 +531,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
 }
 
 func DownloadPkg(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
-    LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
+    mylog.LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
     downloadFilePath := downloadPkgDetailsStruct.DownloadFilePath
     downloadFileChecksum := downloadPkgDetailsStruct.DownloadFileChecksum
@@ -552,7 +552,7 @@ func DownloadPkg(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsS
 
 func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRequestArgsStruct global_structs.HttpRequestArgsStruct) {
     pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
-	LogInfo.Printf("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
+	mylog.LogInfo.Printf("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
     httpRequestArgsStruct.Method = "PUT"
     httpRequestArgsStruct.UploadFilePath = uploadPkgStruct.UploadFilePath
     MakeHttpRequest(httpRequestArgsStruct)
