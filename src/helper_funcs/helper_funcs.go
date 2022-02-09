@@ -142,7 +142,7 @@ func FilterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []global_stru
 	for _, pkgDetailStruct := range foundPackagesDetailsArr {
 		pkgVersion := pkgDetailStruct.Version
 		pkgName := pkgDetailStruct.Name
-		versionsToSearchArr := LoadStringArrValueFromSynchedMap(packagesToDownloadMap, pkgName) // Use global var: packagesToDownloadMap
+		versionsToSearchArr := LoadStringArrValueFromSynchedMap(global_vars.PackagesToDownloadMap, pkgName) // Use global var: packagesToDownloadMap
 		if len(versionsToSearchArr) == 0 {
 			filteredPackagesDetailsArr = append(filteredPackagesDetailsArr, pkgDetailStruct)
 			continue
@@ -161,17 +161,17 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
 
 	// Check if package already exists. If so, then compare it's checksum and skip on matching
-	for _, destServerUrl := range DestServersUrlsArr {
-		for _, repoName := range destReposNamesArr {
+	for _, destServerUrl := range global_vars.DestServersUrlsArr {
+		for _, repoName := range global_vars.DestReposNamesArr {
 			destServerRepo := destServerUrl + "/" + repoName
 			mylog.LogInfo.Printf("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerRepo)
 			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
 			httpRequestArgs := global_structs.HttpRequestArgsStruct{
 				UrlAddress: checkDestServerPkgExistUrl,
-				HeadersMap: HttpRequestHeadersMap,
-				UserToUse:  destServersUserToUse,
-				PassToUse:  destServersPassToUse,
-				TimeoutSec: HttpRequestTimeoutSecondsInt,
+				HeadersMap: global_vars.HttpRequestHeadersMap,
+				UserToUse:  global_vars.DestServersUserToUse,
+				PassToUse:  global_vars.DestServersPassToUse,
+				TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
 				Method:     "GET",
 			}
 
