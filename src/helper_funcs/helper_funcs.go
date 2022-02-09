@@ -4,6 +4,7 @@ import (
 	"golang-artifacts-syncher/src/nuget_packages_xml"
 	"golang-artifacts-syncher/src/global_structs"
 	"golang-artifacts-syncher/src/global_vars"
+	"golang-artifacts-syncher/src/mylog"
 	"bytes"
 	"crypto/sha512"
 	"encoding/base64"
