@@ -65,7 +65,7 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 
 		go func(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
 			defer wg.Done()
-			helper_funcs.DownloadPkg(downloadPkgDetailsStruct)
+			nuget_cli.DownloadNugetPackage(downloadPkgDetailsStruct)
 			helper_funcs.Synched_AppendDownloadedPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadPkgDetailsStruct)
 		}(downloadPkgDetailsStruct)
 	}

@@ -534,26 +534,6 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
     return parsedPackagesDetailsArr
 }
 
-func DownloadPkg(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
-    mylog.LogInfo.Printf("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
-    fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
-    downloadFilePath := downloadPkgDetailsStruct.DownloadFilePath
-    downloadFileChecksum := downloadPkgDetailsStruct.DownloadFileChecksum
-    fileChecksum := downloadPkgDetailsStruct.PkgDetailsStruct.Checksum
-    if fileChecksum == downloadFileChecksum {
-        fileName := filepath.Base(downloadFilePath)
-        mylog.LogWarning.Printf("Checksum match: download target file already exists. Skipping download of: \"%s\"", fileName)
-        return
-    }
-    MakeHttpRequest(
-        global_structs.HttpRequestArgsStruct{
-            UrlAddress: fileUrl,
-            Method: "GET",
-            DownloadFilePath: downloadFilePath,
-        },
-    )
-}
-
 func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRequestArgsStruct global_structs.HttpRequestArgsStruct) {
     pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	mylog.LogInfo.Printf("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
