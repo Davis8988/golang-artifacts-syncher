@@ -21,24 +21,24 @@ import (
 	"time"
 )
 
-func Init() {
-    LogInfo.Print("Initializing helpers pkg vars")
-    convertSyncedMapToString_Lock = sync.RWMutex{}
-    appendPkgDetailsArr_Lock = sync.RWMutex{}
-    appendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
+func InitVars() {
+    mylog.LogInfo.Print("Initializing helpers pkg vars")
+    ConvertSyncedMapToString_Lock = sync.RWMutex{}
+    AppendPkgDetailsArr_Lock = sync.RWMutex{}
+    AppendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
 
-    LogInfo.Print("Initializing from envs vars")
+    mylog.LogInfo.Print("Initializing from envs vars")
     SrcServersUserToUse = Getenv("SRC_SERVERS_USER_TO_USE", "")
 	SrcServersPassToUse = Getenv("SRC_SERVERS_PASS_TO_USE", "")
-	srcServersUrlsStr = Getenv("SRC_SERVERS_URLS_STR", "")
-	srcReposNamesStr = Getenv("SRC_REPOS_NAMES_STR", "")
-	destServersUrlsStr = Getenv("DEST_SERVERS_URLS_STR", "")
-	destReposNamesStr = Getenv("DEST_REPOS_NAMES_STR", "")
-	destServersUserToUse = Getenv("DEST_SERVERS_USER_TO_USE", "")
-	destServersPassToUse = Getenv("DEST_SERVERS_PASS_TO_USE", "")
-	packagesNamesStr = Getenv("PACKAGES_NAMES_STR", "")
-	packagesVersionsStr = Getenv("PACKAGES_VERSIONS_STR", "")
-	httpRequestHeadersStr = Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
+	SrcServersUrlsStr = Getenv("SRC_SERVERS_URLS_STR", "")
+	SrcReposNamesStr = Getenv("SRC_REPOS_NAMES_STR", "")
+	DestServersUrlsStr = Getenv("DEST_SERVERS_URLS_STR", "")
+	DestReposNamesStr = Getenv("DEST_REPOS_NAMES_STR", "")
+	DestServersUserToUse = Getenv("DEST_SERVERS_USER_TO_USE", "")
+	DestServersPassToUse = Getenv("DEST_SERVERS_PASS_TO_USE", "")
+	PackagesNamesStr = Getenv("PACKAGES_NAMES_STR", "")
+	PackagesVersionsStr = Getenv("PACKAGES_VERSIONS_STR", "")
+	HttpRequestHeadersStr = Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
 	DownloadPkgsDirPath = Getenv("DOWNLOAD_PKGS_DIR_PATH", GetCurrentProgramDir())
 	HttpRequestTimeoutSecondsInt = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 }
