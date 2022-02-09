@@ -2,6 +2,7 @@ package nuget_cli
 
 import (
 	"golang-artifacts-syncher/src/global_structs"
+	"golang-artifacts-syncher/src/global_vars"
 	"golang-artifacts-syncher/src/helpers_funcs"
 	"sync"
 )
@@ -31,10 +32,10 @@ func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruc
 				defer wg.Done()
 				httpRequestArgs := global_structs.HttpRequestArgsStruct{
 					UrlAddress: urlToCheck,
-					HeadersMap: helpers_funcs.HttpRequestHeadersMap,
-					UserToUse:  helpers_funcs.SrcServersUserToUse,
-					PassToUse:  helpers_funcs.SrcServersPassToUse,
-					TimeoutSec: helpers_funcs.HttpRequestTimeoutSecondsInt,
+					HeadersMap: global_vars.HttpRequestHeadersMap,
+					UserToUse:  global_vars.SrcServersUserToUse,
+					PassToUse:  global_vars.SrcServersPassToUse,
+					TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
 					Method:     "GET",
 				}
 				foundPackagesDetailsArr := helpers_funcs.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)

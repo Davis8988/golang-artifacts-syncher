@@ -6,30 +6,30 @@ import (
 
 var (
     // Locks
-    convertSyncedMapToString_Lock sync.RWMutex
-    appendPkgDetailsArr_Lock sync.RWMutex
-    appendDownloadedPkgDetailsArr_Lock sync.RWMutex
+    ConvertSyncedMapToString_Lock sync.RWMutex
+    AppendPkgDetailsArr_Lock sync.RWMutex
+    AppendDownloadedPkgDetailsArr_Lock sync.RWMutex
 
-    srcServersUserToUse          string
-    srcServersPassToUse          string
-    srcServersUrlsStr            string
-    srcReposNamesStr             string
-    destServersUrlsStr           string
-    destReposNamesStr            string
-    destServersUserToUse         string
-    destServersPassToUse         string
-    packagesNamesStr             string
-    packagesVersionsStr          string
-    httpRequestHeadersStr        string
+    SrcServersUserToUse          string
+    SrcServersPassToUse          string
+    SrcServersUrlsStr            string
+    SrcReposNamesStr             string
+    DestServersUrlsStr           string
+    DestReposNamesStr            string
+    DestServersUserToUse         string
+    DestServersPassToUse         string
+    PackagesNamesStr             string
+    PackagesVersionsStr          string
+    HttpRequestHeadersStr        string
     DownloadPkgsDirPath          string
-    httpRequestTimeoutSecondsInt int
+    HttpRequestTimeoutSecondsInt int
 
-    srcServersUrlsArr     []string
-    srcReposNamesArr      []string
+    SrcServersUrlsArr     []string
+    SrcReposNamesArr      []string
     DestServersUrlsArr    []string
-    destReposNamesArr     []string
-    packagesNamesArr      []string
-    packagesVersionsArr   []string
-    httpRequestHeadersMap map[string]string
-    packagesToDownloadMap sync.Map
+    DestReposNamesArr     []string
+    PackagesNamesArr      []string
+    PackagesVersionsArr   []string
+    HttpRequestHeadersMap map[string]string
+    PackagesToDownloadMap sync.Map
 )
