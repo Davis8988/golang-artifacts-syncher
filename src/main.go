@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"golang-artifacts-syncher/src/mylog"
 	"golang-artifacts-syncher/src/global_structs"
 	"golang-artifacts-syncher/src/helper_funcs"
 	"golang-artifacts-syncher/src/nuget_cli"
@@ -25,7 +26,7 @@ func validateEnv() {
 }
 
 func parseArgs() {
-	helper_funcs.LogInfo.Print("Parsing args")
+	mylog.LogInfo.Print("Parsing args")
 	flag.Parse()
 }
 
@@ -38,7 +39,7 @@ func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageD
 }
 
 func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
-	helper_funcs.LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
+	mylog.LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
 	var totalDownloadedPackagesDetailsArr []global_structs.DownloadPackageDetailsStruct
 
 	wg := sync.WaitGroup{}
@@ -47,7 +48,7 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 
 	for _, pkgDetailsStruct := range foundPackagesArr {
 		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
-			helper_funcs.LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
+			mylog.LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
 			continue
 		}
 
@@ -73,7 +74,7 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 }
 
 func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
-	helper_funcs.LogInfo.Printf("Uploading %d downloaded packages to servers: %v", len(downloadedPkgsArr), helper_funcs.DestServersUrlsArr)
+	mylog.LogInfo.Printf("Uploading %d downloaded packages to servers: %v", len(downloadedPkgsArr), helper_funcs.DestServersUrlsArr)
 	if len(helper_funcs.DestServersUrlsArr) == 0 {
 		helper_funcs.LogWarning.Printf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
 		return
@@ -89,7 +90,7 @@ func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 }
 
 func main() {
-	helper_funcs.LogInfo.Print("Started")
+	mylog.LogInfo.Print("Started")
 	initVars()
 	parseArgs()
 	updateVars()
@@ -98,5 +99,5 @@ func main() {
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
 	downloadedPkgsArr := downloadSpecifiedPackages(foundPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
-	helper_funcs.LogInfo.Print("Finished")
+	mylog.LogInfo.Print("Finished")
 }
