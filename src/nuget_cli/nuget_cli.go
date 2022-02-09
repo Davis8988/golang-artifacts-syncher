@@ -4,6 +4,7 @@ import (
 	"golang-artifacts-syncher/src/global_structs"
 	"golang-artifacts-syncher/src/global_vars"
 	"golang-artifacts-syncher/src/helper_funcs"
+	"golang-artifacts-syncher/src/mylog"
 	"sync"
 )
 
@@ -25,7 +26,7 @@ func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruc
 	defer wg.Wait()
 
 	if len(searchUrlsArr) > 0 {
-		helper_funcs.LogInfo.Printf("Checking %d src URL addresses for pkgs versions", len(searchUrlsArr))
+		mylog.LogInfo.Printf("Checking %d src URL addresses for pkgs versions", len(searchUrlsArr))
 		for _, urlToCheck := range searchUrlsArr {
 			wg.Add(1)
 			go func(urlToCheck string) {
