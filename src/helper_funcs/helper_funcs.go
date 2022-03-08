@@ -21,6 +21,12 @@ import (
 	"time"
 )
 
+var (
+    startTime time.Time
+    endTime time.Time
+    elapsedTime time.Time
+)
+
 func InitVars() {
     mylog.LogInfo.Print("Initializing helpers pkg vars")
     global_vars.ConvertSyncedMapToString_Lock = sync.RWMutex{}
@@ -449,4 +455,13 @@ func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] global_structs.DownloadPack
 func CompareNugetPackageDetailsStruct(pkg1, pkg2 global_structs.NugetPackageDetailsStruct) bool {
     return (pkg1 == pkg2) || (strings.Compare(pkg1.Name, pkg2.Name) == 0 && strings.Compare(pkg1.Version, pkg2.Version) == 0)
 }
+
+func StartTimer() {
+    startTime = time.Now()
+}
+
+func EndTimer() time.Duration {
+    return time.Since(startTime)
+}
+
 
