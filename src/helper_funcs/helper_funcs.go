@@ -326,13 +326,13 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
     // Incase pushing a file, then add the Content Type header from the reader (includes boundary)
     if method == "PUT" && len(uploadFilePath) > 0 {
-        mylog.LogInfo.Printf("Adding header:  'Content-Type'")
+        mylog.LogDebug.Printf("Adding header:  'Content-Type'")
         req.Header.Add("Content-Type", writer.FormDataContentType())
     }
 
     // Adding headers:
     for k := range headersMap {
-        mylog.LogInfo.Printf("Adding header:  '%s'=\"%s\"", k, headersMap[k])
+        mylog.LogDebug.Printf("Adding header:  '%s'=\"%s\"", k, headersMap[k])
         req.Header.Add(k, headersMap[k])
     }
 
