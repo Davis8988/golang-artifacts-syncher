@@ -95,6 +95,8 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
 		responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
 		if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
 		currentParsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
+		foundPackagesCount = len(currentParsedPackagesDetailsArr);
+		mylog.LogDebug.Printf("Current found packages count: %d", foundPackagesCount)
 		parsedPackagesDetailsArr = append(parsedPackagesDetailsArr, currentParsedPackagesDetailsArr...)  // Add 2 slices
 	}
 
