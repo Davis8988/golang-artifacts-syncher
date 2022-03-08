@@ -125,3 +125,63 @@ func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruc
 
 	return totalFoundPackagesDetailsArr
 }
+
+func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetailsStruct) global_structs.UploadPackageDetailsStruct {
+	pkgPrintStr := FmtSprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
+	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
+	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
+
+	// Check if package already exists. If so, then compare it's checksum and skip on matching
+	for _, destServerUrl := range global_vars.DestServersUrlsArr {
+		for _, repoName := range global_vars.DestReposNamesArr {
+			destServerRepo := destServerUrl + "/" + repoName
+			mylog.LogInfo.Printf("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerRepo)
+			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
+			httpRequestArgs := global_structs.HttpRequestArgsStruct{
+				UrlAddress: checkDestServerPkgExistUrl,
+				HeadersMap: global_vars.HttpRequestHeadersMap,
+				UserToUse:  global_vars.DestServersUserToUse,
+				PassToUse:  global_vars.DestServersPassToUse,
+				TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
+				Method:     "GET",
+			}
+
+			foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			mylog.LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
+
+			emptyNugetPackageDetailsStruct := global_structs.NugetPackageDetailsStruct{}
+			shouldCompareChecksum := true
+			if len(foundPackagesDetailsArr) != 1 {
+				mylog.LogInfo.Printf("Found multiple or no packages: \"%d\" - Should be only 1. Skipping checksum comparison. Continuing with the upload..", len(foundPackagesDetailsArr))
+				shouldCompareChecksum = false
+			} else if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
+				mylog.LogInfo.Print("No package found. Continuing with the upload..")
+				shouldCompareChecksum = false
+			}
+			
+			if shouldCompareChecksum {
+				// Check the checksum:
+				mylog.LogInfo.Printf("Comparing found package's checksum to know if should upload to: %s or not", destServerRepo)
+				foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
+				fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
+				if foundPackageChecksum == fileToUploadChecksum {
+				fileName := filepath.Base(uploadPkgStruct.UploadFilePath)
+				mylog.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n"+
+					"Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
+				return uploadPkgStruct
+				}
+			}
+			
+			if len(destServerRepo) > 1 {
+				lastChar := destServerRepo[len(destServerRepo)-1:]
+				mylog.LogInfo.Printf("Adding '/' char to dest server repo url: \"%s\"", destServerRepo)
+				if lastChar != "/" {destServerRepo += "/"}
+			}
+			httpRequestArgs.UrlAddress = destServerRepo
+			// Upload the package file
+			UploadPkg(uploadPkgStruct, httpRequestArgs)
+		}
+	}
+
+	return uploadPkgStruct
+}
