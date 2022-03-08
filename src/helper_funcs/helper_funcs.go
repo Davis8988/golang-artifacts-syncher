@@ -42,6 +42,7 @@ func InitVars() {
 	global_vars.DownloadPkgsDirPath = Getenv("DOWNLOAD_PKGS_DIR_PATH", GetCurrentProgramDir())
 	global_vars.HttpRequestTimeoutSecondsInt = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
 	global_vars.SearchPackagesUrlSkipGroupCount = StrToInt(Getenv("SEARCH_PACKAGES_URL_SKIP_GROUP_COUNT", "30"))
+	global_vars.PackagesConcurrentDownloadCount = StrToInt(Getenv("PACKAGES_CONCURRENT_DOWNLOAD_COUNT", "5"))
 }
 
 func PrintVars() {
