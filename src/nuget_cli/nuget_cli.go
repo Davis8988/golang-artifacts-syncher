@@ -84,7 +84,7 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] global_
 
 
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) [] global_structs.NugetPackageDetailsStruct {
-    responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
+	responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
     if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
     parsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
 
