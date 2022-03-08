@@ -39,7 +39,7 @@ func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageD
 }
 
 func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
-	mylog.LogInfo.Printf("Downloading found %d packages", len(foundPackagesArr))
+	mylog.LogInfo.Printf("Downloading found %d packages simultaneously in groups of: %d", len(foundPackagesArr), global_vars.PackagesMaxConcurrentDownloadCount)
 	var totalDownloadedPackagesDetailsArr []global_structs.DownloadPackageDetailsStruct
 
 	wg := sync.WaitGroup{}
