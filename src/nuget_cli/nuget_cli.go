@@ -185,3 +185,12 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 
 	return uploadPkgStruct
 }
+
+func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRequestArgsStruct global_structs.HttpRequestArgsStruct) {
+    pkgPrintStr := helper_funcs.FmtSprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
+	mylog.LogInfo.Printf("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
+    httpRequestArgsStruct.Method = "PUT"
+    httpRequestArgsStruct.UploadFilePath = uploadPkgStruct.UploadFilePath
+    helper_funcs.MakeHttpRequest(httpRequestArgsStruct)
+
+}

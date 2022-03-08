@@ -424,15 +424,6 @@ func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName s
 }
 
 
-func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRequestArgsStruct global_structs.HttpRequestArgsStruct) {
-    pkgPrintStr := FmtSprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
-	mylog.LogInfo.Printf("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
-    httpRequestArgsStruct.Method = "PUT"
-    httpRequestArgsStruct.UploadFilePath = uploadPkgStruct.UploadFilePath
-    MakeHttpRequest(httpRequestArgsStruct)
-
-}
-
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
 	global_vars.ConvertSyncedMapToString_Lock.Lock()
 	result := ConvertSyncedMapToString(synchedMap)
