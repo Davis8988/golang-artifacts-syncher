@@ -96,9 +96,12 @@ func StartTimer() {
 	helper_funcs.StartTimer()
 }
 
-func EndTimerAndPrint() {
+func Finish() {
+	mylog.LogInfo.Print("Finished")
+	mylog.LogInfo.Print("")
 	duration := helper_funcs.EndTimer()
 	mylog.LogInfo.Printf("Time: %v", duration)
+	mylog.LogInfo.Print("")
 }
 
 func main() {
@@ -112,7 +115,5 @@ func main() {
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
 	downloadedPkgsArr := downloadSpecifiedPackages(foundPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
-	mylog.LogInfo.Print("Finished")
-	mylog.LogInfo.Print("")
-	EndTimerAndPrint()
+	Finish()
 }
