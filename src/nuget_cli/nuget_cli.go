@@ -32,6 +32,33 @@ func DownloadNugetPackage(downloadPkgDetailsStruct global_structs.DownloadPackag
     )
 }
 
+func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] global_structs.NugetPackageDetailsStruct {
+    parsedPackagesVersionsArr := make([] global_structs.NugetPackageDetailsStruct, 0)
+    mylog.LogInfo.Printf("Parsing http request response for packages details")
+    parsedPackagesDetailsStruct := nuget_packages_xml.ParseMultipleNugetPackagesXmlData(responseBody)
+    if len(parsedPackagesDetailsStruct.Entry) == 0 {  // If failed to parse entries, it might be only a single entry and in that case attempt to parse it
+        entryStruct := nuget_packages_xml.ParseSingleNugetPackagesXmlData(responseBody)
+        pkgDetailsStruct := ParseXmlDataToSinglePkgDetailsStruct(entryStruct)
+        parsedPackagesVersionsArr = append(parsedPackagesVersionsArr, pkgDetailsStruct)
+        return parsedPackagesVersionsArr  
+    }
+    for _, entryStruct := range parsedPackagesDetailsStruct.Entry {
+        pkgDetailsStruct := ParseXmlDataToSinglePkgDetailsStruct(entryStruct)
+        if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {continue}
+        parsedPackagesVersionsArr = append(parsedPackagesVersionsArr, pkgDetailsStruct)
+    }
+    return parsedPackagesVersionsArr
+}
+
+
+func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) [] global_structs.NugetPackageDetailsStruct {
+    responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
+    if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
+    parsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
+
+    return parsedPackagesDetailsArr
+}
+
 
 func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruct {
 	var totalFoundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
@@ -56,7 +83,7 @@ func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruc
 					TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
 					Method:     "GET",
 				}
-				foundPackagesDetailsArr := helper_funcs.SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+				foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
 				foundPackagesDetailsArr = helper_funcs.FilterFoundPackagesByRequestedVersion(foundPackagesDetailsArr) // Filter by requested version - if any version is specified..
 				helper_funcs.Synched_AppendPkgDetailsObj(&totalFoundPackagesDetailsArr, foundPackagesDetailsArr)
 			}(urlToCheck)
