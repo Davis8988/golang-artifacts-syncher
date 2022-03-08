@@ -272,7 +272,7 @@ func LoadStringArrValueFromSynchedMap(synchedMap sync.Map, key string) [] string
 func PrintSyncedMap(synchedMap sync.Map) {
 	synchedMap.Range(func(key interface{}, value interface{}) bool {
 		someVal, _ := synchedMap.Load(key)
-		fmt.Println(someVal)
+		mylog.LogInfo.Println(someVal);
 		return true
 	})
 }
