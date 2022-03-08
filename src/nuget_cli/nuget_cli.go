@@ -101,7 +101,6 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
 		parsedPackagesDetailsArr = append(parsedPackagesDetailsArr, currentParsedPackagesDetailsArr...)  // Add 2 slices
 		currentSkipValue += skipGroupCount;  // Skip another group for the next query
 	}
-
 	
     return parsedPackagesDetailsArr
 }
