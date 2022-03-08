@@ -24,7 +24,7 @@ var (
     DownloadPkgsDirPath          string
     HttpRequestTimeoutSecondsInt int
     SearchPackagesUrlSkipGroupCount int  // Used for URL searching requests of Nuget pkgs - Can't query for all at once, need to query multiple times and skip previous results.
-    PackagesConcurrentDownloadCount int  // Used for URL searching requests of Nuget pkgs - Can't query for all at once, need to query multiple times and skip previous results.
+    PackagesConcurrentDownloadCount int  
 
     SrcServersUrlsArr     []string
     SrcReposNamesArr      []string
