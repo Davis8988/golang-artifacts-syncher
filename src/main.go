@@ -80,7 +80,7 @@ func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 		return
 	}
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
-		helper_funcs.UploadDownloadedPackage(global_structs.UploadPackageDetailsStruct{
+		nuget_cli.UploadDownloadedPackage(global_structs.UploadPackageDetailsStruct{
 			PkgDetailsStruct:       downloadedPkgStruct.PkgDetailsStruct,
 			UploadFilePath:         downloadedPkgStruct.DownloadFilePath,
 			UploadFileChecksum:     downloadedPkgStruct.DownloadFileChecksum,
