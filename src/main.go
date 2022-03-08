@@ -45,7 +45,8 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 	wg := sync.WaitGroup{}
 	// Ensure all routines finish before returning
 	defer wg.Wait()
-	
+	concurrentCountGuard := make(chan int, global_vars.PackagesMaxConcurrentDownloadCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentDownloadCount'
+
 	for _, pkgDetailsStruct := range foundPackagesArr {
 		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
 			mylog.LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
@@ -61,11 +62,13 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 			DownloadFileChecksum:     helper_funcs.CalculateFileChecksum(downloadFilePath), // Can by empty if file doesn't exist yet
 			DownloadFileChecksumType: "SHA512",                                        // Default checksum algorithm for Nuget pkgs
 		}
-
+		
+		concurrentCountGuard <- 1; // Add 1 to concurrent threads count - Would block if array is filled. Can only be freed by thread executing: '<- concurrentCountGuard' below
 		go func(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
 			defer wg.Done()
 			nuget_cli.DownloadNugetPackage(downloadPkgDetailsStruct)
 			helper_funcs.Synched_AppendDownloadedPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadPkgDetailsStruct)
+			<- concurrentCountGuard  // Remove 1 from 'concurrentCountGuard'
 		}(downloadPkgDetailsStruct)
 	}
 	wg.Wait()
