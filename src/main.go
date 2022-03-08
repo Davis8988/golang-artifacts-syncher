@@ -112,6 +112,7 @@ func main() {
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
 	downloadedPkgsArr := downloadSpecifiedPackages(foundPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
-	mylog.LogInfo.Println("Finished")
+	mylog.LogInfo.Print("Finished")
+	mylog.LogInfo.Print("")
 	EndTimerAndPrint()
 }
