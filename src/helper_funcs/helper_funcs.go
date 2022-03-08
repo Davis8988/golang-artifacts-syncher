@@ -154,9 +154,13 @@ func FilterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []global_stru
 	return filteredPackagesDetailsArr
 }
 
+func FmtSprintf(format string, a ...interface{}) string {
+    return fmt.Sprintf(format, a...);
+}
+
 
 func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetailsStruct) global_structs.UploadPackageDetailsStruct {
-	pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
+	pkgPrintStr := FmtSprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
 
@@ -425,7 +429,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
     bodyStr := string(responseBody)
     msgStr := bodyStr
-    if len(response.Status) > 0 {msgStr = fmt.Sprintf("%s  %s", response.Status, bodyStr)}
+    if len(response.Status) > 0 {msgStr = FmtSprintf("%s  %s", response.Status, bodyStr)}
     // mylog.LogDebug.Printf(msgStr)
 
     if response.StatusCode >= 400 {
@@ -535,7 +539,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
 }
 
 func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRequestArgsStruct global_structs.HttpRequestArgsStruct) {
-    pkgPrintStr := fmt.Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
+    pkgPrintStr := FmtSprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	mylog.LogInfo.Printf("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
     httpRequestArgsStruct.Method = "PUT"
     httpRequestArgsStruct.UploadFilePath = uploadPkgStruct.UploadFilePath

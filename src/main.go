@@ -8,7 +8,6 @@ import (
 	"golang-artifacts-syncher/src/mylog"
 	"golang-artifacts-syncher/src/nuget_cli"
 
-	// "golang-artifacts-syncher/src/nuget_cli"
 	"path/filepath"
 	"sync"
 )

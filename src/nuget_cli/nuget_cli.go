@@ -32,6 +32,7 @@ func DownloadNugetPackage(downloadPkgDetailsStruct global_structs.DownloadPackag
     )
 }
 
+
 func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruct {
 	var totalFoundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
 	searchUrlsArr := helper_funcs.PrepareSrcSearchAllPkgsVersionsUrlsArray()
