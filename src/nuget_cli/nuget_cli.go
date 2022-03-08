@@ -91,7 +91,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
 	foundPackagesCount := skipGroupCount + 1;  // Start with dummy found packages of more than group count: skipGroupCount - Meaning there are more packages to search..
 	
 	mylog.LogDebug.Printf("Attempting to query for all packages in groups of: %d", skipGroupCount)
-	for foundPackagesCount >= skipGroupCount {
+	for foundPackagesCount >= skipGroupCount { // While there are still packages to query for
 		httpRequestArgs.UrlAddress = helper_funcs.FmtSprintf("%s&$skip=%d&$top=%d", origUrlAddr, currentSkipValue, skipGroupCount)  // Adding &$skip=%d&$top=%d  to url
 		responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
 		if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
