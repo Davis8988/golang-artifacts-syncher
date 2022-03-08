@@ -45,7 +45,7 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 	wg := sync.WaitGroup{}
 	// Ensure all routines finish before returning
 	defer wg.Wait()
-
+	
 	for _, pkgDetailsStruct := range foundPackagesArr {
 		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
 			mylog.LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
