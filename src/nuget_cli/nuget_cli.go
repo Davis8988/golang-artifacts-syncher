@@ -105,6 +105,28 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
     return parsedPackagesDetailsArr
 }
 
+func SearchSpecificPackageVersionByURLRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) [] global_structs.NugetPackageDetailsStruct {
+	parsedPackagesDetailsArr := make([] global_structs.NugetPackageDetailsStruct, 0)
+	skipGroupCount := global_vars.SearchPackagesUrlSkipGroupCount;
+	origUrlAddr := httpRequestArgs.UrlAddress;
+	currentSkipValue := 0;
+	foundPackagesCount := skipGroupCount + 1;  // Start with dummy found packages of more than group count: skipGroupCount - Meaning there are more packages to search..
+	
+	mylog.LogDebug.Printf("Attempting to query for all packages in groups of: %d", skipGroupCount)
+	for foundPackagesCount >= skipGroupCount { // <-- While there are may still packages to query for
+		httpRequestArgs.UrlAddress = helper_funcs.FmtSprintf("%s&$skip=%d&$top=%d", origUrlAddr, currentSkipValue, skipGroupCount)  // Adding &$skip=%d&$top=%d  to url
+		responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
+		if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
+		currentParsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
+		foundPackagesCount = len(currentParsedPackagesDetailsArr);
+		mylog.LogDebug.Printf("Current found packages count: %d", foundPackagesCount)
+		parsedPackagesDetailsArr = append(parsedPackagesDetailsArr, currentParsedPackagesDetailsArr...)  // Add 2 slices
+		currentSkipValue += skipGroupCount;  // Skip another group for the next query
+	}
+	
+    return parsedPackagesDetailsArr
+}
+
 func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruct {
 	var totalFoundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
 	searchUrlsArr := helper_funcs.PrepareSrcSearchAllPkgsVersionsUrlsArray()
