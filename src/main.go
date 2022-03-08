@@ -92,8 +92,18 @@ func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 	}
 }
 
+func StartTimer() {
+	helper_funcs.StartTimer()
+}
+
+func EndTimer() {
+	duration := helper_funcs.EndTimer()
+	mylog.LogInfo.Printf("Time: %v", duration)
+}
+
 func main() {
 	mylog.LogInfo.Print("Started")
+	StartTimer()
 	initVars()
 	parseArgs()
 	updateVars()
@@ -102,5 +112,6 @@ func main() {
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
 	downloadedPkgsArr := downloadSpecifiedPackages(foundPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
+	EndTimer()
 	mylog.LogInfo.Print("Finished")
 }
