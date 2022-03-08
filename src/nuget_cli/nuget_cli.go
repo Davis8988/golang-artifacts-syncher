@@ -167,7 +167,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 				Method:     "GET",
 			}
 
-			foundPackagesDetailsArr := SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs)
+			foundPackagesDetailsArr := SearchSpecificPackageVersionByURLRequest(httpRequestArgs)
 			mylog.LogInfo.Printf("Found: %s", foundPackagesDetailsArr)
 
 			emptyNugetPackageDetailsStruct := global_structs.NugetPackageDetailsStruct{}
