@@ -441,3 +441,11 @@ func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] global_structs.DownloadPack
     *arr_1 = append(*arr_1, downloadPkgDetailsStruct)
     global_vars.AppendDownloadedPkgDetailsArr_Lock.Unlock()
 }
+
+
+func CompareNugetPackageDetailsStruct(pkg1, pkg2 global_structs.NugetPackageDetailsStruct) bool {
+    if (pkg1 == pkg2) {return true}
+    if (strings.Compare(pkg1.Name, pkg2.Name) == 0 && strings.Compare(pkg1.Version, pkg2.Version) == 0) {return true}
+    return false
+}
+
