@@ -127,7 +127,7 @@ func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruc
 }
 
 func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetailsStruct) global_structs.UploadPackageDetailsStruct {
-	pkgPrintStr := FmtSprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
+	pkgPrintStr := helper_funcs.FmtSprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
 
@@ -165,7 +165,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 				foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
 				fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
 				if foundPackageChecksum == fileToUploadChecksum {
-				fileName := filepath.Base(uploadPkgStruct.UploadFilePath)
+				fileName := helper_funcs.GetFileNameFromPath(uploadPkgStruct.UploadFilePath)
 				mylog.LogWarning.Printf("Checksum match: upload target file already exists in dest server: '%s' \n"+
 					"Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
 				return uploadPkgStruct

@@ -158,6 +158,10 @@ func FmtSprintf(format string, a ...interface{}) string {
     return fmt.Sprintf(format, a...);
 }
 
+func GetFileNameFromPath(somePath string) string {
+    return filepath.Base(somePath);
+}
+
 
 func TrimQuotes(s string) string {
     if len(s) >= 2 {
