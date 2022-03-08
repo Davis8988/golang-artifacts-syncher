@@ -6,6 +6,7 @@ import (
 	"golang-artifacts-syncher/src/global_vars"
 	"golang-artifacts-syncher/src/helper_funcs"
 	"golang-artifacts-syncher/src/mylog"
+	"regexp"
 	"sync"
 )
 
@@ -31,6 +32,36 @@ func DownloadNugetPackage(downloadPkgDetailsStruct global_structs.DownloadPackag
             DownloadFilePath: downloadFilePath,
         },
     )
+}
+
+func ParseXmlDataToSinglePkgDetailsStruct(entryStruct nuget_packages_xml.SinglePackagesDetailsXmlStruct) global_structs.NugetPackageDetailsStruct {
+    var pkgDetailsStruct global_structs.NugetPackageDetailsStruct
+    pkgDetailsStruct.Checksum = entryStruct.Properties.PackageHash
+    pkgDetailsStruct.ChecksumType = entryStruct.Properties.PackageHashAlgorithm
+    pkgDetailsStruct.PkgDetailsUrl = entryStruct.ID
+    pkgDetailsStruct.PkgFileUrl = entryStruct.Content.Src
+    pkgDetailsStruct.Name = ""
+    pkgDetailsStruct.Version = ""
+    parsedNameAndVersionArr := ParsePkgNameAndVersionFromFileURL(pkgDetailsStruct.PkgDetailsUrl)
+    if parsedNameAndVersionArr != nil {
+        pkgDetailsStruct.Name = parsedNameAndVersionArr[0]
+        pkgDetailsStruct.Version = parsedNameAndVersionArr[1]
+    }
+    return pkgDetailsStruct
+}
+
+func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
+    mylog.LogDebug.Printf("Parsing URL for Name & Version: \"%s\"", pkgDetailsUrl)
+    re := regexp.MustCompile("'(.*?)'")  // Find values in between quotes
+    resultArr := re.FindAllString(pkgDetailsUrl, -1)  // -1 = find ALL available matches
+    if len(resultArr) != 2 {
+        mylog.LogError.Printf("Failed to parse URL for pkg Name & Version:  \"%s\"", pkgDetailsUrl)
+        mylog.LogError.Printf("Found regex result count is: %d different from 2", len(resultArr))
+        return nil
+    }
+    // Trim
+    for i, value := range resultArr {resultArr[i] = helper_funcs.TrimQuotes(value)}
+    return resultArr
 }
 
 func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] global_structs.NugetPackageDetailsStruct {
