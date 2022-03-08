@@ -98,6 +98,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
 		foundPackagesCount = len(currentParsedPackagesDetailsArr);
 		mylog.LogDebug.Printf("Current found packages count: %d", foundPackagesCount)
 		parsedPackagesDetailsArr = append(parsedPackagesDetailsArr, currentParsedPackagesDetailsArr...)  // Add 2 slices
+		currentSkipValue += skipGroupCount;  // Skip another group for the next query
 	}
 
 	
