@@ -84,13 +84,16 @@ func ParseHttpRequestResponseForPackagesVersions(responseBody string) [] global_
 
 
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) [] global_structs.NugetPackageDetailsStruct {
+	skipGroupCount := global_vars.SearchPackagesUrlSkipGroupCount;
+	origUrlAddr := httpRequestArgs.UrlAddress;
+	currentSkipValue := 0;
+	httpRequestArgs.UrlAddress = helper_funcs.FmtSprintf("%s&$skip=%d&$top=%d", origUrlAddr, currentSkipValue, skipGroupCount)  // Adding &$skip=%d&$top=%d  to url
 	responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
     if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
     parsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
 
     return parsedPackagesDetailsArr
 }
-
 
 func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruct {
 	var totalFoundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
