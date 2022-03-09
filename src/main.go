@@ -12,6 +12,9 @@ import (
 	"sync"
 )
 
+func initLogger() {
+	mylog.InitLogger()
+}
 
 func initVars() {
 	helper_funcs.InitVars()
@@ -107,6 +110,10 @@ func Finish() {
 func main() {
 	mylog.LogInfo.Print("Started")
 	StartTimer()
+	initLogger()
+	mylog.Logger.Info("Testing %d", 123)
+	mylog.Logger.Infoln("Testing %d", 123)
+	mylog.Logger.Infof("Testing %d", 123)
 	initVars()
 	parseArgs()
 	updateVars()
