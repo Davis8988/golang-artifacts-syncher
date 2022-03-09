@@ -23,10 +23,10 @@ func InitLogger() {
         FullTimestamp:true,
         ForceFormatting: true,
     }
-    formatter.SetColorScheme(&prefixed.ColorScheme{
-        PrefixStyle:    "blue+b",
-        TimestampStyle: "white+h",
-    })
+    // formatter.SetColorScheme(&prefixed.ColorScheme{
+    //     PrefixStyle:    "blue+b",
+    //     TimestampStyle: "white+h",
+    // })
     Logger = &logrus.Logger{
         Out:   os.Stderr,
         Level: logrus.InfoLevel,
