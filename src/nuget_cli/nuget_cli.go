@@ -93,8 +93,11 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
 	mylog.Logger.Debugf("Attempting to query for all packages in groups of: %d", skipGroupCount)
 	for foundPackagesCount >= skipGroupCount { // <-- While there are may still packages to query for
 		httpRequestArgs.UrlAddress = helper_funcs.Fmt_Sprintf("%s&$skip=%d&$top=%d", origUrlAddr, currentSkipValue, skipGroupCount)  // Adding &$skip=%d&$top=%d  to url
-		responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
-		if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
+		httpResponsePtr := helper_funcs.MakeHttpRequest(httpRequestArgs)
+		if httpResponsePtr == nil {return [] global_structs.NugetPackageDetailsStruct {}}
+		httpResponse := *httpResponsePtr
+		responseBody := httpResponse.BodyStr
+		if len(responseBody) == 0 || httpResponse.StatusCode >= 400 {return [] global_structs.NugetPackageDetailsStruct {}}
 		currentParsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
 		foundPackagesCount = len(currentParsedPackagesDetailsArr);
 		mylog.Logger.Debugf("Current found packages count: %d", foundPackagesCount)
@@ -106,8 +109,11 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
 }
 
 func SearchSpecificPackageVersionByURLRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) [] global_structs.NugetPackageDetailsStruct {
-	responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
-    if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
+	httpResponsePtr := helper_funcs.MakeHttpRequest(httpRequestArgs)
+    if httpResponsePtr == nil {return [] global_structs.NugetPackageDetailsStruct {}}
+	httpResponse := *httpResponsePtr
+	responseBody := httpResponse.BodyStr
+    if len(responseBody) == 0 || httpResponse.StatusCode >= 400 {return [] global_structs.NugetPackageDetailsStruct {}}
     parsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
 
     return parsedPackagesDetailsArr

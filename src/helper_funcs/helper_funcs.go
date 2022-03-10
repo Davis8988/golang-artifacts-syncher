@@ -394,7 +394,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) *glob
 
     httpResponseResultStruct := global_structs.HttpResponseStruct {
         BodyStr: bodyStr,
-        StatusCode: response.Status,
+        StatusCode: response.StatusCode,
     } 
     return &httpResponseResultStruct
 }

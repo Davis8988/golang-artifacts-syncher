@@ -15,7 +15,7 @@ type HttpRequestArgsStruct struct {
 
 type HttpResponseStruct struct {
 	BodyStr  string
-	StatusCode  string
+	StatusCode  int
 }
 
 type NugetPackageDetailsStruct struct {
