@@ -147,7 +147,7 @@ func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruc
 	return totalFoundPackagesDetailsArr
 }
 
-func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
+func DownloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
 	var totalDownloadedPackagesDetailsArr []global_structs.DownloadPackageDetailsStruct
 	if len(foundPackagesArr) == 0 {
 		mylog.Logger.Warn("No packages to download found")
