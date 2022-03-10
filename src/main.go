@@ -84,6 +84,10 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 }
 
 func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
+	if len(downloadedPkgsArr) == 0 {
+		mylog.Logger.Warnf("No packages to upload")
+		return
+	}
 	mylog.Logger.Infof("Uploading %d downloaded packages to servers: %v", len(downloadedPkgsArr), global_vars.DestServersUrlsArr)
 	if len(global_vars.DestServersUrlsArr) == 0 {
 		mylog.Logger.Warnf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
