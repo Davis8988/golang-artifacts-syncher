@@ -484,7 +484,9 @@ func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPac
 }
 
 func DeleteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
-
+    downloadPkgsDir := global_vars.DownloadPkgsDirPath
+    mylog.Logger.Infof("Removing all unuploaded packages from: %s", downloadPkgsDir)
+    
 }
 
 func StartTimer() {
