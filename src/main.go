@@ -43,23 +43,7 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 }
 
 func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
-	if len(downloadedPkgsArr) == 0 {
-		mylog.Logger.Warnf("No packages to upload given")
-		return
-	}
-	mylog.Logger.Infof("Uploading %d downloaded packages to servers: %v", len(downloadedPkgsArr), global_vars.DestServersUrlsArr)
-	if len(global_vars.DestServersUrlsArr) == 0 {
-		mylog.Logger.Warnf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
-		return
-	}
-	for _, downloadedPkgStruct := range downloadedPkgsArr {
-		nuget_cli.UploadDownloadedPackage(global_structs.UploadPackageDetailsStruct{
-			PkgDetailsStruct:       downloadedPkgStruct.PkgDetailsStruct,
-			UploadFilePath:         downloadedPkgStruct.DownloadFilePath,
-			UploadFileChecksum:     downloadedPkgStruct.DownloadFileChecksum,
-			UploadFileChecksumType: downloadedPkgStruct.DownloadFileChecksumType,
-		})
-	}
+	nuget_cli.UploadDownloadedPackages(downloadedPkgsArr)
 }
 
 func StartTimer() {
