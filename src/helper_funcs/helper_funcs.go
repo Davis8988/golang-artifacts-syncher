@@ -19,6 +19,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"sort"
 )
 
 var (
@@ -463,6 +464,10 @@ func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] global_structs.DownloadPack
 
 func CompareNugetPackageDetailsStruct(pkg1, pkg2 global_structs.NugetPackageDetailsStruct) bool {
     return (pkg1 == pkg2) || (strings.Compare(pkg1.Name, pkg2.Name) == 0 && strings.Compare(pkg1.Version, pkg2.Version) == 0)
+}
+
+func SortNugetPackageDetailsStructArr(nugetPackageDetailsStructArr [] global_structs.NugetPackageDetailsStruct) {
+    sort.Sort(global_structs.NugetPackageVersionSorter(nugetPackageDetailsStructArr))
 }
 
 func StartTimer() {

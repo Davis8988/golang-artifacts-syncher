@@ -31,6 +31,12 @@ func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageD
 	return nuget_cli.SearchForAvailableNugetPackages()
 }
 
+func SortFoundNugetPackagesArray(nugetPackagesDetailsStructArr []global_structs.NugetPackageDetailsStruct) {
+	mylog.Logger.Infof("Sorting found nuget packages array")
+	helper_funcs.SortNugetPackageDetailsStructArr(nugetPackagesDetailsStructArr)
+	mylog.Logger.Infof("Done")
+}
+
 func downloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
 	return nuget_cli.DownloadFoundPackages(foundPackagesArr)
 }
@@ -57,6 +63,8 @@ func main() {
 	parseArgs()
 	validateEnvBeforeRun()
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
+	SortFoundNugetPackagesArray(foundPackagesArr)
+	helper_funcs.SortNugetPackageDetailsStructArr(foundPackagesArr)
 	downloadedPkgsArr := downloadFoundPackages(foundPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
 	Finish()
