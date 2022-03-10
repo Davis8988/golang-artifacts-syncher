@@ -13,6 +13,11 @@ type HttpRequestArgsStruct struct {
     SkipErrorsPrintOnReceivedHttpCode *int
 }
 
+type HttpResponseStruct struct {
+	BodyStr  string
+	StatusCode  string
+}
+
 type NugetPackageDetailsStruct struct {
     Name string
     Version string

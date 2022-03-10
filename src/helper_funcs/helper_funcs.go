@@ -304,7 +304,7 @@ func CalculateFileChecksum(filePath string) string {
     return base64.StdEncoding.EncodeToString(h.Sum(nil))  // nil instead of a byte array to append to
 }
 
-func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) string {
+func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) *global_structs.HttpResponseStruct {
     urlAddress := httpRequestArgs.UrlAddress
     downloadFilePath := httpRequestArgs.DownloadFilePath
     uploadFilePath := httpRequestArgs.UploadFilePath
@@ -329,7 +329,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     req, err := http.NewRequest(method, urlAddress, body)
     if err != nil {
         mylog.Logger.Errorf("\n%s\nFailed creating HTTP request object for URL: \"%s\"\n", err, urlAddress)
-        return ""
+        return nil
     }
 
     // Incase pushing a file, then add the Content Type header from the reader (includes boundary)
@@ -355,7 +355,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     if err != nil {
         skipCodePointer := httpRequestArgs.SkipErrorsPrintOnReceivedHttpCode
         if (skipCodePointer == nil || *skipCodePointer != response.StatusCode) {mylog.Logger.Errorf("\n%s\n", err)}
-        return ""
+        return nil
     }
   
     defer response.Body.Close() // Finally step: close the body obj
@@ -371,13 +371,13 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
             mylog.Logger.Errorf("\n%s\nFailed writing response Body to file: %s\n", err, downloadFilePath)
             panic(err)
         }
-        return "" // Finish here
+        return nil // Finish here
     }
 
     responseBody, err := ioutil.ReadAll(response.Body)
     if err != nil {
         mylog.Logger.Errorf("\n%s\nFailed reading request's response body: %s\n", err, urlAddress)
-        return ""
+        return nil
     }
 
     bodyStr := string(responseBody)
@@ -392,7 +392,11 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
         }
     }
 
-    return bodyStr
+    httpResponseResultStruct := global_structs.HttpResponseStruct {
+        BodyStr: bodyStr,
+        StatusCode: response.Status,
+    } 
+    return &httpResponseResultStruct
 }
 
 func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName string) (io.Reader, *multipart.Writer) {
