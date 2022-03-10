@@ -483,6 +483,10 @@ func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPac
     return nugetPackageDetailsStructArr[sliceInd:]
 }
 
+func DeleteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
+
+}
+
 func StartTimer() {
     startTime = time.Now()
 }

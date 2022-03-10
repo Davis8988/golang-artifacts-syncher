@@ -51,7 +51,7 @@ func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 
 // Remove all packages that were downloaded but not uploaded - no need for them anymore
 func deleteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
-	nuget_cli.UploadDownloadedPackages(uploadedPkgsArr)
+	helper_funcs.DeleteUnuploadedPackages(uploadedPkgsArr)
 }
 
 func StartTimer() {
