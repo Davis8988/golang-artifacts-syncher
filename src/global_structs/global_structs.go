@@ -10,7 +10,7 @@ type HttpRequestArgsStruct struct {
     PassToUse  string
     TimeoutSec  int
     Method  string
-    SkipErrorsPrintOnReceivedHttpCode int
+    SkipErrorsPrintOnReceivedHttpCode *int
 }
 
 type NugetPackageDetailsStruct struct {

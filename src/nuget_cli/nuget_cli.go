@@ -202,6 +202,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 			destServerRepo := destServerUrl + "/" + repoName
 			mylog.Logger.Infof("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerRepo)
 			checkDestServerPkgExistUrl := destServerRepo + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
+			notFoundHttpCode := 404  // Not found http code
 			httpRequestArgs := global_structs.HttpRequestArgsStruct{
 				UrlAddress: checkDestServerPkgExistUrl,
 				HeadersMap: global_vars.HttpRequestHeadersMap,
@@ -209,7 +210,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 				PassToUse:  global_vars.DestServersPassToUse,
 				TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
 				Method:     "GET",
-				SkipErrorsPrintOnReceivedHttpCode: 404,  // Not found http code
+				SkipErrorsPrintOnReceivedHttpCode: &notFoundHttpCode,  
 			}
 
 			foundPackagesDetailsArr := SearchSpecificPackageVersionByURLRequest(httpRequestArgs)

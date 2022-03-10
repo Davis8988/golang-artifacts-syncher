@@ -353,7 +353,8 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     // Make the http request
     response, err := client.Do(req)
     if err != nil {
-        mylog.Logger.Errorf("\n%s\nFailed while making the request: %s\n", err, urlAddress)
+        skipCodePointer := httpRequestArgs.SkipErrorsPrintOnReceivedHttpCode
+        if (skipCodePointer == nil || *skipCodePointer != response.StatusCode) {mylog.Logger.Errorf("\n%s\n", err)}
         return ""
     }
   
