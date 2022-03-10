@@ -2,9 +2,9 @@ package mylog
 
 import (
 	"github.com/mattn/go-colorable"
-	"github.com/sirupsen/logrus"
 	logrus "github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
+	"os"
 	//"log"
 )
 
@@ -33,7 +33,7 @@ func InitLogger() {
     loglevel := Getenv("LOG_LEVEL", "INFO")
     loglevelInt, err := logrus.ParseLevel(loglevel)
     if err != nil {logrus.Panic(err)}
-    
+
     Logger = &logrus.Logger{
         Out:   colorable.NewColorableStderr(),
         Level: loglevelInt,
