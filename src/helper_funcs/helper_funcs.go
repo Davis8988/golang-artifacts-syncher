@@ -49,6 +49,7 @@ func InitVars() {
 	global_vars.SearchPackagesUrlSkipGroupCount = StrToInt(Getenv("SEARCH_PACKAGES_URL_SKIP_GROUP_COUNT", "30"))
 	global_vars.PackagesMaxConcurrentDownloadCount = StrToInt(Getenv("PACKAGES_MAX_CONCURRENT_DOWNLOAD_COUNT", "5"))
 	global_vars.PackagesMaxConcurrentUploadCount = StrToInt(Getenv("PACKAGES_MAX_CONCURRENT_UPLOAD_COUNT", "5"))
+	global_vars.PackagesDownloadLimitCount = StrToInt(Getenv("PACKAGES_DOWNLOAD_LIMIT_COUNT", "-1"))
 }
 
 func PrintVars() {
