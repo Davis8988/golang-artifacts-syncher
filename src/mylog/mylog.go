@@ -3,6 +3,7 @@ package mylog
 import (
     logrus "github.com/sirupsen/logrus"
     prefixed "github.com/x-cray/logrus-prefixed-formatter"
+    "github.com/mattn/go-colorable"
     //"log"
     "os"
 )
@@ -24,16 +25,14 @@ func InitLogger() {
         FullTimestamp:true,
         ForceFormatting: true,
     }
-    if fileInfo, _ := os.Stdout.Stat(); (fileInfo.Mode() & os.ModeCharDevice) != 0 {
-        formatter.DisableColors = true;
-        formatter.ForceColors = false;
-    }
-    // formatter.SetColorScheme(&prefixed.ColorScheme{
-    //     PrefixStyle:    "blue+b",
-    //     TimestampStyle: "white+h",
-    // })
+    // if fileInfo, _ := os.Stdout.Stat(); (fileInfo.Mode() & os.ModeCharDevice) != 0 {
+    //     println("No TTY detected - Disabling colors")
+    //     formatter.DisableColors = true;
+    //     formatter.ForceColors = false;
+    // }
+
     Logger = &logrus.Logger{
-        Out:   os.Stderr,
+        Out:   colorable.NewColorableStderr(),
         Level: logrus.InfoLevel,
         Formatter: formatter,
     }
