@@ -64,7 +64,6 @@ func main() {
 	validateEnvBeforeRun()
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
 	SortFoundNugetPackagesArray(foundPackagesArr)
-	helper_funcs.SortNugetPackageDetailsStructArr(foundPackagesArr)
 	downloadedPkgsArr := downloadFoundPackages(foundPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
 	Finish()

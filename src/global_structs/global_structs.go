@@ -15,8 +15,8 @@ func (a NugetPackageVersionSorter) Less(i, j int) bool {
     if err != nil {panic(fmt.Sprintf("Failed to parse version: '%s' during comparison func", a[i].Version))}
     v2, err := version.NewVersion(a[j].Version)
     if err != nil {panic(fmt.Sprintf("Failed to parse version: '%s' during comparison func", a[j].Version))}
-    // return v1.LessThan(v2)  // Sorts so that first is the lowest
-    return v1.GreaterThan(v2)  // Sorts so that first is the greatest
+    return v1.LessThan(v2)  // Sorts so that first is the lowest
+    // return v1.GreaterThan(v2)  // Sorts so that first is the greatest
 }
 
 type HttpRequestArgsStruct struct {
