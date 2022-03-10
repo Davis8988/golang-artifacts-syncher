@@ -479,14 +479,19 @@ func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPac
     mylog.Logger.Infof("Keeping last: %d found packages", lastNCount)
     arrayLen := len(nugetPackageDetailsStructArr)
 	sliceInd := arrayLen - lastNCount
-    if lastNCount < 0 {sliceInd = 0}
+    if sliceInd < 0 {sliceInd = 0}
     return nugetPackageDetailsStructArr[sliceInd:]
 }
 
 func DeleteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
     downloadPkgsDir := global_vars.DownloadPkgsDirPath
     mylog.Logger.Infof("Removing all unuploaded packages from: %s", downloadPkgsDir)
-    
+    files, err := ioutil.ReadDir("./")
+    if err != nil {
+        mylog.Logger.Fatal(err)
+    }
+    mylog.Logger.Debugf("Found dir content: %v", files)
+    mylog.Logger.Debugf("")
 }
 
 func StartTimer() {
