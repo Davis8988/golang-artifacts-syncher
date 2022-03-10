@@ -268,6 +268,10 @@ func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRe
 
 }
 
+func ParseNugetFileName(nugetFileName string) global_structs.NugetPackageDetailsStruct{
+	
+}
+
 func UploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
 	if len(downloadedPkgsArr) == 0 {
 		mylog.Logger.Warnf("No packages to upload given")
