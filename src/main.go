@@ -56,7 +56,7 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 
 	for _, pkgDetailsStruct := range foundPackagesArr {
 		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
-			mylog.Logger.Info("Skipping downloading of an unnamed/unversioned pkg")
+			mylog.Logger.Info("Skipping downloading of an unnamed/no-versioned pkg")
 			continue
 		}
 
