@@ -471,6 +471,12 @@ func SortNugetPackageDetailsStructArr(nugetPackageDetailsStructArr [] global_str
     sort.Sort(global_structs.NugetPackageVersionSorter(nugetPackageDetailsStructArr))
 }
 
+func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPackageDetailsStruct, lastNCount int) {
+    mylog.Logger.Infof("Keeping last %d found packages", lastNCount)
+    
+}
+
+
 func StartTimer() {
     startTime = time.Now()
 }
