@@ -8,30 +8,24 @@ import (
 	"golang-artifacts-syncher/src/nuget_cli"
 )
 
-func initLogger() {
+func initialize() {
+	StartTimer()
 	mylog.InitLogger()
-}
-
-func initVars() {
 	helper_funcs.InitVars()
-}
-
-func printVars() {
 	helper_funcs.PrintVars()
 }
 
-func validateEnv() {
+func validateEnvBeforeRun() {
 	helper_funcs.ValidateEnvironment()
 }
 
-func parseArgs() {
+func parseArgs()() {
 	mylog.Logger.Info("Parsing args")
 	flag.Parse()
+	helper_funcs.UpdateVars()
+	helper_funcs.PrintVars()
 }
 
-func updateVars() {
-	helper_funcs.UpdateVars()
-}
 
 func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageDetailsStruct {
 	return nuget_cli.SearchForAvailableNugetPackages()
@@ -59,13 +53,9 @@ func Finish() {
 
 func main() {
 	println("Program Started")
-	StartTimer()
-	initLogger()
-	initVars()
+	initialize()
 	parseArgs()
-	updateVars()
-	printVars()
-	validateEnv()
+	validateEnvBeforeRun()
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
 	downloadedPkgsArr := downloadSpecifiedPackages(foundPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
