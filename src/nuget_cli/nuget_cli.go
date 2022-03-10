@@ -1,11 +1,11 @@
 package nuget_cli
 
 import (
-	"golang-artifacts-syncher/src/nuget_packages_xml"
 	"golang-artifacts-syncher/src/global_structs"
 	"golang-artifacts-syncher/src/global_vars"
 	"golang-artifacts-syncher/src/helper_funcs"
 	"golang-artifacts-syncher/src/mylog"
+	"golang-artifacts-syncher/src/nuget_packages_xml"
 	"regexp"
 	"sync"
 )
@@ -92,7 +92,7 @@ func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.
 	
 	mylog.Logger.Debugf("Attempting to query for all packages in groups of: %d", skipGroupCount)
 	for foundPackagesCount >= skipGroupCount { // <-- While there are may still packages to query for
-		httpRequestArgs.UrlAddress = helper_funcs.FmtSprintf("%s&$skip=%d&$top=%d", origUrlAddr, currentSkipValue, skipGroupCount)  // Adding &$skip=%d&$top=%d  to url
+		httpRequestArgs.UrlAddress = helper_funcs.Fmt_Sprintf("%s&$skip=%d&$top=%d", origUrlAddr, currentSkipValue, skipGroupCount)  // Adding &$skip=%d&$top=%d  to url
 		responseBody := helper_funcs.MakeHttpRequest(httpRequestArgs)
 		if len(responseBody) == 0 {return [] global_structs.NugetPackageDetailsStruct {}}
 		currentParsedPackagesDetailsArr := ParseHttpRequestResponseForPackagesVersions(responseBody)
@@ -147,8 +147,50 @@ func SearchForAvailableNugetPackages() []global_structs.NugetPackageDetailsStruc
 	return totalFoundPackagesDetailsArr
 }
 
+func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
+	var totalDownloadedPackagesDetailsArr []global_structs.DownloadPackageDetailsStruct
+	if len(foundPackagesArr) == 0 {
+		mylog.Logger.Warn("No packages to download found")
+		return totalDownloadedPackagesDetailsArr
+	}
+	mylog.Logger.Infof("Downloading found %d packages simultaneously in groups of: %d", len(foundPackagesArr), global_vars.PackagesMaxConcurrentDownloadCount)
+
+	wg := sync.WaitGroup{}
+	// Ensure all routines finish before returning
+	defer wg.Wait()
+	concurrentCountGuard := make(chan int, global_vars.PackagesMaxConcurrentDownloadCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentDownloadCount'
+
+	for _, pkgDetailsStruct := range foundPackagesArr {
+		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
+			mylog.Logger.Info("Skipping downloading of an unnamed/no-versioned pkg")
+			continue
+		}
+		
+		wg.Add(1)
+		fileName := pkgDetailsStruct.Name + "." + pkgDetailsStruct.Version + ".nupkg"
+		downloadFilePath := helper_funcs.Filepath_Join(global_vars.DownloadPkgsDirPath, fileName) // downloadPkgsDirPath == global var
+		downloadPkgDetailsStruct := global_structs.DownloadPackageDetailsStruct{
+			PkgDetailsStruct:         pkgDetailsStruct,
+			DownloadFilePath:         downloadFilePath,
+			DownloadFileChecksum:     helper_funcs.CalculateFileChecksum(downloadFilePath), // Can by empty if file doesn't exist yet
+			DownloadFileChecksumType: "SHA512",                                        // Default checksum algorithm for Nuget pkgs
+		}
+		
+		concurrentCountGuard <- 1; // Add 1 to concurrent threads count - Would block if array is filled. Can only be freed by thread executing: '<- concurrentCountGuard' below
+		go func(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
+			defer wg.Done()
+			DownloadNugetPackage(downloadPkgDetailsStruct)
+			helper_funcs.Synched_AppendDownloadedPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadPkgDetailsStruct)
+			<- concurrentCountGuard  // Remove 1 from 'concurrentCountGuard'
+		}(downloadPkgDetailsStruct)
+	}
+	wg.Wait()
+
+	return totalDownloadedPackagesDetailsArr
+}
+
 func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetailsStruct) global_structs.UploadPackageDetailsStruct {
-	pkgPrintStr := helper_funcs.FmtSprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
+	pkgPrintStr := helper_funcs.Fmt_Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
 
@@ -186,7 +228,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 				foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
 				fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
 				if foundPackageChecksum == fileToUploadChecksum {
-				fileName := helper_funcs.GetFileNameFromPath(uploadPkgStruct.UploadFilePath)
+				fileName := helper_funcs.Filepath_GetFileNameFromPath(uploadPkgStruct.UploadFilePath)
 				mylog.Logger.Warnf("Checksum match: upload target file already exists in dest server: '%s' \n"+
 					"Skipping upload of pkg: \"%s\"", destServerRepo, fileName)
 				return uploadPkgStruct
@@ -208,7 +250,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 }
 
 func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRequestArgsStruct global_structs.HttpRequestArgsStruct) {
-    pkgPrintStr := helper_funcs.FmtSprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
+    pkgPrintStr := helper_funcs.Fmt_Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	mylog.Logger.Infof("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
     httpRequestArgsStruct.Method = "PUT"
     httpRequestArgsStruct.UploadFilePath = uploadPkgStruct.UploadFilePath

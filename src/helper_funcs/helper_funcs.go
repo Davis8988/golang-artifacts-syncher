@@ -162,12 +162,17 @@ func FilterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []global_stru
 }
 
 
-func FmtSprintf(format string, a ...interface{}) string {
+func Fmt_Sprintf(format string, a ...interface{}) string {
     return fmt.Sprintf(format, a...);
 }
 
-func GetFileNameFromPath(somePath string) string {
+func Filepath_GetFileNameFromPath(somePath string) string {
     return filepath.Base(somePath);
+}
+
+
+func Filepath_Join(elem ...string) string {
+    return filepath.Join(elem...);
 }
 
 
@@ -379,7 +384,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
     bodyStr := string(responseBody)
     msgStr := bodyStr
-    if len(response.Status) > 0 {msgStr = FmtSprintf("%s  %s", response.Status, bodyStr)}
+    if len(response.Status) > 0 {msgStr = Fmt_Sprintf("%s  %s", response.Status, bodyStr)}
     // mylog.Logger.Debugf(msgStr)
 
     if response.StatusCode >= 400 {
