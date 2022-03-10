@@ -23,8 +23,6 @@ import (
 
 var (
     startTime time.Time
-    endTime time.Time
-    elapsedTime time.Time
 )
 
 func InitVars() {
