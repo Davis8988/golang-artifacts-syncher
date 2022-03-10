@@ -160,6 +160,7 @@ func DownloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetails
 	defer wg.Wait()
 	concurrentCountGuard := make(chan int, global_vars.PackagesMaxConcurrentDownloadCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentDownloadCount'
 
+	// Download concurrently with threads
 	for _, pkgDetailsStruct := range foundPackagesArr {
 		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
 			mylog.Logger.Info("Skipping downloading of an unnamed/no-versioned pkg")
