@@ -479,6 +479,7 @@ func RemoveIndexFromNugetPackageDetailsStructArray(nugetPackageDetailsStructArr 
 }
 
 func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPackageDetailsStruct, lastNCount int) [] global_structs.NugetPackageDetailsStruct {
+    if (lastNCount <=0) {return nugetPackageDetailsStructArr}
     mylog.Logger.Infof("Keeping last: %d found packages", lastNCount)
     return RemoveIndexFromNugetPackageDetailsStructArray(nugetPackageDetailsStructArr, lastNCount)
 }
