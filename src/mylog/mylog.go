@@ -36,6 +36,7 @@ func InitLogger() {
         Formatter: formatter,
     }
 
+    // Collect loglevel from env vars
     loglevel := Getenv("LOG_LEVEL", "INFO")
     loglevelInt, err := logrus.ParseLevel(loglevel)
     if err != nil {Logger.Panic(err)}
