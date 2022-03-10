@@ -32,7 +32,7 @@ func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageD
 	return nuget_cli.SearchForAvailableNugetPackages()
 }
 
-func SortFoundNugetPackagesArray(nugetPackagesDetailsStructArr []global_structs.NugetPackageDetailsStruct) {
+func sortFoundNugetPackagesArray(nugetPackagesDetailsStructArr []global_structs.NugetPackageDetailsStruct) {
 	helper_funcs.SortNugetPackageDetailsStructArr(nugetPackagesDetailsStructArr)
 }
 
@@ -47,6 +47,11 @@ func downloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetails
 
 func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
 	nuget_cli.UploadDownloadedPackages(downloadedPkgsArr)
+}
+
+// Remove all packages that were downloaded but not uploaded - no need for them anymore
+func deleteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
+	nuget_cli.UploadDownloadedPackages(uploadedPkgsArr)
 }
 
 func StartTimer() {
@@ -68,7 +73,7 @@ func main() {
 	validateEnvBeforeRun()
 	totalFoundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
 	mylog.Logger.Infof("Total found packages count: %d", len(totalFoundPackagesArr))
-	SortFoundNugetPackagesArray(totalFoundPackagesArr)
+	sortFoundNugetPackagesArray(totalFoundPackagesArr)
 	targetPackagesArr := FilterFoundPackages(totalFoundPackagesArr)
 	downloadedPkgsArr := downloadFoundPackages(targetPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
