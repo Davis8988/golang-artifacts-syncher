@@ -383,11 +383,13 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     bodyStr := string(responseBody)
     msgStr := bodyStr
     if len(response.Status) > 0 {msgStr = Fmt_Sprintf("%s  %s", response.Status, bodyStr)}
-    // mylog.Logger.Debugf(msgStr)
 
     if response.StatusCode >= 400 {
-        mylog.Logger.Errorf("\n%s", msgStr)
-        mylog.Logger.Errorf("Returned code: %d. HTTP request failure: %s\n", response.StatusCode, urlAddress)
+        skipCodePointer := httpRequestArgs.SkipErrorsPrintOnReceivedHttpCode
+        if (skipCodePointer == nil || *skipCodePointer != response.StatusCode) {
+            mylog.Logger.Errorf("\n%s", msgStr)
+            mylog.Logger.Errorf("Returned code: %d. HTTP request failure: %s\n", response.StatusCode, urlAddress)
+        }
     }
 
     return bodyStr
