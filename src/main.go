@@ -29,7 +29,7 @@ func validateEnv() {
 }
 
 func parseArgs() {
-	mylog.LogInfo.Print("Parsing args")
+	mylog.Logger.Info("Parsing args")
 	flag.Parse()
 }
 
@@ -42,7 +42,7 @@ func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageD
 }
 
 func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
-	mylog.LogInfo.Printf("Downloading found %d packages simultaneously in groups of: %d", len(foundPackagesArr), global_vars.PackagesMaxConcurrentDownloadCount)
+	mylog.Logger.Infof("Downloading found %d packages simultaneously in groups of: %d", len(foundPackagesArr), global_vars.PackagesMaxConcurrentDownloadCount)
 	var totalDownloadedPackagesDetailsArr []global_structs.DownloadPackageDetailsStruct
 
 	wg := sync.WaitGroup{}
@@ -52,7 +52,7 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 
 	for _, pkgDetailsStruct := range foundPackagesArr {
 		if len(pkgDetailsStruct.Name) == 0 || len(pkgDetailsStruct.Version) == 0 {
-			mylog.LogInfo.Print("Skipping downloading of an unnamed/unversioned pkg")
+			mylog.Logger.Info("Skipping downloading of an unnamed/unversioned pkg")
 			continue
 		}
 
@@ -80,9 +80,9 @@ func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDet
 }
 
 func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
-	mylog.LogInfo.Printf("Uploading %d downloaded packages to servers: %v", len(downloadedPkgsArr), global_vars.DestServersUrlsArr)
+	mylog.Logger.Infof("Uploading %d downloaded packages to servers: %v", len(downloadedPkgsArr), global_vars.DestServersUrlsArr)
 	if len(global_vars.DestServersUrlsArr) == 0 {
-		mylog.LogWarning.Printf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
+		mylog.Logger.Warnf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
 		return
 	}
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
@@ -100,20 +100,17 @@ func StartTimer() {
 }
 
 func Finish() {
-	mylog.LogInfo.Print("Finished")
-	mylog.LogInfo.Print("")
+	mylog.Logger.Info("Finished")
+	mylog.Logger.Info("")
 	duration := helper_funcs.EndTimer()
-	mylog.LogInfo.Printf("Time: %v", duration)
-	mylog.LogInfo.Print("")
+	mylog.Logger.Infof("Time: %v", duration)
+	mylog.Logger.Info("")
 }
 
 func main() {
-	mylog.LogInfo.Print("Started")
+	println("Program Started")
 	StartTimer()
 	initLogger()
-	mylog.Logger.Info("Testing %d", 123)
-	mylog.Logger.Infoln("Testing %d", 123)
-	mylog.Logger.Infof("Testing %d", 123)
 	initVars()
 	parseArgs()
 	updateVars()

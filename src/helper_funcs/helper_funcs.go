@@ -28,12 +28,12 @@ var (
 )
 
 func InitVars() {
-    mylog.LogInfo.Print("Initializing helpers pkg vars")
+    mylog.Logger.Info("Initializing helpers pkg vars")
     global_vars.ConvertSyncedMapToString_Lock = sync.RWMutex{}
     global_vars.AppendPkgDetailsArr_Lock = sync.RWMutex{}
     global_vars.AppendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
 
-    mylog.LogInfo.Print("Initializing from envs vars")
+    mylog.Logger.Info("Initializing from envs vars")
     global_vars.SrcServersUserToUse = Getenv("SRC_SERVERS_USER_TO_USE", "")
 	global_vars.SrcServersPassToUse = Getenv("SRC_SERVERS_PASS_TO_USE", "")
 	global_vars.SrcServersUrlsStr = Getenv("SRC_SERVERS_URLS_STR", "")
@@ -53,49 +53,49 @@ func InitVars() {
 }
 
 func PrintVars() {
-    mylog.LogInfo.Printf("SRC_SERVERS_URLS_STR: '%s'", global_vars.SrcServersUrlsStr)
-	mylog.LogInfo.Printf("SRC_REPOS_NAMES_STR: '%s'", global_vars.SrcReposNamesStr)
-	mylog.LogInfo.Printf("SRC_SERVERS_USER_TO_USE: '%s'", global_vars.SrcServersUserToUse)
-	mylog.LogInfo.Printf("SRC_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(global_vars.SrcServersPassToUse)))
-	mylog.LogInfo.Printf("DEST_SERVERS_URLS_STR: '%s'", global_vars.DestServersUrlsStr)
-	mylog.LogInfo.Printf("DEST_REPOS_NAMES_STR: '%s'", global_vars.DestReposNamesStr)
-	mylog.LogInfo.Printf("DEST_SERVERS_USER_TO_USE: '%s'", global_vars.DestServersUserToUse)
-	mylog.LogInfo.Printf("DEST_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(global_vars.DestServersPassToUse)))
-	mylog.LogInfo.Printf("PACKAGES_NAMES_STR: '%s'", global_vars.PackagesNamesStr)
-	mylog.LogInfo.Printf("PACKAGES_VERSIONS_STR: '%s'", global_vars.PackagesVersionsStr)
-	mylog.LogInfo.Printf("HTTP_REQUEST_HEADERS_STR: '%s'", global_vars.HttpRequestHeadersStr)
-	mylog.LogInfo.Printf("DOWNLOAD_PKGS_DIR_PATH: '%s'", global_vars.DownloadPkgsDirPath)
-	mylog.LogInfo.Printf("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", global_vars.HttpRequestTimeoutSecondsInt)
+    mylog.Logger.Infof("SRC_SERVERS_URLS_STR: '%s'", global_vars.SrcServersUrlsStr)
+	mylog.Logger.Infof("SRC_REPOS_NAMES_STR: '%s'", global_vars.SrcReposNamesStr)
+	mylog.Logger.Infof("SRC_SERVERS_USER_TO_USE: '%s'", global_vars.SrcServersUserToUse)
+	mylog.Logger.Infof("SRC_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(global_vars.SrcServersPassToUse)))
+	mylog.Logger.Infof("DEST_SERVERS_URLS_STR: '%s'", global_vars.DestServersUrlsStr)
+	mylog.Logger.Infof("DEST_REPOS_NAMES_STR: '%s'", global_vars.DestReposNamesStr)
+	mylog.Logger.Infof("DEST_SERVERS_USER_TO_USE: '%s'", global_vars.DestServersUserToUse)
+	mylog.Logger.Infof("DEST_SERVERS_PASS_TO_USE: '%s'", strings.Repeat("*", len(global_vars.DestServersPassToUse)))
+	mylog.Logger.Infof("PACKAGES_NAMES_STR: '%s'", global_vars.PackagesNamesStr)
+	mylog.Logger.Infof("PACKAGES_VERSIONS_STR: '%s'", global_vars.PackagesVersionsStr)
+	mylog.Logger.Infof("HTTP_REQUEST_HEADERS_STR: '%s'", global_vars.HttpRequestHeadersStr)
+	mylog.Logger.Infof("DOWNLOAD_PKGS_DIR_PATH: '%s'", global_vars.DownloadPkgsDirPath)
+	mylog.Logger.Infof("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", global_vars.HttpRequestTimeoutSecondsInt)
 
-	mylog.LogInfo.Printf("srcServersUrlsArr: %v", global_vars.SrcServersUrlsArr)
-	mylog.LogInfo.Printf("DestServersUrlsArr: %v", global_vars.DestServersUrlsArr)
-	mylog.LogInfo.Printf("srcReposNamesArr: %v", global_vars.SrcReposNamesArr)
-	mylog.LogInfo.Printf("packagesNamesArr: %v", global_vars.PackagesNamesArr)
-	mylog.LogInfo.Printf("packagesVersionsArr: %v", global_vars.PackagesVersionsArr)
+	mylog.Logger.Infof("srcServersUrlsArr: %v", global_vars.SrcServersUrlsArr)
+	mylog.Logger.Infof("DestServersUrlsArr: %v", global_vars.DestServersUrlsArr)
+	mylog.Logger.Infof("srcReposNamesArr: %v", global_vars.SrcReposNamesArr)
+	mylog.Logger.Infof("packagesNamesArr: %v", global_vars.PackagesNamesArr)
+	mylog.Logger.Infof("packagesVersionsArr: %v", global_vars.PackagesVersionsArr)
 	packagesToDownloadMapStr := Synched_ConvertSyncedMapToString(global_vars.PackagesToDownloadMap)
-	mylog.LogInfo.Printf("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
+	mylog.Logger.Infof("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
 }
 
 func ValidateEnvironment() {
-    mylog.LogInfo.Print("Validating envs")
+    mylog.Logger.Info("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
 	if ! IsStrArrayEmpty(global_vars.PackagesVersionsArr) {
-		mylog.LogInfo.Print("Comparing packages names & versions arrays lengths")
+		mylog.Logger.Info("Comparing packages names & versions arrays lengths")
 		if len(global_vars.PackagesVersionsArr) != len(global_vars.PackagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
 			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
 			errMsg += "When passing packages versions to search - the versions count must be of the same count of packages names to search.\n"
 			errMsg += "A version for each package name to search"
-			mylog.LogError.Fatal(errMsg)
+			mylog.Logger.Fatal(errMsg)
 		}
 	}
 
-	mylog.LogInfo.Print("All Good")
+	mylog.Logger.Info("All Good")
 }
 
 func UpdateVars() {
-    mylog.LogInfo.Print("Updating vars")
+    mylog.Logger.Info("Updating vars")
 	global_vars.SrcServersUrlsArr = make([]string, 0, 4)
 	global_vars.DestServersUrlsArr = make([]string, 0, 4)
 	global_vars.SrcReposNamesArr = make([]string, 0, 4)
@@ -124,7 +124,7 @@ func UpdateVars() {
 func PrepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 	var searchUrlsArr = make([]string, 0, 10) // Create a slice with length=0 and capacity=10
 
-	mylog.LogInfo.Print("Preparing src search packages urls array")
+	mylog.Logger.Info("Preparing src search packages urls array")
 	for _, srcServerUrl := range global_vars.SrcServersUrlsArr {
 		for _, repoName := range global_vars.SrcReposNamesArr {
 			for _, pkgName := range global_vars.PackagesNamesArr {
@@ -144,7 +144,7 @@ func PrepareSrcSearchAllPkgsVersionsUrlsArray() []string {
 }
 
 func FilterFoundPackagesByRequestedVersion(foundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct) []global_structs.NugetPackageDetailsStruct {
-	mylog.LogInfo.Printf("Filtering found pkgs by requested versions")
+	mylog.Logger.Infof("Filtering found pkgs by requested versions")
 	var filteredPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
 	for _, pkgDetailStruct := range foundPackagesDetailsArr {
 		pkgVersion := pkgDetailStruct.Version
@@ -183,7 +183,7 @@ func TrimQuotes(s string) string {
 func GetCurrentProgramDir() string {
     ex, err := os.Executable()
     if err != nil {
-        mylog.LogError.Fatalf("%s\nFailed getting current program's dir", err)
+        mylog.Logger.Fatalf("%s\nFailed getting current program's dir", err)
     }
     return filepath.Dir(ex)
 }
@@ -201,7 +201,7 @@ func Getenv(key, fallback string) string {
 func StrToInt(strVar string) int {
 	intVar, err := strconv.Atoi(strVar)
     if err != nil {
-        mylog.LogError.Printf("%s\nFailed converting string: \"%s\" to integer", err, strVar)
+        mylog.Logger.Errorf("%s\nFailed converting string: \"%s\" to integer", err, strVar)
         panic(err)
     }
     return intVar
@@ -221,7 +221,7 @@ func LoadStringArrValueFromSynchedMap(synchedMap sync.Map, key string) [] string
 func PrintSyncedMap(synchedMap sync.Map) {
 	synchedMap.Range(func(key interface{}, value interface{}) bool {
 		someVal, _ := synchedMap.Load(key)
-		mylog.LogInfo.Println(someVal);
+		mylog.Logger.Infoln(someVal);
 		return true
 	})
 }
@@ -243,11 +243,11 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     
     HttpRequestHeadersMap := make(map[string] string)
     tempHeadersPairsArr := strings.Split(httpRequestHeadersStr, ";")
-    mylog.LogInfo.Printf("Looping on headers values to init headers map")
+    mylog.Logger.Infof("Looping on headers values to init headers map")
     for _, headersPairStr := range tempHeadersPairsArr {
         tempPairArr := strings.Split(headersPairStr, "=")
         if len(tempPairArr) != 2 {
-            mylog.LogError.Printf("Found header pair: \"%v\"  that is not in the right format of: \"key=value\"", tempPairArr)
+            mylog.Logger.Errorf("Found header pair: \"%v\"  that is not in the right format of: \"key=value\"", tempPairArr)
             return nil
         }
         headerKey := tempPairArr[0]
@@ -263,10 +263,10 @@ func GetFileName(filePath string) string {
 
 func CreateDir(dirPath string) {
     if _, err := os.Stat(dirPath); err == nil {return}  // If dir already exists - finish here
-    mylog.LogDebug.Printf("Creating dir: %s", dirPath)
+    mylog.Logger.Debugf("Creating dir: %s", dirPath)
     err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
-		mylog.LogError.Printf("%s\nFailed creating dir: \"%s\"", err, dirPath)
+		mylog.Logger.Errorf("%s\nFailed creating dir: \"%s\"", err, dirPath)
         panic(err)
 	}
 }
@@ -274,11 +274,11 @@ func CreateDir(dirPath string) {
 func CreateFile(filePath string) *os.File {
     dirPath := filepath.Dir(filePath)
     CreateDir(dirPath)
-    mylog.LogDebug.Printf("Creating file: %s", filePath)
+    mylog.Logger.Debugf("Creating file: %s", filePath)
     // Create the file
     file, err := os.Create(filePath)
     if err != nil  {
-        mylog.LogError.Printf("%s\nFailed creating file: \"%s\"", err, filePath)
+        mylog.Logger.Errorf("%s\nFailed creating file: \"%s\"", err, filePath)
         panic(err)
     }
     return file
@@ -286,16 +286,16 @@ func CreateFile(filePath string) *os.File {
 
 func CalculateFileChecksum(filePath string) string {
     if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {return ""}  // If missing file: return empty
-    mylog.LogDebug.Printf("Calculating sha512 checksum of file: %s", filePath)
+    mylog.Logger.Debugf("Calculating sha512 checksum of file: %s", filePath)
     f, err := os.Open(filePath)
     if err != nil {
-        mylog.LogError.Printf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
+        mylog.Logger.Errorf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
         panic(err)
     }
     defer f.Close()
     h := sha512.New()
     if _, err := io.Copy(h, f); err != nil {
-        mylog.LogError.Printf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
+        mylog.Logger.Errorf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
         panic(err)
     }
 
@@ -312,7 +312,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     timeoutSec := httpRequestArgs.TimeoutSec
     method := strings.ToUpper(httpRequestArgs.Method)
 
-    mylog.LogInfo.Printf("Making an HTTP '%s' request to URL: \"%s\"", method, urlAddress)
+    mylog.Logger.Infof("Making an HTTP '%s' request to URL: \"%s\"", method, urlAddress)
 
     client := http.Client{Timeout: time.Duration(timeoutSec) * time.Second,}
     
@@ -326,32 +326,32 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
     req, err := http.NewRequest(method, urlAddress, body)
     if err != nil {
-        mylog.LogError.Printf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlAddress)
+        mylog.Logger.Errorf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlAddress)
         return ""
     }
 
     // Incase pushing a file, then add the Content Type header from the reader (includes boundary)
     if method == "PUT" && len(uploadFilePath) > 0 {
-        mylog.LogDebug.Printf("Adding header:  'Content-Type'")
+        mylog.Logger.Debugf("Adding header:  'Content-Type'")
         req.Header.Add("Content-Type", writer.FormDataContentType())
     }
 
     // Adding headers:
     for k := range headersMap {
-        mylog.LogDebug.Printf("Adding header:  '%s'=\"%s\"", k, headersMap[k])
+        mylog.Logger.Debugf("Adding header:  '%s'=\"%s\"", k, headersMap[k])
         req.Header.Add(k, headersMap[k])
     }
 
     // Adding creds
     if len(username) > 0 && len(password) > 0 {
-        mylog.LogInfo.Printf("Adding creds of user:  '%s'", username)
+        mylog.Logger.Infof("Adding creds of user:  '%s'", username)
         req.SetBasicAuth(username, password)
     }
 
     // Make the http request
     response, err := client.Do(req)
     if err != nil {
-        mylog.LogError.Printf("%s\nFailed while making the request: %s", err, urlAddress)
+        mylog.Logger.Errorf("%s\nFailed while making the request: %s", err, urlAddress)
         return ""
     }
   
@@ -359,13 +359,13 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     
     // If got: downloadFilePath var, then Writer the body to file
     if len(downloadFilePath) > 0 {
-        mylog.LogInfo.Printf("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
+        mylog.Logger.Infof("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
         fileHandle := CreateFile(downloadFilePath)  // Create the file
         defer fileHandle.Close()
 
         _, err = io.Copy(fileHandle, response.Body)
         if err != nil  {
-            mylog.LogError.Printf("%s\nFailed writing response Body to file: %s", err, downloadFilePath)
+            mylog.Logger.Errorf("%s\nFailed writing response Body to file: %s", err, downloadFilePath)
             panic(err)
         }
         return "" // Finish here
@@ -373,29 +373,29 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
     responseBody, err := ioutil.ReadAll(response.Body)
     if err != nil {
-        mylog.LogError.Printf("%s\nFailed reading request's response body: %s", err, urlAddress)
+        mylog.Logger.Errorf("%s\nFailed reading request's response body: %s", err, urlAddress)
         return ""
     }
 
     bodyStr := string(responseBody)
     msgStr := bodyStr
     if len(response.Status) > 0 {msgStr = FmtSprintf("%s  %s", response.Status, bodyStr)}
-    // mylog.LogDebug.Printf(msgStr)
+    // mylog.Logger.Debugf(msgStr)
 
     if response.StatusCode >= 400 {
-        mylog.LogError.Printf("%s", msgStr)
-        mylog.LogError.Printf("Returned code: %d. HTTP request failure: %s", response.StatusCode, urlAddress)
+        mylog.Logger.Errorf("%s", msgStr)
+        mylog.Logger.Errorf("Returned code: %d. HTTP request failure: %s", response.StatusCode, urlAddress)
     }
 
     return bodyStr
 }
 
 func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName string) (io.Reader, *multipart.Writer) {
-    mylog.LogInfo.Printf("Reading file content for upload: \"%s\"", uploadFilePath)
+    mylog.Logger.Infof("Reading file content for upload: \"%s\"", uploadFilePath)
 
     // If missing file: return empty body
     if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
-        mylog.LogError.Printf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
+        mylog.Logger.Errorf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
         return nil, nil
     }
 
