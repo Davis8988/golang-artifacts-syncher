@@ -170,7 +170,6 @@ func Filepath_GetFileNameFromPath(somePath string) string {
     return filepath.Base(somePath);
 }
 
-
 func Filepath_Join(elem ...string) string {
     return filepath.Join(elem...);
 }
