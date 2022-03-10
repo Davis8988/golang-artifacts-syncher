@@ -490,8 +490,9 @@ func DeleteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDe
     if err != nil {
         mylog.Logger.Fatal(err)
     }
-    mylog.Logger.Debugf("Found dir content: %v", files)
-    mylog.Logger.Debugf("")
+    
+    uploadedFileNames := map[string]int{}
+
 }
 
 func StartTimer() {
