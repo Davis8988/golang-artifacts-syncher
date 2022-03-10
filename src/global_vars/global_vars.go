@@ -22,12 +22,12 @@ var (
     PackagesVersionsStr          string
     HttpRequestHeadersStr        string
     DownloadPkgsDirPath          string
-    HttpRequestTimeoutSecondsInt int
-    SearchPackagesUrlSkipGroupCount int  // Used for URL searching requests of Nuget pkgs - Can't query for all at once, need to query multiple times and skip previous results.
-    PackagesDownloadLimitCount int  
+    LogLevel                     string
+    HttpRequestTimeoutSecondsInt       int
+    SearchPackagesUrlSkipGroupCount    int  // Used for URL searching requests of Nuget pkgs - Can't query for all at once, need to query multiple times and skip previous results.
+    PackagesDownloadLimitCount         int  
     PackagesMaxConcurrentDownloadCount int  
-    PackagesMaxConcurrentUploadCount int  
-    LogLevel string
+    PackagesMaxConcurrentUploadCount   int  
 
     SrcServersUrlsArr     []string
     SrcReposNamesArr      []string
