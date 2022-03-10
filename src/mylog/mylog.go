@@ -5,7 +5,6 @@ import (
     prefixed "github.com/x-cray/logrus-prefixed-formatter"
     "github.com/mattn/go-colorable"
     //"log"
-    "os"
 )
 
 var (
