@@ -1,10 +1,11 @@
 package mylog
 
 import (
-    logrus "github.com/sirupsen/logrus"
-    prefixed "github.com/x-cray/logrus-prefixed-formatter"
-    "github.com/mattn/go-colorable"
-    //"log"
+	"github.com/mattn/go-colorable"
+	"github.com/sirupsen/logrus"
+	logrus "github.com/sirupsen/logrus"
+	prefixed "github.com/x-cray/logrus-prefixed-formatter"
+	//"log"
 )
 
 var (
@@ -14,29 +15,10 @@ var (
     //LogWarning = log.New(os.Stdout, "\u001b[33mWARNING: ", log.LstdFlags)
     //LogError = log.New(os.Stdout, "\u001b[35m Error: \u001B[31m", log.LstdFlags)
     //LogDebug = log.New(os.Stdout, "\u001b[36mDebug: ", log.LstdFlags)
-    levelList = map[string] int{
-        "PANIC",
-        "FATAL",
-        "ERROR",
-        "WARN",
-        "INFO",
-        "DEBUG",
-        "TRACE",
-    }
-
-    := map[int]string{
-     
-        90: "Dog",
-        91: "Cat",
-        92: "Cow",
-        93: "Bird",
-        94: "Rabbit",
-}
 )
 
 func InitLogger() {
     println("Initializing Logger")
-    loglevel := Getenv("LOG_LEVEL", "INFO")
     formatter := &prefixed.TextFormatter{
         TimestampFormat : "2006-01-02  15:04:05",
         ForceColors :true,
@@ -48,10 +30,13 @@ func InitLogger() {
     //     formatter.DisableColors = true;
     //     formatter.ForceColors = false;
     // }
-
+    loglevel := Getenv("LOG_LEVEL", "INFO")
+    loglevelInt, err := logrus.ParseLevel(loglevel)
+    if err != nil {logrus.Panic(err)}
+    
     Logger = &logrus.Logger{
         Out:   colorable.NewColorableStderr(),
-        Level: logrus.InfoLevel,
+        Level: loglevelInt,
         Formatter: formatter,
     }
 }
