@@ -23,6 +23,10 @@ func InitLogger() {
         FullTimestamp:true,
         ForceFormatting: true,
     }
+    if fileInfo, _ := os.Stdout.Stat(); (fileInfo.Mode() & os.ModeCharDevice) != 0 {
+        formatter.DisableColors = true;
+        formatter.ForceColors = false;
+    }
     // formatter.SetColorScheme(&prefixed.ColorScheme{
     //     PrefixStyle:    "blue+b",
     //     TimestampStyle: "white+h",
