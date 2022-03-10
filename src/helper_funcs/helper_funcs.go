@@ -494,14 +494,21 @@ func DeleteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDe
     // Assign uploaded packages names
     uploadedFileNamesMap := map[string]int{}
     fileUploadedIndicator := 1
-    for _,pkg := range(uploadedPkgsArr) {
+    for _, pkg := range(uploadedPkgsArr) {
         pkgDetails := pkg.PkgDetailsStruct
         expectedFilename := Fmt_Sprintf("%s.%s.nupkg", strings.ToLower(pkgDetails.Name), pkgDetails.Version)
         uploadedFileNamesMap[expectedFilename] = fileUploadedIndicator
     }
 
     // Loop on found files - Delete files that are NOT in the assigned map
-
+    for _, file := range(files) {
+        filename := file.Name()
+        
+        // If filename is not in the map:
+        if _, isMapContainsKey := uploadedFileNamesMap[filename]; ! isMapContainsKey {
+            mylog.Logger.Debugf("Delete: %s", filename)
+        }
+    }
 
 }
 
