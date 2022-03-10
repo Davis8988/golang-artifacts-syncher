@@ -209,6 +209,7 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 				PassToUse:  global_vars.DestServersPassToUse,
 				TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
 				Method:     "GET",
+				SkipErrorsPrintOnReceivedHttpCode: 404,  // Not found http code
 			}
 
 			foundPackagesDetailsArr := SearchSpecificPackageVersionByURLRequest(httpRequestArgs)
