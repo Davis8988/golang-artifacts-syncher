@@ -201,7 +201,7 @@ func Getenv(key, fallback string) string {
 func StrToInt(strVar string) int {
 	intVar, err := strconv.Atoi(strVar)
     if err != nil {
-        mylog.Logger.Errorf("%s\nFailed converting string: \"%s\" to integer", err, strVar)
+        mylog.Logger.Errorf("\n%s\nFailed converting string: \"%s\" to integer\n", err, strVar)
         panic(err)
     }
     return intVar
@@ -247,7 +247,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     for _, headersPairStr := range tempHeadersPairsArr {
         tempPairArr := strings.Split(headersPairStr, "=")
         if len(tempPairArr) != 2 {
-            mylog.Logger.Errorf("Found header pair: \"%v\"  that is not in the right format of: \"key=value\"", tempPairArr)
+            mylog.Logger.Errorf("\nFound header pair: \"%v\"  that is not in the right format of: \"key=value\"\n", tempPairArr)
             return nil
         }
         headerKey := tempPairArr[0]
@@ -266,7 +266,7 @@ func CreateDir(dirPath string) {
     mylog.Logger.Debugf("Creating dir: %s", dirPath)
     err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
-		mylog.Logger.Errorf("%s\nFailed creating dir: \"%s\"", err, dirPath)
+		mylog.Logger.Errorf("\n%s\nFailed creating dir: \"%s\"\n", err, dirPath)
         panic(err)
 	}
 }
@@ -278,7 +278,7 @@ func CreateFile(filePath string) *os.File {
     // Create the file
     file, err := os.Create(filePath)
     if err != nil  {
-        mylog.Logger.Errorf("%s\nFailed creating file: \"%s\"", err, filePath)
+        mylog.Logger.Errorf("\n%s\nFailed creating file: \"%s\"\n", err, filePath)
         panic(err)
     }
     return file
@@ -289,13 +289,13 @@ func CalculateFileChecksum(filePath string) string {
     mylog.Logger.Debugf("Calculating sha512 checksum of file: %s", filePath)
     f, err := os.Open(filePath)
     if err != nil {
-        mylog.Logger.Errorf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
+        mylog.Logger.Errorf("\n%s\nFailed calculating sha512 checksum of file: \"%s\"\n", err, filePath)
         panic(err)
     }
     defer f.Close()
     h := sha512.New()
     if _, err := io.Copy(h, f); err != nil {
-        mylog.Logger.Errorf("%s\nFailed calculating sha512 checksum of file: \"%s\"", err, filePath)
+        mylog.Logger.Errorf("\n%s\nFailed calculating sha512 checksum of file: \"%s\"\n", err, filePath)
         panic(err)
     }
 
@@ -326,7 +326,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
     req, err := http.NewRequest(method, urlAddress, body)
     if err != nil {
-        mylog.Logger.Errorf("%s\nFailed creating HTTP request object for URL: \"%s\"", err, urlAddress)
+        mylog.Logger.Errorf("\n%s\nFailed creating HTTP request object for URL: \"%s\"\n", err, urlAddress)
         return ""
     }
 
@@ -351,7 +351,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     // Make the http request
     response, err := client.Do(req)
     if err != nil {
-        mylog.Logger.Errorf("%s\nFailed while making the request: %s", err, urlAddress)
+        mylog.Logger.Errorf("\n%s\nFailed while making the request: %s\n", err, urlAddress)
         return ""
     }
   
@@ -365,7 +365,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
         _, err = io.Copy(fileHandle, response.Body)
         if err != nil  {
-            mylog.Logger.Errorf("%s\nFailed writing response Body to file: %s", err, downloadFilePath)
+            mylog.Logger.Errorf("\n%s\nFailed writing response Body to file: %s\n", err, downloadFilePath)
             panic(err)
         }
         return "" // Finish here
@@ -373,7 +373,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
 
     responseBody, err := ioutil.ReadAll(response.Body)
     if err != nil {
-        mylog.Logger.Errorf("%s\nFailed reading request's response body: %s", err, urlAddress)
+        mylog.Logger.Errorf("\n%s\nFailed reading request's response body: %s\n", err, urlAddress)
         return ""
     }
 
@@ -383,8 +383,8 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) strin
     // mylog.Logger.Debugf(msgStr)
 
     if response.StatusCode >= 400 {
-        mylog.Logger.Errorf("%s", msgStr)
-        mylog.Logger.Errorf("Returned code: %d. HTTP request failure: %s", response.StatusCode, urlAddress)
+        mylog.Logger.Errorf("\n%s", msgStr)
+        mylog.Logger.Errorf("Returned code: %d. HTTP request failure: %s\n", response.StatusCode, urlAddress)
     }
 
     return bodyStr
@@ -395,7 +395,7 @@ func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName s
 
     // If missing file: return empty body
     if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
-        mylog.Logger.Errorf("%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object", err, uploadFilePath)
+        mylog.Logger.Errorf("\n%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object\n", err, uploadFilePath)
         return nil, nil
     }
 

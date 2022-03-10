@@ -55,8 +55,8 @@ func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
     re := regexp.MustCompile("'(.*?)'")  // Find values in between quotes
     resultArr := re.FindAllString(pkgDetailsUrl, -1)  // -1 = find ALL available matches
     if len(resultArr) != 2 {
-        mylog.Logger.Errorf("Failed to parse URL for pkg Name & Version:  \"%s\"", pkgDetailsUrl)
-        mylog.Logger.Errorf("Found regex result count is: %d different from 2", len(resultArr))
+        mylog.Logger.Errorf("\nFailed to parse URL for pkg Name & Version:  \"%s\"", pkgDetailsUrl)
+        mylog.Logger.Errorf("Found regex result count is: %d different from 2\n", len(resultArr))
         return nil
     }
     // Trim
