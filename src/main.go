@@ -67,6 +67,7 @@ func main() {
 	parseArgs()
 	validateEnvBeforeRun()
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
+	mylog.Logger.Infof("Total found packages count: %d", len(foundPackagesArr))
 	SortFoundNugetPackagesArray(foundPackagesArr)
 	foundPackagesArr = FilterFoundPackages(foundPackagesArr)
 	downloadedPkgsArr := downloadFoundPackages(foundPackagesArr)
