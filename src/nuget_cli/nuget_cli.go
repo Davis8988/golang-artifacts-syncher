@@ -270,12 +270,14 @@ func UploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 	}
 
 	wg := sync.WaitGroup{}
+	concurrentCountGuard := make(chan int, global_vars.PackagesMaxConcurrentUploadCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentUploadCount'
 
 	// Ensure all routines finish before returning
 	defer wg.Wait()
 
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
 		wg.Add(1)
+		concurrentCountGuard <- 1; // Add 1 to concurrent threads count - Would block if array is filled. Can only be freed by thread executing: '<- concurrentCountGuard' below
 		go func(downloadedPkgDetails global_structs.DownloadPackageDetailsStruct) {
 			defer wg.Done()
 			UploadDownloadedPackage(global_structs.UploadPackageDetailsStruct{
@@ -284,6 +286,7 @@ func UploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 				UploadFileChecksum:     downloadedPkgDetails.DownloadFileChecksum,
 				UploadFileChecksumType: downloadedPkgDetails.DownloadFileChecksumType,
 			})
+			<- concurrentCountGuard  // Remove 1 from 'concurrentCountGuard'
 		}(downloadedPkgStruct)
 	}
 	wg.Wait()
