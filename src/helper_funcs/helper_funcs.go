@@ -507,8 +507,13 @@ func DeleteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDe
         // If filename is not in the map:
         if _, isMapContainsKey := uploadedFileNamesMap[filename]; ! isMapContainsKey {
             mylog.Logger.Debugf("Delete: %s", filename)
+        } else {
+            // filename is in the map:
+            mylog.Logger.Warnf("Skip: %s", filename)
         }
     }
+
+    mylog.Logger.Info("Done")
 
 }
 
