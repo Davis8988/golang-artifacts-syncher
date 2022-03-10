@@ -30,15 +30,17 @@ func InitLogger() {
     //     formatter.DisableColors = true;
     //     formatter.ForceColors = false;
     // }
-    loglevel := Getenv("LOG_LEVEL", "INFO")
-    loglevelInt, err := logrus.ParseLevel(loglevel)
-    if err != nil {logrus.Panic(err)}
 
     Logger = &logrus.Logger{
         Out:   colorable.NewColorableStderr(),
-        Level: loglevelInt,
         Formatter: formatter,
     }
+
+    loglevel := Getenv("LOG_LEVEL", "INFO")
+    loglevelInt, err := logrus.ParseLevel(loglevel)
+    if err != nil {Logger.Panic(err)}
+
+    Logger.SetLevel(loglevelInt)
 }
 
 // Attempts to resolve an environment variable, 
