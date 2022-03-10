@@ -42,8 +42,9 @@ func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageD
 }
 
 func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
-	mylog.Logger.Infof("Downloading found %d packages simultaneously in groups of: %d", len(foundPackagesArr), global_vars.PackagesMaxConcurrentDownloadCount)
 	var totalDownloadedPackagesDetailsArr []global_structs.DownloadPackageDetailsStruct
+	if len(foundPackagesArr) == 0 {return totalDownloadedPackagesDetailsArr}
+	mylog.Logger.Infof("Downloading found %d packages simultaneously in groups of: %d", len(foundPackagesArr), global_vars.PackagesMaxConcurrentDownloadCount)
 
 	wg := sync.WaitGroup{}
 	// Ensure all routines finish before returning
