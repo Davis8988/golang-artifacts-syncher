@@ -220,14 +220,17 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 			}
 
 			foundPackagesDetailsArr := SearchSpecificPackageVersionByURLRequest(httpRequestArgs)
-			mylog.Logger.Infof("Found: %s", foundPackagesDetailsArr)
+			foundPackagesCount := len(foundPackagesDetailsArr)
+			if (foundPackagesCount != 0 ) {
+				mylog.Logger.Infof("Found: %s", foundPackagesDetailsArr)
+			}
 
 			emptyNugetPackageDetailsStruct := global_structs.NugetPackageDetailsStruct{}
 			shouldCompareChecksum := true
-			if len(foundPackagesDetailsArr) != 1 {
-				mylog.Logger.Infof("Found multiple or no packages: \"%d\" - Should be only 1. Skipping checksum comparison. Continuing with the upload..", len(foundPackagesDetailsArr))
+			if foundPackagesCount != 1 {
+				mylog.Logger.Infof("Found multiple or no packages: \"%d\" - Should be only 1. Skipping checksum comparison. Continuing with the upload..", foundPackagesCount)
 				shouldCompareChecksum = false
-			} else if len(foundPackagesDetailsArr) == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
+			} else if foundPackagesCount == 1 && foundPackagesDetailsArr[0] == emptyNugetPackageDetailsStruct {
 				mylog.Logger.Info("No package found. Continuing with the upload..")
 				shouldCompareChecksum = false
 			}
