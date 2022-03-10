@@ -31,8 +31,8 @@ func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageD
 	return nuget_cli.SearchForAvailableNugetPackages()
 }
 
-func downloadSpecifiedPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
-	return nuget_cli.DownloadSpecifiedPackages(foundPackagesArr)
+func downloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
+	return nuget_cli.DownloadFoundPackages(foundPackagesArr)
 }
 
 func uploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
@@ -57,7 +57,7 @@ func main() {
 	parseArgs()
 	validateEnvBeforeRun()
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
-	downloadedPkgsArr := downloadSpecifiedPackages(foundPackagesArr)
+	downloadedPkgsArr := downloadFoundPackages(foundPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
 	Finish()
 }
