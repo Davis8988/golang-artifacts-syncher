@@ -268,12 +268,23 @@ func UploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 		mylog.Logger.Warnf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
 		return
 	}
+
+	wg := sync.WaitGroup{}
+
+	// Ensure all routines finish before returning
+	defer wg.Wait()
+
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
-		UploadDownloadedPackage(global_structs.UploadPackageDetailsStruct{
-			PkgDetailsStruct:       downloadedPkgStruct.PkgDetailsStruct,
-			UploadFilePath:         downloadedPkgStruct.DownloadFilePath,
-			UploadFileChecksum:     downloadedPkgStruct.DownloadFileChecksum,
-			UploadFileChecksumType: downloadedPkgStruct.DownloadFileChecksumType,
-		})
+		wg.Add(1)
+		go func(downloadedPkgDetails global_structs.DownloadPackageDetailsStruct) {
+			defer wg.Done()
+			UploadDownloadedPackage(global_structs.UploadPackageDetailsStruct{
+				PkgDetailsStruct:       downloadedPkgDetails.PkgDetailsStruct,
+				UploadFilePath:         downloadedPkgDetails.DownloadFilePath,
+				UploadFileChecksum:     downloadedPkgDetails.DownloadFileChecksum,
+				UploadFileChecksumType: downloadedPkgDetails.DownloadFileChecksumType,
+			})
+		}(downloadedPkgStruct)
 	}
+	wg.Wait()
 }
