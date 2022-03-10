@@ -154,6 +154,7 @@ func DownloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetails
 		return totalDownloadedPackagesDetailsArr
 	}
 	mylog.Logger.Infof("Downloading found %d packages simultaneously in groups of: %d", len(foundPackagesArr), global_vars.PackagesMaxConcurrentDownloadCount)
+	mylog.Logger.Infof(" to dir: %s", global_vars.DownloadPkgsDirPath)
 
 	wg := sync.WaitGroup{}
 	// Ensure all routines finish before returning
@@ -169,7 +170,7 @@ func DownloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetails
 		
 		wg.Add(1)
 		fileName := pkgDetailsStruct.Name + "." + pkgDetailsStruct.Version + ".nupkg"
-		downloadFilePath := helper_funcs.Filepath_Join(global_vars.DownloadPkgsDirPath, fileName) // downloadPkgsDirPath == global var
+		downloadFilePath := helper_funcs.Filepath_Join(global_vars.DownloadPkgsDirPath, fileName) // 'downloadPkgsDirPath' is a global var
 		downloadPkgDetailsStruct := global_structs.DownloadPackageDetailsStruct{
 			PkgDetailsStruct:         pkgDetailsStruct,
 			DownloadFilePath:         downloadFilePath,
@@ -276,6 +277,7 @@ func UploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 	// Ensure all routines finish before returning
 	defer wg.Wait()
 
+	// Upload concurrently with threads
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
 		wg.Add(1)
 		concurrentCountGuard <- 1; // Add 1 to concurrent threads count - Would block if array is filled. Can only be freed by thread executing: '<- concurrentCountGuard' below
