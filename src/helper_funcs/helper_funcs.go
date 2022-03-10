@@ -468,14 +468,20 @@ func CompareNugetPackageDetailsStruct(pkg1, pkg2 global_structs.NugetPackageDeta
 }
 
 func SortNugetPackageDetailsStructArr(nugetPackageDetailsStructArr [] global_structs.NugetPackageDetailsStruct) {
+    if len(nugetPackageDetailsStructArr) == 0 {return}
+	mylog.Logger.Infof("Sorting found nuget packages array")
     sort.Sort(global_structs.NugetPackageVersionSorter(nugetPackageDetailsStructArr))
+    mylog.Logger.Infof("Done")
 }
 
-func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPackageDetailsStruct, lastNCount int) {
-    mylog.Logger.Infof("Keeping last %d found packages", lastNCount)
-    
+func RemoveIndexFromNugetPackageDetailsStructArray(nugetPackageDetailsStructArr [] global_structs.NugetPackageDetailsStruct, index int) [] global_structs.NugetPackageDetailsStruct {
+    return append(nugetPackageDetailsStructArr[:index], nugetPackageDetailsStructArr[index+1:]...)
 }
 
+func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPackageDetailsStruct, lastNCount int) [] global_structs.NugetPackageDetailsStruct {
+    mylog.Logger.Infof("Keeping last: %d found packages", lastNCount)
+    return RemoveIndexFromNugetPackageDetailsStructArray(nugetPackageDetailsStructArr, lastNCount)
+}
 
 func StartTimer() {
     startTime = time.Now()

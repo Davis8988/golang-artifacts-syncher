@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"golang-artifacts-syncher/src/global_structs"
+	"golang-artifacts-syncher/src/global_vars"
 	"golang-artifacts-syncher/src/helper_funcs"
 	"golang-artifacts-syncher/src/mylog"
 	"golang-artifacts-syncher/src/nuget_cli"
@@ -32,15 +33,12 @@ func searchAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageD
 }
 
 func SortFoundNugetPackagesArray(nugetPackagesDetailsStructArr []global_structs.NugetPackageDetailsStruct) {
-	mylog.Logger.Infof("Sorting found nuget packages array")
 	helper_funcs.SortNugetPackageDetailsStructArr(nugetPackagesDetailsStructArr)
-	mylog.Logger.Infof("Done")
 }
 
-func FilterFoundPackages(nugetPackagesDetailsStructArr []global_structs.NugetPackageDetailsStruct) {
-	mylog.Logger.Infof("Filtering found nuget packages")
-	helper_funcs.SortNugetPackageDetailsStructArr(nugetPackagesDetailsStructArr)
-	mylog.Logger.Infof("Done")
+func FilterFoundPackages(nugetPackagesDetailsStructArr []global_structs.NugetPackageDetailsStruct) []global_structs.NugetPackageDetailsStruct {
+	foundPackagesDetailsArr := helper_funcs.FilterFoundPackagesByRequestedVersion(nugetPackagesDetailsStructArr) // Filter by requested version - if any version is specified..
+	return helper_funcs.FilterLastNPackages(foundPackagesDetailsArr, global_vars.PackagesDownloadLimitCount)
 }
 
 func downloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
@@ -70,7 +68,7 @@ func main() {
 	validateEnvBeforeRun()
 	foundPackagesArr := searchAvailableVersionsOfSpecifiedPackages()
 	SortFoundNugetPackagesArray(foundPackagesArr)
-	FilterFoundPackages(foundPackagesArr)
+	foundPackagesArr = FilterFoundPackages(foundPackagesArr)
 	downloadedPkgsArr := downloadFoundPackages(foundPackagesArr)
 	uploadDownloadedPackages(downloadedPkgsArr)
 	Finish()
