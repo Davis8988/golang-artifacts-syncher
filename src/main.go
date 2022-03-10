@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"golang-artifacts-syncher/src/global_structs"
-	"golang-artifacts-syncher/src/global_vars"
 	"golang-artifacts-syncher/src/helper_funcs"
 	"golang-artifacts-syncher/src/mylog"
 	"golang-artifacts-syncher/src/nuget_cli"
