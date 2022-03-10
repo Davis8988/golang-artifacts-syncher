@@ -2,6 +2,7 @@ package global_structs
 
 import (
     "github.com/hashicorp/go-version"
+    "fmt"
 )
 
 // AxisSorter sorts planets by Version.
@@ -11,9 +12,9 @@ func (a NugetPackageVersionSorter) Len() int           { return len(a) }
 func (a NugetPackageVersionSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a NugetPackageVersionSorter) Less(i, j int) bool { 
     v1, err := version.NewVersion(a[i].Version)
-    if err != nil {panic("Failed to parse version: '%s' during comparison func", a[i].Version)
+    if err != nil {panic(fmt.Sprintf("Failed to parse version: '%s' during comparison func", a[i].Version))}
     v2, err := version.NewVersion(a[j].Version)
-    if err != nil {panic("Failed to parse version: '%s' during comparison func", a[j].Version)
+    if err != nil {panic(fmt.Sprintf("Failed to parse version: '%s' during comparison func", a[j].Version))}
     return v1.LessThan(v2)
 }
 
