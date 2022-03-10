@@ -14,10 +14,29 @@ var (
     //LogWarning = log.New(os.Stdout, "\u001b[33mWARNING: ", log.LstdFlags)
     //LogError = log.New(os.Stdout, "\u001b[35m Error: \u001B[31m", log.LstdFlags)
     //LogDebug = log.New(os.Stdout, "\u001b[36mDebug: ", log.LstdFlags)
+    levelList = map[string] int{
+        "PANIC",
+        "FATAL",
+        "ERROR",
+        "WARN",
+        "INFO",
+        "DEBUG",
+        "TRACE",
+    }
+
+    := map[int]string{
+     
+        90: "Dog",
+        91: "Cat",
+        92: "Cow",
+        93: "Bird",
+        94: "Rabbit",
+}
 )
 
 func InitLogger() {
     println("Initializing Logger")
+    loglevel := Getenv("LOG_LEVEL", "INFO")
     formatter := &prefixed.TextFormatter{
         TimestampFormat : "2006-01-02  15:04:05",
         ForceColors :true,
@@ -35,4 +54,14 @@ func InitLogger() {
         Level: logrus.InfoLevel,
         Formatter: formatter,
     }
+}
+
+// Attempts to resolve an environment variable, 
+//  with a default value if it's empty
+func Getenv(key, fallback string) string {
+    value := os.Getenv(key)
+    if len(value) == 0 {
+        return fallback
+    }
+    return value
 }
