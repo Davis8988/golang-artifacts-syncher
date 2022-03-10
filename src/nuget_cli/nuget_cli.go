@@ -221,10 +221,8 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 
 			foundPackagesDetailsArr := SearchSpecificPackageVersionByURLRequest(httpRequestArgs)
 			foundPackagesCount := len(foundPackagesDetailsArr)
-			if (foundPackagesCount != 0 ) {
-				mylog.Logger.Infof("Found: %s", foundPackagesDetailsArr)
-			}
-
+			mylog.Logger.Debugf("Found: %s", foundPackagesDetailsArr)
+			
 			emptyNugetPackageDetailsStruct := global_structs.NugetPackageDetailsStruct{}
 			shouldCompareChecksum := true
 			if foundPackagesCount != 1 {
