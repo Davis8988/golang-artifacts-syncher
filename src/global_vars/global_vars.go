@@ -7,15 +7,16 @@ import (
 var (
     // Locks
     ConvertSyncedMapToString_Lock sync.RWMutex
-    AppendPkgDetailsArr_Lock sync.RWMutex
+    JoinTwoPkgDetailsSlices_Lock sync.RWMutex
+    JoinTwoPkgDetailsMaps_Lock sync.RWMutex
     AppendDownloadedPkgDetailsArr_Lock sync.RWMutex
+    AppendPkgDetailsArr_Lock sync.RWMutex
+    AppendPkgDetailsMap_Lock sync.RWMutex
 
     SrcServersUserToUse          string
     SrcServersPassToUse          string
     SrcServersUrlsStr            string
-    SrcReposNamesStr             string
     DestServersUrlsStr           string
-    DestReposNamesStr            string
     DestServersUserToUse         string
     DestServersPassToUse         string
     PackagesNamesStr             string
@@ -28,11 +29,10 @@ var (
     PackagesDownloadLimitCount         int  
     PackagesMaxConcurrentDownloadCount int  
     PackagesMaxConcurrentUploadCount   int  
+    PackagesMaxConcurrentDeleteCount   int  
 
     SrcServersUrlsArr     []string
-    SrcReposNamesArr      []string
     DestServersUrlsArr    []string
-    DestReposNamesArr     []string
     PackagesNamesArr      []string
     PackagesVersionsArr   []string
     HttpRequestHeadersMap map[string]string
