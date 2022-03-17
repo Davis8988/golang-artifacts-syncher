@@ -12,9 +12,9 @@ func (a NugetPackageVersionSorter) Len() int           { return len(a) }
 func (a NugetPackageVersionSorter) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a NugetPackageVersionSorter) Less(i, j int) bool { 
     v1, err := version.NewVersion(a[i].Version)
-    if err != nil {panic(fmt.Sprintf("Failed to parse version: '%s' during comparison func", a[i].Version))}
+    if err != nil {panic(fmt.Sprintf("%s\nFailed to parse version: '%s' during comparison func", err, a[i].Version))}
     v2, err := version.NewVersion(a[j].Version)
-    if err != nil {panic(fmt.Sprintf("Failed to parse version: '%s' during comparison func", a[j].Version))}
+    if err != nil {panic(fmt.Sprintf("%s\nFailed to parse version: '%s' during comparison func", err, a[j].Version))}
     return v1.LessThan(v2)  // Sorts so that first is the lowest
     // return v1.GreaterThan(v2)  // Sorts so that first is the greatest
 }
@@ -28,11 +28,12 @@ type HttpRequestArgsStruct struct {
     PassToUse  string
     TimeoutSec  int
     Method  string
-    SkipErrorsPrintOnReceivedHttpCode *int
 }
 
 type HttpResponseStruct struct {
+    UrlAddress string
 	BodyStr  string
+	StatusStr  string
 	StatusCode  int
 }
 
@@ -43,6 +44,10 @@ type NugetPackageDetailsStruct struct {
     ChecksumType string
     PkgDetailsUrl string
     PkgFileUrl string
+}
+
+func (pkgDetailsStruct NugetPackageDetailsStruct) HashCode() string {
+    return fmt.Sprintf("%s-%s", pkgDetailsStruct.Name, pkgDetailsStruct.Version)
 }
 
 
