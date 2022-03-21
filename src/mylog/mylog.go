@@ -4,6 +4,7 @@ import (
 	"github.com/mattn/go-colorable"
 	logrus "github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
+    "golang-artifacts-syncher/src/global_vars"
 	"os"
 	//"log"
 )
@@ -37,7 +38,7 @@ func InitLogger() {
     }
 
     // Collect loglevel from env vars
-    loglevel := Getenv("LOG_LEVEL", "INFO")
+    loglevel := Getenv("LOG_LEVEL", global_vars.DefaultLogLevel)
     loglevelInt, err := logrus.ParseLevel(loglevel)
     if err != nil {Logger.Panic(err)}
 

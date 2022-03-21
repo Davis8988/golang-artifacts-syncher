@@ -3,6 +3,8 @@ package global_structs
 import (
     "github.com/hashicorp/go-version"
     "fmt"
+    "reflect"
+    "strings"
 )
 
 // AxisSorter sorts planets by Version.
@@ -56,6 +58,7 @@ type DownloadPackageDetailsStruct struct {
     DownloadFilePath string
     DownloadFileChecksum  string
 	DownloadFileChecksumType  string
+	IsSuccessful  bool
 }
 
 type UploadPackageDetailsStruct struct {
@@ -63,5 +66,54 @@ type UploadPackageDetailsStruct struct {
     UploadFilePath string
     UploadFileChecksum  string
 	UploadFileChecksumType  string
+    IsSuccessful  bool
+}
+
+type AppConfiguration struct {
+    SrcServersUserToUse          string
+    SrcServersPassToUse          string
+    SrcServersUrlsStr            string
+    DestServersUrlsStr           string
+    DestServersUserToUse         string
+    DestServersPassToUse         string
+    PackagesNamesStr             string
+    PackagesVersionsStr          string
+    HttpRequestHeadersStr        string
+    DownloadPkgsDirPath          string
+    LogLevel                     string
+    HttpRequestGlobalDefaultTimeoutSecondsInt int
+    HttpRequestDownloadTimeoutSecondsInt int
+    HttpRequestUploadTimeoutSecondsInt int
+    SearchPackagesUrlSkipGroupCount    int  // Used for URL searching requests of Nuget pkgs - Can't query for all at once, need to query multiple times and skip previous results.
+    PackagesDownloadLimitCount         int  
+    PackagesMaxConcurrentDownloadCount int  
+    PackagesMaxConcurrentUploadCount   int  
+    PackagesMaxConcurrentDeleteCount   int  
+
+    SrcServersUrlsArr     []string
+    DestServersUrlsArr    []string
+    PackagesNamesArr      []string
+    PackagesVersionsArr   []string
+    HttpRequestHeadersMap map[string]string
+}
+
+func (appConfig AppConfiguration) ToString() string {
+    v := reflect.ValueOf(appConfig)
+    // fieldsArr := make([]interface{}, v.NumField())
+    resultStr := ""
+    typeOfObj := v.Type()
+    passwordFieldsNamesMap := make(map[string] string)
+    passwordFieldsNamesMap["SrcServersPassToUse"] = "SrcServersPassToUse"
+    passwordFieldsNamesMap["DestServersPassToUse"] = "DestServersPassToUse"
+    for i := 0; i< v.NumField(); i++ {
+        fieldName := typeOfObj.Field(i).Name
+        fieldValue := fmt.Sprintf("%v", v.Field(i).Interface())
+        if _, isMapContainsKey := passwordFieldsNamesMap[fieldName]; isMapContainsKey {
+            fieldValue = strings.Repeat("*", len(fieldValue))
+        }
+
+        resultStr += fmt.Sprintf("%s : %v\n", fieldName, fieldValue)
+    }
+    return resultStr
 }
 

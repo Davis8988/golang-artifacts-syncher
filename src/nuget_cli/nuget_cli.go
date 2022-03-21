@@ -15,7 +15,7 @@ func PushNugetPackage() {
 
 }
 
-func DownloadNugetPackage(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
+func DownloadNugetPackage(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) global_structs.DownloadPackageDetailsStruct {
 	mylog.Logger.Infof("Downloading package: %s==%s", downloadPkgDetailsStruct.PkgDetailsStruct.Name, downloadPkgDetailsStruct.PkgDetailsStruct.Version)
     fileUrl := downloadPkgDetailsStruct.PkgDetailsStruct.PkgFileUrl
     downloadFilePath := downloadPkgDetailsStruct.DownloadFilePath
@@ -24,15 +24,22 @@ func DownloadNugetPackage(downloadPkgDetailsStruct global_structs.DownloadPackag
     if fileChecksum == downloadFileChecksum {
         fileName := helper_funcs.GetFileName(downloadFilePath)
         mylog.Logger.Warnf("Checksum match: download target file already exists. Skipping download of: \"%s\"", fileName)
-        return
+		downloadPkgDetailsStruct.IsSuccessful = true
+        return downloadPkgDetailsStruct
     }
-    helper_funcs.MakeHttpRequest(
+    httpResponsePtr := helper_funcs.MakeHttpRequest(
         global_structs.HttpRequestArgsStruct{
             UrlAddress: fileUrl,
             Method: "GET",
             DownloadFilePath: downloadFilePath,
+            TimeoutSec: global_vars.AppConfig.HttpRequestDownloadTimeoutSecondsInt,
         },
     )
+
+	if httpResponsePtr == nil {return downloadPkgDetailsStruct}
+	httpResponse := *httpResponsePtr
+	if httpResponse.StatusCode < 400 {downloadPkgDetailsStruct.IsSuccessful = true}
+	return downloadPkgDetailsStruct
 }
 
 func ParseXmlDataToSinglePkgDetailsStruct(entryStruct nuget_packages_xml.SinglePackagesDetailsXmlStruct) *global_structs.NugetPackageDetailsStruct {
@@ -56,6 +63,7 @@ func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
     if len(resultArr) != 2 {
         mylog.Logger.Errorf("\nFailed to parse URL for pkg Name & Version:  \"%s\"", pkgDetailsUrl)
         mylog.Logger.Errorf("Found regex result count is: %d different from 2\n", len(resultArr))
+		helper_funcs.Synched_ErrorsDetected(true)
         return nil
     }
 
@@ -109,7 +117,7 @@ func ParseHttpRequestResponseForPackagesVersions_ToMap(responseBody string) map[
 func SearchPackagesAvailableVersionsByURLRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) [] global_structs.NugetPackageDetailsStruct {
 	parsedPackagesDetailsArr := [] global_structs.NugetPackageDetailsStruct {}
 	queryUrlAddr := httpRequestArgs.UrlAddress;
-	skipGroupCount := global_vars.SearchPackagesUrlSkipGroupCount;
+	skipGroupCount := global_vars.AppConfig.SearchPackagesUrlSkipGroupCount;
 	currentSkipValue := 0;
 	foundPackagesCount := skipGroupCount + 1;  // Start with dummy found packages of more than group count: skipGroupCount - Meaning there are more packages to search..
 	
@@ -161,6 +169,7 @@ func SearchSpecificPackageVersionByURLRequest(httpRequestArgs global_structs.Htt
 	if responseCode >= 400 {
         mylog.Logger.Errorf("\n%d  %s", responseCode, responseBody)
 		mylog.Logger.Errorf("Returned code: %d. HTTP request failure: %s\n", responseCode, urlAddress)
+		helper_funcs.Synched_ErrorsDetected(true)
 		return [] global_structs.NugetPackageDetailsStruct {}
     }
 
@@ -175,7 +184,7 @@ func SearchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.
 	var totalFoundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
 	
 	wg := sync.WaitGroup{}
-	for _, pkgName := range global_vars.PackagesNamesArr {
+	for _, pkgName := range global_vars.AppConfig.PackagesNamesArr {
 		wg.Add(1)
         go func(packageNameToSearch string) {
 			defer wg.Done()
@@ -184,10 +193,10 @@ func SearchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.
 			for _, urlToCheck := range searchUrlsArr {
 				getRequestArgs := global_structs.HttpRequestArgsStruct{
 					UrlAddress: urlToCheck,  // Only the url is different each time
-					HeadersMap: global_vars.HttpRequestHeadersMap,
-					UserToUse:  global_vars.SrcServersUserToUse,
-					PassToUse:  global_vars.SrcServersPassToUse,
-					TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
+					HeadersMap: global_vars.AppConfig.HttpRequestHeadersMap,
+					UserToUse:  global_vars.AppConfig.SrcServersUserToUse,
+					PassToUse:  global_vars.AppConfig.SrcServersPassToUse,
+					TimeoutSec: global_vars.AppConfig.HttpRequestGlobalDefaultTimeoutSecondsInt,
 					Method:     "GET",
 				}
 				var foundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
@@ -215,14 +224,14 @@ func SearchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.
 			// Filter total found pkgs count of package: ${packageNameToSearch}
 			mylog.Logger.Debugf("Filtering thread found '%s' pkgs by requested versions", packageNameToSearch)
 			threadFoundPackagesDetailsArr = helper_funcs.FilterFoundPackagesByRequestedVersion(threadFoundPackagesDetailsArr) // Filter by requested version - if any version is specified..
-			mylog.Logger.Debugf("Keeping last: %d of found '%s' packages", global_vars.PackagesDownloadLimitCount, packageNameToSearch)
-			threadFoundPackagesDetailsArr = helper_funcs.FilterLastNPackages(threadFoundPackagesDetailsArr, global_vars.PackagesDownloadLimitCount)
+			mylog.Logger.Debugf("Keeping last: %d of found '%s' packages", global_vars.AppConfig.PackagesDownloadLimitCount, packageNameToSearch)
+			threadFoundPackagesDetailsArr = helper_funcs.FilterLastNPackages(threadFoundPackagesDetailsArr, global_vars.AppConfig.PackagesDownloadLimitCount)
 			mylog.Logger.Infof("Targeted %d of '%s' packages", len(threadFoundPackagesDetailsArr), packageNameToSearch)
 			helper_funcs.Synched_JoinTwoPkgDetailsSlices(&totalFoundPackagesDetailsArr, threadFoundPackagesDetailsArr)
 		} (pkgName)
 	}
 
-	mylog.Logger.Debug("Waiting for threads to finish searching for pkgs")
+	mylog.Logger.Debug("Waiting for searching threads to finish searching for pkgs")
 	wg.Wait()
 	mylog.Logger.Infof("Total packages found count: %d", len(totalFoundPackagesDetailsArr))
 	
@@ -236,20 +245,20 @@ func SearchDestServersForAvailableNugetPackages() map[string] map[string] map[st
 	totalFoundDestServersPackagesDetailsMap := make(map[string] map[string] map[string] global_structs.NugetPackageDetailsStruct)
 	
 	wg := sync.WaitGroup{}
-	for _, destServerUrl := range global_vars.DestServersUrlsArr {
+	for _, destServerUrl := range global_vars.AppConfig.DestServersUrlsArr {
 		wg.Add(1)
         go func(destServerUrlToSearch string) {
 			defer wg.Done()
 			threadFoundPackagesDetailsMap := make(map[string] map[string] global_structs.NugetPackageDetailsStruct)
 			foundPackagesCount := 0
-			for _, pkgName := range global_vars.PackagesNamesArr {
+			for _, pkgName := range global_vars.AppConfig.PackagesNamesArr {
 				urlToCheck := destServerUrlToSearch + "Packages()?$filter=tolower(Id)%20eq%20'"+pkgName+"'"
 				getRequestArgs := global_structs.HttpRequestArgsStruct{
 					UrlAddress: urlToCheck,  // Only the url is different each time
-					HeadersMap: global_vars.HttpRequestHeadersMap,
-					UserToUse:  global_vars.SrcServersUserToUse,
-					PassToUse:  global_vars.SrcServersPassToUse,
-					TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
+					HeadersMap: global_vars.AppConfig.HttpRequestHeadersMap,
+					UserToUse:  global_vars.AppConfig.SrcServersUserToUse,
+					PassToUse:  global_vars.AppConfig.SrcServersPassToUse,
+					TimeoutSec: global_vars.AppConfig.HttpRequestGlobalDefaultTimeoutSecondsInt,
 					Method:     "GET",
 				}
 				
@@ -265,12 +274,12 @@ func SearchDestServersForAvailableNugetPackages() map[string] map[string] map[st
 				threadFoundPackagesDetailsMap[pkgName] = foundPackagesDetailsMap  // Append to existing map
 			}
 			
-			mylog.Logger.Infof("Found total %d of '%s' packages in dest server: %s", foundPackagesCount, global_vars.PackagesNamesStr, destServerUrlToSearch)
+			mylog.Logger.Infof("Found total %d of '%s' packages in dest server: %s", foundPackagesCount, global_vars.AppConfig.PackagesNamesStr, destServerUrlToSearch)
 			helper_funcs.Synched_AddPkgDetailsStructMapToMap(totalFoundDestServersPackagesDetailsMap, destServerUrlToSearch, threadFoundPackagesDetailsMap)
 		} (destServerUrl)
 	}
 
-	mylog.Logger.Debug("Waiting for threads to finish searching for pkgs")
+	mylog.Logger.Debug("Waiting for searching threads to finish searching for pkgs")
 	wg.Wait()
 	pkgsCount := 0
 	for _, destServerFoundPkgsMap := range totalFoundDestServersPackagesDetailsMap {
@@ -278,26 +287,25 @@ func SearchDestServersForAvailableNugetPackages() map[string] map[string] map[st
 			pkgsCount += len(foundPkgsMap)
 		}
 	}
-	mylog.Logger.Infof("Total of %d packages found at dest servers: %s", pkgsCount, global_vars.DestServersUrlsArr)
+	mylog.Logger.Infof("Total of %d packages found at dest servers: %s", pkgsCount, global_vars.AppConfig.DestServersUrlsArr)
 	
 	return totalFoundDestServersPackagesDetailsMap
 }
 
 
-func DownloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
+func DownloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetailsStruct, destServersFoundPackagesMap map[string] map[string] map[string] global_structs.NugetPackageDetailsStruct) []global_structs.DownloadPackageDetailsStruct {
 	foundPackagesCount := len(foundPackagesArr)
 	if foundPackagesCount == 0 {
 		mylog.Logger.Warn("No packages to download found")
 		return []global_structs.DownloadPackageDetailsStruct {}
 	}
 	totalDownloadedPackagesDetailsArr := make([]global_structs.DownloadPackageDetailsStruct, 0, foundPackagesCount)
-	mylog.Logger.Infof("Downloading found %d packages simultaneously in groups of: %d", len(foundPackagesArr), global_vars.PackagesMaxConcurrentDownloadCount)
-	mylog.Logger.Infof(" to dir: %s", global_vars.DownloadPkgsDirPath)
+	mylog.Logger.Infof("Downloading %d found packages simultaneously in groups of: %d", len(foundPackagesArr), global_vars.AppConfig.PackagesMaxConcurrentDownloadCount)
+	mylog.Logger.Infof(" to dir: %s", global_vars.AppConfig.DownloadPkgsDirPath)
 
-	wg := sync.WaitGroup{}
-	// Ensure all routines finish before returning
-	defer wg.Wait()
-	concurrentCountGuard := make(chan int, global_vars.PackagesMaxConcurrentDownloadCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentDownloadCount'
+	wg := new(sync.WaitGroup)
+	
+	concurrentCountGuard := make(chan int, global_vars.AppConfig.PackagesMaxConcurrentDownloadCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentDownloadCount'
 
 	// Download concurrently with threads
 	for _, pkgDetailsStruct := range foundPackagesArr {
@@ -305,49 +313,82 @@ func DownloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetails
 			mylog.Logger.Info("Skipping downloading of an unnamed/no-versioned pkg")
 			continue
 		}
-		
-		wg.Add(1)
+
+		if doAllDestServersContainPackage(pkgDetailsStruct, destServersFoundPackagesMap) {
+			mylog.Logger.Warnf("Checksum match: download target package: %s already exists in all dest servers: '%s'. Skipping download of it", pkgDetailsStruct.HashCode(), global_vars.AppConfig.DestServersUrlsStr)
+			continue
+		}
+
 		fileName := pkgDetailsStruct.Name + "." + pkgDetailsStruct.Version + ".nupkg"
-		downloadFilePath := helper_funcs.Filepath_Join(global_vars.DownloadPkgsDirPath, fileName) // 'downloadPkgsDirPath' is a global var
+		downloadFilePath := helper_funcs.Filepath_Join(global_vars.AppConfig.DownloadPkgsDirPath, fileName) // 'downloadPkgsDirPath' is a global var
+		pkgFileChecksum := helper_funcs.CalculateFileChecksum(downloadFilePath);
 		downloadPkgDetailsStruct := global_structs.DownloadPackageDetailsStruct{
 			PkgDetailsStruct:         pkgDetailsStruct,
 			DownloadFilePath:         downloadFilePath,
-			DownloadFileChecksum:     helper_funcs.CalculateFileChecksum(downloadFilePath), // Can by empty if file doesn't exist yet
+			DownloadFileChecksum:     pkgFileChecksum, // Can by empty if file doesn't exist yet
+			IsSuccessful:             false,
 			DownloadFileChecksumType: "SHA512",                                        // Default checksum algorithm for Nuget pkgs
 		}
 		
+		// Record 1 thread
+		wg.Add(1)
 		concurrentCountGuard <- 1; // Add 1 to concurrent threads count - Would block if array is filled. Can only be freed by thread executing: '<- concurrentCountGuard' below
 		go func(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
 			defer wg.Done()
-			DownloadNugetPackage(downloadPkgDetailsStruct)
+			downloadPkgDetailsStruct = DownloadNugetPackage(downloadPkgDetailsStruct)
 			helper_funcs.Synched_AppendDownloadedPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadPkgDetailsStruct)
 			<- concurrentCountGuard  // Remove 1 from 'concurrentCountGuard'
 		}(downloadPkgDetailsStruct)
 	}
+
+	mylog.Logger.Debugf("Waiting for downloading threads")
 	wg.Wait()
+	mylog.Logger.Debugf("Finished waiting for downloading threads")
 
 	return totalDownloadedPackagesDetailsArr
 }
 
-func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetailsStruct) global_structs.UploadPackageDetailsStruct {
+func doAllDestServersContainPackage(pkgDetailsStruct global_structs.NugetPackageDetailsStruct, destServersFoundPackagesMap map[string] map[string] map[string] global_structs.NugetPackageDetailsStruct) bool {
+	pkgName := pkgDetailsStruct.Name
+	pkgHash := pkgDetailsStruct.HashCode()
+	pkgChecksum := pkgDetailsStruct.Checksum
+	
+	// Skipping download of already dest-servers-existing pkgs
+	for destServerUrl, destServerPackagesMap := range destServersFoundPackagesMap {
+		mylog.Logger.Debugf("Checking if dest server: %s already contains pkg: %s", destServerUrl, pkgHash)
+		packagesMap, isDestServerContainsPkgsMap := destServerPackagesMap[pkgName]
+		if ! isDestServerContainsPkgsMap {return false}
+
+		// Found map of versions of the package - checking if contains the specific pkg version
+		packageDetailsStruct, isPkgsMapContainsPackage := packagesMap[pkgHash]
+		if ! isPkgsMapContainsPackage {return false}
+		
+		// Found the specific pkg version - comparing checksum
+		destServerPkgChecksum := packageDetailsStruct.Checksum
+		if destServerPkgChecksum != pkgChecksum {return false}  // If found at least 1 dest server that doesn't contain the pkg - return false!
+	}
+	return true
+}
+
+func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetailsStruct) global_structs.UploadPackageDetailsStruct{
 	pkgPrintStr := helper_funcs.Fmt_Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	pkgName := uploadPkgStruct.PkgDetailsStruct.Name
 	pkgVersion := uploadPkgStruct.PkgDetailsStruct.Version
 
 	// Check if package already exists. If so, then compare it's checksum and skip on matching
-	for _, destServerUrl := range global_vars.DestServersUrlsArr {
+	for _, destServerUrl := range global_vars.AppConfig.DestServersUrlsArr {
 		mylog.Logger.Infof("Checking if pkg: '%s' already exists at dest server: %s", pkgPrintStr, destServerUrl)
 		checkDestServerPkgExistUrl := destServerUrl + "/" + "Packages(Id='" + pkgName + "',Version='" + pkgVersion + "')"
-		httpRequestArgs := global_structs.HttpRequestArgsStruct{
+		uploadHttpRequestArgs := global_structs.HttpRequestArgsStruct{
 			UrlAddress: checkDestServerPkgExistUrl,
-			HeadersMap: global_vars.HttpRequestHeadersMap,
-			UserToUse:  global_vars.DestServersUserToUse,
-			PassToUse:  global_vars.DestServersPassToUse,
-			TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
+			HeadersMap: global_vars.AppConfig.HttpRequestHeadersMap,
+			UserToUse:  global_vars.AppConfig.DestServersUserToUse,
+			PassToUse:  global_vars.AppConfig.DestServersPassToUse,
+			TimeoutSec: global_vars.AppConfig.HttpRequestUploadTimeoutSecondsInt,
 			Method:     "GET",
 		}
 
-		foundPackagesDetailsArr := SearchSpecificPackageVersionByURLRequest(httpRequestArgs)
+		foundPackagesDetailsArr := SearchSpecificPackageVersionByURLRequest(uploadHttpRequestArgs)
 		foundPackagesCount := len(foundPackagesDetailsArr)
 		mylog.Logger.Debugf("Found: %s", foundPackagesDetailsArr)
 		
@@ -367,10 +408,11 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 			foundPackageChecksum := foundPackagesDetailsArr[0].Checksum
 			fileToUploadChecksum := uploadPkgStruct.UploadFileChecksum
 			if foundPackageChecksum == fileToUploadChecksum {
-			fileName := helper_funcs.Filepath_GetFileNameFromPath(uploadPkgStruct.UploadFilePath)
-			mylog.Logger.Warnf("Checksum match: upload target file already exists in dest server: '%s' \n"+
-				"Skipping upload of pkg: \"%s\"", destServerUrl, fileName)
-			return uploadPkgStruct
+				fileName := helper_funcs.Filepath_GetFileNameFromPath(uploadPkgStruct.UploadFilePath)
+				mylog.Logger.Warnf("Checksum match: upload target file already exists in dest server: '%s' \n"+
+					"Skipping upload of pkg: \"%s\"", destServerUrl, fileName)
+				uploadPkgStruct.IsSuccessful = true
+				continue
 			}
 		}
 		
@@ -381,37 +423,41 @@ func UploadDownloadedPackage(uploadPkgStruct global_structs.UploadPackageDetails
 				destServerUrl += "/"
 			}
 		}
-		httpRequestArgs.UrlAddress = destServerUrl
+		uploadHttpRequestArgs.UrlAddress = destServerUrl
 		// Upload the package file
-		UploadPkg(uploadPkgStruct, httpRequestArgs)
-	
+		uploadPkgStruct = UploadPkg(uploadPkgStruct, uploadHttpRequestArgs)
 	}
-
 	return uploadPkgStruct
 }
 
-func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, httpRequestArgsStruct global_structs.HttpRequestArgsStruct) {
+func UploadPkg(uploadPkgStruct global_structs.UploadPackageDetailsStruct, uploadHttpRequestArgs global_structs.HttpRequestArgsStruct) global_structs.UploadPackageDetailsStruct{
     pkgPrintStr := helper_funcs.Fmt_Sprintf("%s==%s", uploadPkgStruct.PkgDetailsStruct.Name, uploadPkgStruct.PkgDetailsStruct.Version)
 	mylog.Logger.Infof("Uploading package: \"%s\" from: %s", pkgPrintStr, uploadPkgStruct.UploadFilePath)
-    httpRequestArgsStruct.Method = "PUT"
-    httpRequestArgsStruct.UploadFilePath = uploadPkgStruct.UploadFilePath
-    helper_funcs.MakeHttpRequest(httpRequestArgsStruct)
+    uploadHttpRequestArgs.Method = "PUT"
+    uploadHttpRequestArgs.UploadFilePath = uploadPkgStruct.UploadFilePath
+    httpResponsePtr := helper_funcs.MakeHttpRequest(uploadHttpRequestArgs)
 
+	if httpResponsePtr == nil {return uploadPkgStruct}
+	httpResponse := *httpResponsePtr
+	if httpResponse.StatusCode <= 400 {uploadPkgStruct.IsSuccessful = true}
+	return uploadPkgStruct
 }
 
-func UploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
-	if len(downloadedPkgsArr) == 0 {
+func UploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct) []global_structs.UploadPackageDetailsStruct {
+	downloadedPkgsCount := len(downloadedPkgsArr)
+	totalUploadedPackagesDetailsArr := make([] global_structs.UploadPackageDetailsStruct, 0 , downloadedPkgsCount)
+	if downloadedPkgsCount == 0 {
 		mylog.Logger.Warnf("No packages to upload given")
-		return
+		return totalUploadedPackagesDetailsArr
 	}
-	mylog.Logger.Infof("Uploading %d downloaded packages to servers: %v  in groups of: %d", len(downloadedPkgsArr), global_vars.DestServersUrlsArr, global_vars.PackagesMaxConcurrentUploadCount)
-	if len(global_vars.DestServersUrlsArr) == 0 {
-		mylog.Logger.Warnf("No servers to upload to were given - skipping uploading of: %d packages", len(downloadedPkgsArr))
-		return
+	mylog.Logger.Infof("Uploading %d downloaded packages to servers: %v  in groups of: %d", downloadedPkgsCount, global_vars.AppConfig.DestServersUrlsArr, global_vars.AppConfig.PackagesMaxConcurrentUploadCount)
+	if len(global_vars.AppConfig.DestServersUrlsArr) == 0 {
+		mylog.Logger.Warnf("No servers to upload to were given - skipping uploading of: %d packages", downloadedPkgsCount)
+		return totalUploadedPackagesDetailsArr
 	}
 
 	wg := sync.WaitGroup{}
-	concurrentCountGuard := make(chan int, global_vars.PackagesMaxConcurrentUploadCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentUploadCount'
+	concurrentCountGuard := make(chan int, global_vars.AppConfig.PackagesMaxConcurrentUploadCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentUploadCount'
 
 	// Upload concurrently with threads
 	for _, downloadedPkgStruct := range downloadedPkgsArr {
@@ -419,23 +465,30 @@ func UploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 		concurrentCountGuard <- 1; // Add 1 to concurrent threads count - Would block if array is filled. Can only be freed by thread executing: '<- concurrentCountGuard' below
 		go func(downloadedPkgDetails global_structs.DownloadPackageDetailsStruct) {
 			defer wg.Done()
-			UploadDownloadedPackage(global_structs.UploadPackageDetailsStruct{
+			uploadPkgStruct := global_structs.UploadPackageDetailsStruct{
 				PkgDetailsStruct       : downloadedPkgDetails.PkgDetailsStruct,
 				UploadFilePath         : downloadedPkgDetails.DownloadFilePath,
 				UploadFileChecksum     : downloadedPkgDetails.DownloadFileChecksum,
 				UploadFileChecksumType : downloadedPkgDetails.DownloadFileChecksumType,
-			})
+				IsSuccessful           : false,
+			}
+			uploadPkgStruct = UploadDownloadedPackage(uploadPkgStruct)
+			helper_funcs.Synched_AppendUploadedPkgDetailsObj(&totalUploadedPackagesDetailsArr, uploadPkgStruct)
 			<- concurrentCountGuard  // Remove 1 from 'concurrentCountGuard'
 		}(downloadedPkgStruct)
 	}
 	
+	mylog.Logger.Debugf("Waiting for uploading threads")
 	wg.Wait()
+	mylog.Logger.Debugf("Finished waiting for uploading threads")
+
+	return totalUploadedPackagesDetailsArr
 	
 }
 
-func DeleteRemoteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDetailsStruct, destServersFoundPackagesMap map[string] map[string] map[string] global_structs.NugetPackageDetailsStruct) {
+func DeleteRemoteUnuploadedPackages(uploadedPkgsArr []global_structs.NugetPackageDetailsStruct, destServersFoundPackagesMap map[string] map[string] map[string] global_structs.NugetPackageDetailsStruct) {
 	if len(uploadedPkgsArr) == 0 {return}
-	remoteServersStr := global_vars.DestServersUrlsStr
+	remoteServersStr := global_vars.AppConfig.DestServersUrlsStr
     mylog.Logger.Infof("Removing all unuploaded packages from remote servers: %s", remoteServersStr)
 	mylog.Logger.Info("")
     
@@ -443,9 +496,9 @@ func DeleteRemoteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPac
 	destServersPackagesToRemoveMap = destServersFoundPackagesMap
 	
 	// Remove packages that shouldn't be deleted:
-	for _, uploadedPkgStruct := range uploadedPkgsArr {
-		pkgName := uploadedPkgStruct.PkgDetailsStruct.Name
-		pkgHash := uploadedPkgStruct.PkgDetailsStruct.HashCode()
+	for _, pkgDetailsStruct := range uploadedPkgsArr {
+		pkgName := pkgDetailsStruct.Name
+		pkgHash := pkgDetailsStruct.HashCode()
 		for _, destServerPackagesMap := range destServersPackagesToRemoveMap {
 			if packagesMap, isMapContainsKey := destServerPackagesMap[pkgName]; isMapContainsKey {
 				mylog.Logger.Warnf("Skip delete remote pkg: %s", pkgHash)
@@ -460,14 +513,14 @@ func DeleteRemoteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPac
 			pkgsCount += len(foundPkgsMap)
 		}
 	}
-	mylog.Logger.Infof("Removing total of %d packages from dest servers: %s", pkgsCount, global_vars.DestServersUrlsArr)
+	mylog.Logger.Infof("Removing total of %d packages from dest servers: %s", pkgsCount, global_vars.AppConfig.DestServersUrlsArr)
 	if pkgsCount == 0 {
 		mylog.Logger.Info(" ** No packages to remove from dest servers")
 		return
 	}
 
 	wg := sync.WaitGroup{}
-	concurrentCountGuard := make(chan int, global_vars.PackagesMaxConcurrentDeleteCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentDeleteCount'
+	concurrentCountGuard := make(chan int, global_vars.AppConfig.PackagesMaxConcurrentDeleteCount) // Set an array of size: 'global_vars.PackagesMaxConcurrentDeleteCount'
 
 	// Upload concurrently with threads
 	for destServerUrl, destServerPkgsMap := range destServersPackagesToRemoveMap {
@@ -491,15 +544,16 @@ func DeleteRemoteUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPac
 func DeleteRemotePackage(pkgToDeleteStruct global_structs.NugetPackageDetailsStruct) {
 	delRequestArgs := global_structs.HttpRequestArgsStruct{
 		UrlAddress: pkgToDeleteStruct.PkgFileUrl,  // Only the url is different each time
-		HeadersMap: global_vars.HttpRequestHeadersMap,
-		UserToUse:  global_vars.DestServersUserToUse,
-		PassToUse:  global_vars.DestServersPassToUse,
-		TimeoutSec: global_vars.HttpRequestTimeoutSecondsInt,
+		HeadersMap: global_vars.AppConfig.HttpRequestHeadersMap,
+		UserToUse:  global_vars.AppConfig.DestServersUserToUse,
+		PassToUse:  global_vars.AppConfig.DestServersPassToUse,
+		TimeoutSec: global_vars.AppConfig.HttpRequestGlobalDefaultTimeoutSecondsInt,
 		Method:     "DELETE",
 	}
 	httpResponsePtr := helper_funcs.MakeHttpRequest(delRequestArgs)
 	if httpResponsePtr == nil {
 		mylog.Logger.Errorf("'httpResponsePtr' is null. Failed to delete package: %s", delRequestArgs.UrlAddress)
+		helper_funcs.Synched_ErrorsDetected(true)
 		return
 	}
 	httpResponse := *httpResponsePtr
@@ -509,5 +563,6 @@ func DeleteRemotePackage(pkgToDeleteStruct global_structs.NugetPackageDetailsStr
 
 	if httpResponse.StatusCode >= 400 {
 		mylog.Logger.Errorf("%s %s - Failed to delete package: %s", httpResponse.StatusStr, responseBody, delRequestArgs.UrlAddress)
+		helper_funcs.Synched_ErrorsDetected(true)
 	}
 }
