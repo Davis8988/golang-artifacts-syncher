@@ -27,50 +27,49 @@ var (
 )
 
 func InitVars() {
+    global_vars.ErrorsDetected = false
+
     mylog.Logger.Info("Initializing helpers pkg vars")
     global_vars.ConvertSyncedMapToString_Lock      = sync.RWMutex{}
     global_vars.JoinTwoPkgDetailsSlices_Lock       = sync.RWMutex{}
     global_vars.JoinTwoPkgDetailsMaps_Lock         = sync.RWMutex{}
     global_vars.AppendDownloadedPkgDetailsArr_Lock = sync.RWMutex{}
+    global_vars.AppendUploadedPkgDetailsArr_Lock   = sync.RWMutex{}
     global_vars.AppendPkgDetailsArr_Lock           = sync.RWMutex{}
     global_vars.AppendPkgDetailsMap_Lock           = sync.RWMutex{}
+    global_vars.ErrorsDetected_Lock                = sync.RWMutex{}
 
+    httpRequestGlobalDefaultTimeoutSecondsInt := 210
     mylog.Logger.Info("Initializing from envs vars")
-    global_vars.SrcServersUserToUse                = Getenv("SRC_SERVERS_USER_TO_USE", "")
-    global_vars.SrcServersPassToUse                = Getenv("SRC_SERVERS_PASS_TO_USE", "")
-    global_vars.SrcServersUrlsStr                  = Getenv("SRC_SERVERS_URLS_STR", "")
-    global_vars.DestServersUrlsStr                 = Getenv("DEST_SERVERS_URLS_STR", "")
-    global_vars.DestServersUserToUse               = Getenv("DEST_SERVERS_USER_TO_USE", "")
-    global_vars.DestServersPassToUse               = Getenv("DEST_SERVERS_PASS_TO_USE", "")
-    global_vars.PackagesNamesStr                   = Getenv("PACKAGES_NAMES_STR", "")
-    global_vars.PackagesVersionsStr                = Getenv("PACKAGES_VERSIONS_STR", "")
-    global_vars.HttpRequestHeadersStr              = Getenv("HTTP_REQUEST_HEADERS_STR", "") // Example: "key=value;key1=value1;key2=value2"
-    global_vars.DownloadPkgsDirPath                = Getenv("DOWNLOAD_PKGS_DIR_PATH", filepath.Join(GetCurrentProgramDir(), "Downloads"))
-    global_vars.HttpRequestTimeoutSecondsInt       = StrToInt(Getenv("HTTP_REQUEST_TIMEOUT_SECONDS_INT", "45"))
-    global_vars.SearchPackagesUrlSkipGroupCount    = StrToInt(Getenv("SEARCH_PACKAGES_URL_SKIP_GROUP_COUNT", "30"))
-    global_vars.PackagesMaxConcurrentDownloadCount = StrToInt(Getenv("PACKAGES_MAX_CONCURRENT_DOWNLOAD_COUNT", "5"))
-    global_vars.PackagesMaxConcurrentUploadCount   = StrToInt(Getenv("PACKAGES_MAX_CONCURRENT_UPLOAD_COUNT", "5"))
-    global_vars.PackagesMaxConcurrentDeleteCount   = StrToInt(Getenv("PACKAGES_MAX_CONCURRENT_DELETE_COUNT", "5"))
-    global_vars.PackagesDownloadLimitCount         = StrToInt(Getenv("PACKAGES_DOWNLOAD_LIMIT_COUNT", "-1"))
+    global_vars.AppConfig = global_structs.AppConfiguration{
+        SrcServersUserToUse                : Getenv("SRC_SERVERS_USER_TO_USE", ""),
+        SrcServersPassToUse                : Getenv("SRC_SERVERS_PASS_TO_USE", ""),
+        SrcServersUrlsStr                  : Getenv("SRC_SERVERS_URLS_STR", ""),
+        DestServersUrlsStr                 : Getenv("DEST_SERVERS_URLS_STR", ""),
+        DestServersUserToUse               : Getenv("DEST_SERVERS_USER_TO_USE", ""),
+        DestServersPassToUse               : Getenv("DEST_SERVERS_PASS_TO_USE", ""),
+        PackagesNamesStr                   : Getenv("PACKAGES_NAMES_STR", ""),
+        PackagesVersionsStr                : Getenv("PACKAGES_VERSIONS_STR", ""),
+        HttpRequestHeadersStr              : Getenv("HTTP_REQUEST_HEADERS_STR", ""), // Example: "key=value;key1=value1;key2=value2"
+        DownloadPkgsDirPath                : Getenv("DOWNLOAD_PKGS_DIR_PATH", filepath.Join(GetCurrentProgramDir(), "Downloads")),
+        HttpRequestGlobalDefaultTimeoutSecondsInt : StrToInt(Getenv("HTTP_REQUEST_GLOBAL_DEFAULT_TIMEOUT_SECONDS_INT", strconv.Itoa(httpRequestGlobalDefaultTimeoutSecondsInt))),
+        HttpRequestDownloadTimeoutSecondsInt      : StrToInt(Getenv("HTTP_REQUEST_DOWNLOAD_TIMEOUT_SECONDS_INT", strconv.Itoa(httpRequestGlobalDefaultTimeoutSecondsInt))),
+        HttpRequestUploadTimeoutSecondsInt        : StrToInt(Getenv("HTTP_REQUEST_UPLOAD_TIMEOUT_SECONDS_INT", strconv.Itoa(httpRequestGlobalDefaultTimeoutSecondsInt))),
+        SearchPackagesUrlSkipGroupCount           : StrToInt(Getenv("SEARCH_PACKAGES_URL_SKIP_GROUP_COUNT", "30")),
+        PackagesMaxConcurrentDownloadCount        : StrToInt(Getenv("PACKAGES_MAX_CONCURRENT_DOWNLOAD_COUNT", "5")),
+        PackagesMaxConcurrentUploadCount          : StrToInt(Getenv("PACKAGES_MAX_CONCURRENT_UPLOAD_COUNT", "5")),
+        PackagesMaxConcurrentDeleteCount          : StrToInt(Getenv("PACKAGES_MAX_CONCURRENT_DELETE_COUNT", "5")),
+        PackagesDownloadLimitCount                : StrToInt(Getenv("PACKAGES_DOWNLOAD_LIMIT_COUNT", "-1")),
+    }
+    
+    // Log level - this is set in mylog module
+    global_vars.AppConfig.LogLevel = mylog.Logger.Level.String()
+    
 }
 
 func PrintVars() {
-    mylog.Logger.Infof("SRC_SERVERS_URLS_STR: '%s'"            , global_vars.SrcServersUrlsStr)
-	mylog.Logger.Infof("SRC_SERVERS_USER_TO_USE: '%s'"         , global_vars.SrcServersUserToUse)
-	mylog.Logger.Infof("SRC_SERVERS_PASS_TO_USE: '%s'"         , strings.Repeat("*", len(global_vars.SrcServersPassToUse)))
-	mylog.Logger.Infof("DEST_SERVERS_URLS_STR: '%s'"           , global_vars.DestServersUrlsStr)
-	mylog.Logger.Infof("DEST_SERVERS_USER_TO_USE: '%s'"        , global_vars.DestServersUserToUse)
-	mylog.Logger.Infof("DEST_SERVERS_PASS_TO_USE: '%s'"        , strings.Repeat("*", len(global_vars.DestServersPassToUse)))
-	mylog.Logger.Infof("PACKAGES_NAMES_STR: '%s'"              , global_vars.PackagesNamesStr)
-	mylog.Logger.Infof("PACKAGES_VERSIONS_STR: '%s'"           , global_vars.PackagesVersionsStr)
-	mylog.Logger.Infof("HTTP_REQUEST_HEADERS_STR: '%s'"        , global_vars.HttpRequestHeadersStr)
-	mylog.Logger.Infof("DOWNLOAD_PKGS_DIR_PATH: '%s'"          , global_vars.DownloadPkgsDirPath)
-	mylog.Logger.Infof("HTTP_REQUEST_TIMEOUT_SECONDS_INT: '%d'", global_vars.HttpRequestTimeoutSecondsInt)
-
-	mylog.Logger.Infof("srcServersUrlsArr: %v"      , global_vars.SrcServersUrlsArr)
-	mylog.Logger.Infof("DestServersUrlsArr: %v"     , global_vars.DestServersUrlsArr)
-	mylog.Logger.Infof("packagesNamesArr: %v"       , global_vars.PackagesNamesArr)
-	mylog.Logger.Infof("packagesVersionsArr: %v"    , global_vars.PackagesVersionsArr)
+    appConfigStr := global_vars.AppConfig.ToString()
+    mylog.Logger.Infof("Configuration: \n%s", appConfigStr)
 	
 	packagesToDownloadMapStr := Synched_ConvertSyncedMapToString(global_vars.PackagesToDownloadMap)
 	mylog.Logger.Infof("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
@@ -80,9 +79,9 @@ func ValidateEnvironment() {
     mylog.Logger.Info("Validating envs")
 
 	// Validate len(packagesVersionsArr) == len(packagesNamesArr)  (Only when packagesVersionsArr is defined)
-	if ! IsStrArrayEmpty(global_vars.PackagesVersionsArr) {
+	if ! IsStrArrayEmpty(global_vars.AppConfig.PackagesVersionsArr) {
 		mylog.Logger.Debug("Comparing packages names & versions arrays lengths")
-		if len(global_vars.PackagesVersionsArr) != len(global_vars.PackagesNamesArr) {
+		if len(global_vars.AppConfig.PackagesVersionsArr) != len(global_vars.AppConfig.PackagesNamesArr) {
 			errMsg := "Packages Versions to search count is different from Packages Names to search count\n"
 			errMsg += "Can't search for packages versions & names which are not of the same count.\n"
 			errMsg += "When passing packages versions to search - the versions count must be of the same count of packages names to search.\n"
@@ -91,24 +90,24 @@ func ValidateEnvironment() {
 		}
 	}
 
-    mylog.Logger.Debug("Validating all src URLs addresses: %s", global_vars.SrcServersUrlsArr)
-    for i, srcServerUrl := range global_vars.SrcServersUrlsArr {
+    mylog.Logger.Debug("Validating all src URLs addresses: %s", global_vars.AppConfig.SrcServersUrlsArr)
+    for i, srcServerUrl := range global_vars.AppConfig.SrcServersUrlsArr {
         if len(srcServerUrl) == 1 {continue}
         lastChar := srcServerUrl[len(srcServerUrl)-1:]
         if lastChar == "/" {continue}
         mylog.Logger.Debugf("Fix: Adding '/' char to src server repo url: \"%s\"", srcServerUrl)
         srcServerUrl += "/"
-        global_vars.SrcServersUrlsArr[i] = srcServerUrl
+        global_vars.AppConfig.SrcServersUrlsArr[i] = srcServerUrl
     }
     
-    mylog.Logger.Debug("Validating all dest URLs addresses: %s", global_vars.DestServersUrlsArr)
-    for i, destServerUrl := range global_vars.DestServersUrlsArr {
+    mylog.Logger.Debug("Validating all dest URLs addresses: %s", global_vars.AppConfig.DestServersUrlsArr)
+    for i, destServerUrl := range global_vars.AppConfig.DestServersUrlsArr {
         if len(destServerUrl) == 1 {continue}
         lastChar := destServerUrl[len(destServerUrl)-1:]
         if lastChar == "/" {continue}
         mylog.Logger.Debugf("Fix: Adding '/' char to src server repo url: \"%s\"", destServerUrl)
         destServerUrl += "/"
-        global_vars.DestServersUrlsArr[i] = destServerUrl
+        global_vars.AppConfig.DestServersUrlsArr[i] = destServerUrl
     }
 
 	mylog.Logger.Info("All Good")
@@ -116,22 +115,22 @@ func ValidateEnvironment() {
 
 func UpdateVars() {
     mylog.Logger.Info("Updating vars")
-	global_vars.SrcServersUrlsArr = make([]string, 0, 4)
-	global_vars.DestServersUrlsArr = make([]string, 0, 4)
-	global_vars.PackagesNamesArr = make([]string, 0, 10)
-	global_vars.PackagesVersionsArr = make([]string, 0, 10)
-	if len(global_vars.SrcServersUrlsStr)   > 1 {global_vars.SrcServersUrlsArr   = strings.Split(global_vars.SrcServersUrlsStr,   ";")}
-	if len(global_vars.DestServersUrlsStr)  > 1 {global_vars.DestServersUrlsArr  = strings.Split(global_vars.DestServersUrlsStr,  ";")}
-	if len(global_vars.PackagesNamesStr)    > 1 {global_vars.PackagesNamesArr    = strings.Split(global_vars.PackagesNamesStr,    ";")}
-	if len(global_vars.PackagesVersionsStr) > 1 {global_vars.PackagesVersionsArr = strings.Split(global_vars.PackagesVersionsStr, ";")}
-	global_vars.HttpRequestHeadersMap = ParseHttpHeadersStrToMap(global_vars.HttpRequestHeadersStr)
+	global_vars.AppConfig.SrcServersUrlsArr = make([]string, 0, 4)
+	global_vars.AppConfig.DestServersUrlsArr = make([]string, 0, 4)
+	global_vars.AppConfig.PackagesNamesArr = make([]string, 0, 10)
+	global_vars.AppConfig.PackagesVersionsArr = make([]string, 0, 10)
+	if len(global_vars.AppConfig.SrcServersUrlsStr)   > 1 {global_vars.AppConfig.SrcServersUrlsArr   = strings.Split(global_vars.AppConfig.SrcServersUrlsStr,   ";")}
+	if len(global_vars.AppConfig.DestServersUrlsStr)  > 1 {global_vars.AppConfig.DestServersUrlsArr  = strings.Split(global_vars.AppConfig.DestServersUrlsStr,  ";")}
+	if len(global_vars.AppConfig.PackagesNamesStr)    > 1 {global_vars.AppConfig.PackagesNamesArr    = strings.Split(global_vars.AppConfig.PackagesNamesStr,    ";")}
+	if len(global_vars.AppConfig.PackagesVersionsStr) > 1 {global_vars.AppConfig.PackagesVersionsArr = strings.Split(global_vars.AppConfig.PackagesVersionsStr, ";")}
+	global_vars.AppConfig.HttpRequestHeadersMap = ParseHttpHeadersStrToMap(global_vars.AppConfig.HttpRequestHeadersStr)
 
-	for i, pkgName := range global_vars.PackagesNamesArr {
+	for i, pkgName := range global_vars.AppConfig.PackagesNamesArr {
 		// If map doesn't contain value at: 'pkgName' - add one to point to empty string array: []
 		global_vars.PackagesToDownloadMap.LoadOrStore(pkgName, make([]string, 0, 10))
 		// If received a version array for it - add it to the list
-		if len(global_vars.PackagesVersionsArr) > i {
-			pkgVersion := global_vars.PackagesVersionsArr[i]
+		if len(global_vars.AppConfig.PackagesVersionsArr) > i {
+			pkgVersion := global_vars.AppConfig.PackagesVersionsArr[i]
 			currentVersionsArr := LoadStringArrValueFromSynchedMap(global_vars.PackagesToDownloadMap, pkgName)
 			global_vars.PackagesToDownloadMap.Store(pkgName, append(currentVersionsArr, pkgVersion))
 		}
@@ -142,7 +141,7 @@ func PrepareSrcSearchUrlsForPackageArray(pkgName string) []string {
 	var searchUrlsArr = make([]string, 0, 10) // Create a slice with length=0 and capacity=10
 
 	mylog.Logger.Info("Preparing src search packages urls array")
-	for _, srcServerUrl := range global_vars.SrcServersUrlsArr {
+	for _, srcServerUrl := range global_vars.AppConfig.SrcServersUrlsArr {
         if len(srcServerUrl) == 1 {continue}
         versionsToSearchArr := LoadStringArrValueFromSynchedMap(global_vars.PackagesToDownloadMap, pkgName)
         if len(versionsToSearchArr) == 0 { // Either use search
@@ -265,6 +264,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
         tempPairArr := strings.Split(headersPairStr, "=")
         if len(tempPairArr) != 2 {
             mylog.Logger.Errorf("\nFound header pair: \"%v\"  that is not in the right format of: \"key=value\"\n", tempPairArr)
+            Synched_ErrorsDetected(true)
             return nil
         }
         headerKey := tempPairArr[0]
@@ -302,7 +302,7 @@ func CreateFile(filePath string) *os.File {
 }
 
 func CalculateFileChecksum(filePath string) string {
-    if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {return ""}  // If missing file: return empty
+    if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {return ""}  // If file doesn't exist: return empty
     mylog.Logger.Debugf("Calculating sha512 checksum of file: %s", filePath)
     f, err := os.Open(filePath)
     if err != nil {
@@ -344,6 +344,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) *glob
     req, err := http.NewRequest(method, urlAddress, body)
     if err != nil {
         mylog.Logger.Errorf("\n%s\nFailed creating HTTP request object for URL: \"%s\"\n", err, urlAddress)
+        Synched_ErrorsDetected(true)
         return nil
     }
 
@@ -361,7 +362,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) *glob
 
     // Adding creds
     if len(username) > 0 && len(password) > 0 {
-        mylog.Logger.Infof("Adding creds of user:  '%s'", username)
+        mylog.Logger.Debugf("Adding creds of user:  '%s'", username)
         req.SetBasicAuth(username, password)
     }
 
@@ -369,11 +370,19 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) *glob
     response, err := client.Do(req)
     if err != nil {
         mylog.Logger.Errorf("\n%s\n", err)
+        Synched_ErrorsDetected(true)
         return nil
     }
   
     defer response.Body.Close() // Finally step: close the body obj
     
+    httpResponseResultStruct := global_structs.HttpResponseStruct {
+        UrlAddress: urlAddress,
+        BodyStr: "",
+        StatusStr: response.Status,
+        StatusCode: response.StatusCode,
+    }
+
     // If got: downloadFilePath var, then Writer the body to file
     if len(downloadFilePath) > 0 {
         mylog.Logger.Infof("Downloading '%s' to:  %s", urlAddress, downloadFilePath)
@@ -385,22 +394,17 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) *glob
             mylog.Logger.Errorf("\n%s\nFailed writing response Body to file: %s\n", err, downloadFilePath)
             panic(err)
         }
-        return nil // Finish here
+        return &httpResponseResultStruct // Finish here
     }
 
     responseBody, err := ioutil.ReadAll(response.Body)
     if err != nil {
         mylog.Logger.Errorf("\n%s\nFailed reading request's response body: %s\n", err, urlAddress)
-        return nil
+        Synched_ErrorsDetected(true)
+        return &httpResponseResultStruct
     }
 
-    bodyStr := string(responseBody)
-    httpResponseResultStruct := global_structs.HttpResponseStruct {
-        UrlAddress: urlAddress,
-        BodyStr: bodyStr,
-        StatusStr: response.Status,
-        StatusCode: response.StatusCode,
-    }
+    httpResponseResultStruct.BodyStr = string(responseBody)
 
     return &httpResponseResultStruct
 }
@@ -411,6 +415,7 @@ func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName s
     // If missing file: return empty body
     if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
         mylog.Logger.Errorf("\n%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object\n", err, uploadFilePath)
+        Synched_ErrorsDetected(true)
         return nil, nil
     }
 
@@ -452,6 +457,12 @@ func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
 	result := ConvertSyncedMapToString(synchedMap)
 	defer global_vars.ConvertSyncedMapToString_Lock.Unlock()
 	return result
+}
+
+func Synched_ErrorsDetected(errorsDetected bool) {
+    global_vars.ErrorsDetected_Lock.Lock()
+    global_vars.ErrorsDetected = errorsDetected
+    global_vars.ErrorsDetected_Lock.Unlock()
 }
 
 func ConvertPkgDetailsArrayToMap(pkgDetailsArr [] global_structs.NugetPackageDetailsStruct) map[string] global_structs.NugetPackageDetailsStruct {
@@ -518,6 +529,12 @@ func Synched_AppendDownloadedPkgDetailsObj(arr_1 *[] global_structs.DownloadPack
     global_vars.AppendDownloadedPkgDetailsArr_Lock.Unlock()
 }
 
+func Synched_AppendUploadedPkgDetailsObj(arr_1 *[] global_structs.UploadPackageDetailsStruct, uploadedPkgDetailsStruct global_structs.UploadPackageDetailsStruct) {
+    global_vars.AppendUploadedPkgDetailsArr_Lock.Lock()
+    *arr_1 = append(*arr_1, uploadedPkgDetailsStruct)
+    global_vars.AppendUploadedPkgDetailsArr_Lock.Unlock()
+}
+
 
 func CompareNugetPackageDetailsStruct(pkg1, pkg2 global_structs.NugetPackageDetailsStruct) bool {
     return (pkg1 == pkg2) || (strings.Compare(pkg1.Name, pkg2.Name) == 0 && strings.Compare(pkg1.Version, pkg2.Version) == 0)
@@ -538,22 +555,22 @@ func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPac
     return nugetPackageDetailsStructArr[sliceInd:]
 }
 
-func DeleteLocalUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPackageDetailsStruct) {
-    if len(uploadedPkgsArr) == 0 {return}
-    downloadPkgsDir := global_vars.DownloadPkgsDirPath
-    mylog.Logger.Infof("Removing all unuploaded packages from: %s", downloadPkgsDir)
+func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
+    downloadPkgsDir := global_vars.AppConfig.DownloadPkgsDirPath
+    mylog.Logger.Infof("Removing all downloaded packages from: %s", downloadPkgsDir)
     files, err := ioutil.ReadDir(downloadPkgsDir)
     if err != nil {
         mylog.Logger.Fatal(err)
     }
-    
-    // Assign uploaded packages names
-    uploadedFileNamesMap := map[string]int{}
+
+    // Assign un-uploaded packages names - Skip them on delete
+    unUploadedFileNamesMap := map[string]int{}
     fileUploadedIndicator := 1
-    for _, pkg := range(uploadedPkgsArr) {
-        pkgDetails := pkg.PkgDetailsStruct
+    for _, uploadedPkgStruct := range(uploadedPkgsArr) {
+        if (uploadedPkgStruct.IsSuccessful) {continue}
+        pkgDetails := uploadedPkgStruct.PkgDetailsStruct
         expectedFilename := Fmt_Sprintf("%s.%s.nupkg", strings.ToLower(pkgDetails.Name), pkgDetails.Version)
-        uploadedFileNamesMap[expectedFilename] = fileUploadedIndicator
+        unUploadedFileNamesMap[expectedFilename] = fileUploadedIndicator
     }
 
     // Loop on found files - Delete files that are NOT in the assigned map
@@ -561,17 +578,19 @@ func DeleteLocalUnuploadedPackages(uploadedPkgsArr []global_structs.DownloadPack
         filename := file.Name()
         
         // If filename is not in the map:
-        if _, isMapContainsKey := uploadedFileNamesMap[filename]; ! isMapContainsKey {
-            mylog.Logger.Debugf("Delete: %s", filename)
-            fileToDeletePath := filepath.Join(downloadPkgsDir, filename)
-            err := os.Remove(fileToDeletePath)
-            if (err != nil) {
-                mylog.Logger.Errorf("\n%s\nFailed removing: %s", err, filename)
-            }
-        } else {
-            // filename is in the map:
-            mylog.Logger.Warnf("Skip delete local file: %s", filename)
+        if _, isMapContainsKey := unUploadedFileNamesMap[filename]; isMapContainsKey {
+            mylog.Logger.Warnf("Skip delete un-uploaded local file: %s", filename)
+            continue
+        } 
+
+        // filename is in the map:
+        mylog.Logger.Debugf("Delete: %s", filename)
+        fileToDeletePath := filepath.Join(downloadPkgsDir, filename)
+        err := os.Remove(fileToDeletePath)
+        if (err != nil) {
+            mylog.Logger.Errorf("\n%s\nFailed removing: %s", err, filename)
         }
+        
     }
 
     mylog.Logger.Info("Done")
