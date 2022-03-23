@@ -24,5 +24,9 @@ var (
 
     PackagesToDownloadMap sync.Map
 
+    // Slices
+    DownloadedPkgsMap   [] global_structs.DownloadedPackagesDataStruct
+    UploadedPkgsDataArr [] global_structs.UploadedPackagesDataStruct
+
     ErrorsDetected bool
 )
