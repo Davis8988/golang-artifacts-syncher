@@ -69,6 +69,16 @@ type UploadPackageDetailsStruct struct {
     IsSuccessful  bool
 }
 
+type UploadedPackagesDataStruct struct {
+    DestServerUrl string
+    UploadedPackagesMap map[string] UploadPackageDetailsStruct  // 'name-version' -> UploadPackageDetailsStruct
+}
+
+type DownloadedPackagesDataStruct struct {
+    SrcServerUrl string
+    DownloadedPackagesMap map[string] DownloadPackageDetailsStruct  // 'name-version' -> DownloadPackageDetailsStruct
+}
+
 type AppConfiguration struct {
     SrcServersUserToUse          string
     SrcServersPassToUse          string
@@ -112,7 +122,7 @@ func (appConfig AppConfiguration) ToString() string {
             fieldValue = strings.Repeat("*", len(fieldValue))
         }
 
-        resultStr += fmt.Sprintf("%s : %v\n", fieldName, fieldValue)
+        resultStr += fmt.Sprintf("  %s : %v\n", fieldName, fieldValue)
     }
     return resultStr
 }

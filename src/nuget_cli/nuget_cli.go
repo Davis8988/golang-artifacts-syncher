@@ -315,7 +315,7 @@ func DownloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetails
 		}
 
 		if doAllDestServersContainPackage(pkgDetailsStruct, destServersFoundPackagesMap) {
-			mylog.Logger.Warnf("Checksum match: download target package: %s already exists in all dest servers: '%s'. Skipping download of it", pkgDetailsStruct.HashCode(), global_vars.AppConfig.DestServersUrlsStr)
+			mylog.Logger.Warnf("Checksum match: remote target package: %s already exists in all dest servers: '%s'. Skipping download of it", pkgDetailsStruct.HashCode(), global_vars.AppConfig.DestServersUrlsStr)
 			continue
 		}
 

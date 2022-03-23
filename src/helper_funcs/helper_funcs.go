@@ -278,8 +278,13 @@ func GetFileName(filePath string) string {
     return filepath.Base(filePath)
 }
 
+func DirExists(dirPath string) bool {
+    if _, err := os.Stat(dirPath); err == nil {return true}  
+    return false
+}
+
 func CreateDir(dirPath string) {
-    if _, err := os.Stat(dirPath); err == nil {return}  // If dir already exists - finish here
+    if DirExists(dirPath) {return}  // If dir already exists - finish here
     mylog.Logger.Debugf("Creating dir: %s", dirPath)
     err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
@@ -558,6 +563,10 @@ func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPac
 func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
     downloadPkgsDir := global_vars.AppConfig.DownloadPkgsDirPath
     mylog.Logger.Infof("Removing all downloaded packages from: %s", downloadPkgsDir)
+    if ! DirExists(downloadPkgsDir) {
+        mylog.Logger.Warnf("Download dir doesn't exist at: %s", downloadPkgsDir)
+        return
+    }
     files, err := ioutil.ReadDir(downloadPkgsDir)
     if err != nil {
         mylog.Logger.Fatal(err)
@@ -604,4 +613,52 @@ func EndTimer() time.Duration {
     return time.Since(startTime)
 }
 
+func PrintFinishSummary(filteredFoundPackagesDetailsList []global_structs.NugetPackageDetailsStruct, downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct, uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
+    failedDownloadingPkgsCount := 0
+	failedUploadingPkgsCount := 0
+	for _, downloadPkgStruct := range downloadedPkgsArr {
+		if (downloadPkgStruct.IsSuccessful) {continue}
+		failedDownloadingPkgsCount += 1
+	}
+	for _, uploadedPkgsStruct := range uploadedPkgsArr {
+		if (uploadedPkgsStruct.IsSuccessful) {continue}
+		failedUploadingPkgsCount += 1
+	}
+	mylog.Logger.Info("")
+	appConfigStr := global_vars.AppConfig.ToString()
+    mylog.Logger.Infof("Configuration: \n%s", appConfigStr)
+
+	mylog.Logger.Info("")
+	mylog.Logger.Info("Summary:")
+	mylog.Logger.Infof(" Targeted %d packages:", len(filteredFoundPackagesDetailsList))
+	for i, pkgDetailsStruct := range filteredFoundPackagesDetailsList {
+		mylog.Logger.Infof("  %d) %s", i+1, pkgDetailsStruct.HashCode())
+	}
+	
+	if (failedDownloadingPkgsCount > 0) {
+		mylog.Logger.Warnf(" Failed downloading %d packages:", failedDownloadingPkgsCount)
+		for _, downloadPkgStruct := range downloadedPkgsArr {
+			if (downloadPkgStruct.IsSuccessful) {continue}
+			mylog.Logger.Infof("  - %s", downloadPkgStruct.PkgDetailsStruct.HashCode())
+		}
+	}
+
+	if (failedUploadingPkgsCount > 0) {
+		mylog.Logger.Warnf(" Failed uploading %d packages:", failedUploadingPkgsCount)
+		for _, uploadedPkgsStruct := range uploadedPkgsArr {
+			if (uploadedPkgsStruct.IsSuccessful) {continue}
+			mylog.Logger.Infof("  * %s", uploadedPkgsStruct.PkgDetailsStruct.HashCode())
+		}
+	}
+	mylog.Logger.Info("")
+	mylog.Logger.Info("Done")
+	mylog.Logger.Info("Finished")
+	duration := EndTimer()
+	mylog.Logger.Infof("Time: %v", duration)
+	mylog.Logger.Info("")
+	if global_vars.ErrorsDetected {
+		mylog.Logger.Errorf("Errors were detected. See log above")
+		mylog.Logger.Info("")
+	}
+}
 

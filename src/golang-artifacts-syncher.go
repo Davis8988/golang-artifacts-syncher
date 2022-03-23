@@ -3,13 +3,17 @@ package main
 import (
 	"flag"
 	"golang-artifacts-syncher/src/global_structs"
-	"golang-artifacts-syncher/src/global_vars"
 	"golang-artifacts-syncher/src/helper_funcs"
 	"golang-artifacts-syncher/src/mylog"
 	"golang-artifacts-syncher/src/nuget_cli"
 )
 
+var (    
+    BuildVersion string = ""
+)
+
 func Start() {
+	println(helper_funcs.Fmt_Sprintf("Version: %s", BuildVersion))
 	println("Program Started")
 }
 
@@ -61,52 +65,8 @@ func StartTimer() {
 }
 
 func Finish(filteredFoundPackagesDetailsList []global_structs.NugetPackageDetailsStruct, downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct, uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
-	failedDownloadingPkgsCount := 0
-	failedUploadingPkgsCount := 0
-	for _, downloadPkgStruct := range downloadedPkgsArr {
-		if (downloadPkgStruct.IsSuccessful) {continue}
-		failedDownloadingPkgsCount += 1
-	}
-	for _, uploadedPkgsStruct := range uploadedPkgsArr {
-		if (uploadedPkgsStruct.IsSuccessful) {continue}
-		failedUploadingPkgsCount += 1
-	}
-	mylog.Logger.Info("")
-	appConfigStr := global_vars.AppConfig.ToString()
-    mylog.Logger.Infof("Configuration: \n%s", appConfigStr)
-
-	mylog.Logger.Info("")
-	mylog.Logger.Info("Summary:")
-	mylog.Logger.Infof(" Targeted %d packages:", len(filteredFoundPackagesDetailsList))
-	for i, pkgDetailsStruct := range filteredFoundPackagesDetailsList {
-		mylog.Logger.Infof("  %d) %s", i+1, pkgDetailsStruct.HashCode())
-	}
-	
-	if (failedDownloadingPkgsCount > 0) {
-		mylog.Logger.Warnf(" Failed downloading %d packages:", failedDownloadingPkgsCount)
-		for _, downloadPkgStruct := range downloadedPkgsArr {
-			if (downloadPkgStruct.IsSuccessful) {continue}
-			mylog.Logger.Infof("  - %s", downloadPkgStruct.PkgDetailsStruct.HashCode())
-		}
-	}
-
-	if (failedUploadingPkgsCount > 0) {
-		mylog.Logger.Warnf(" Failed uploading %d packages:", failedUploadingPkgsCount)
-		for _, uploadedPkgsStruct := range uploadedPkgsArr {
-			if (uploadedPkgsStruct.IsSuccessful) {continue}
-			mylog.Logger.Infof("  * %s", uploadedPkgsStruct.PkgDetailsStruct.HashCode())
-		}
-	}
-	mylog.Logger.Info("")
-	mylog.Logger.Info("Done")
-	mylog.Logger.Info("Finished")
-	duration := helper_funcs.EndTimer()
-	mylog.Logger.Infof("Time: %v", duration)
-	mylog.Logger.Info("")
-	if global_vars.ErrorsDetected {
-		mylog.Logger.Errorf("Errors were detected. See log above")
-		mylog.Logger.Info("")
-	}
+	helper_funcs.PrintFinishSummary(filteredFoundPackagesDetailsList, downloadedPkgsArr, uploadedPkgsArr)
+	mylog.Logger.Infof("Version: %s", BuildVersion)
 }
 
 
