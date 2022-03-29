@@ -6,6 +6,9 @@ launch.json
 # Visual Studio
 .vs
 
+# App
+*execution_finished*.txt
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -24,3 +27,5 @@ launch.json
 
 # Nuget
 *.nupkg
+
+

@@ -30,15 +30,19 @@ WORKDIR /app
 COPY . .
 
 RUN chmod +x ./docker/entrypoint.sh && \ 
-    echo Executing: go build -buildmode=exe -o $EXECUTABLE_APP_PATH -ldflags="-s -w -X 'main.BuildVersion=$SYNCHER_BUILD_VERSION'" src/golang-artifacts-syncher.go && \
-    go build -buildmode=exe -o $EXECUTABLE_APP_PATH -ldflags="-s -w -X 'main.BuildVersion=$SYNCHER_BUILD_VERSION'" src/golang-artifacts-syncher.go
+    echo Executing: go build -buildmode=exe -o $EXECUTABLE_APP_PATH -ldflags="-s -w -X 'main.AppVersion=$SYNCHER_BUILD_VERSION'" src/golang-artifacts-syncher.go && \
+    go build -buildmode=exe -o $EXECUTABLE_APP_PATH -ldflags="-s -w -X 'main.AppVersion=$SYNCHER_BUILD_VERSION'" src/golang-artifacts-syncher.go
 
 # Runtime image:
-FROM artifactory.esl.corp.elbit.co.il/aerospace-simulators-devops-docker/alpine:3.14.4-curl-git
+FROM artifactory.esl.corp.elbit.co.il/aerospace-simulators-devops-docker/alpine:3.14.4-curl
 
 WORKDIR /app
 COPY --from=builder "/app/bin/golang-artifacts-syncher" "/usr/bin/"
-COPY ./docker/entrypoint.sh "/app/bin/"
+COPY ./docker/      "/app/"
 
-CMD ["sh", "/app/bin/entrypoint.sh"]
+# --fail=fail silently without output
+HEALTHCHECK --interval=5s --timeout=4s --start-period=5s CMD ash "/app/healthcheck.sh"
+
+
+CMD ["sh", "/app/entrypoint.sh"]
 

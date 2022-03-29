@@ -22,6 +22,9 @@ var (
     // Configration of the app
     AppConfig global_structs.AppConfiguration
 
+    // Success Indicator File Path
+    SuccessIndicatorFile string
+
     PackagesToDownloadMap sync.Map
 
     // Slices

@@ -9,29 +9,34 @@ import (
 )
 
 var (    
-    BuildVersion string = ""
+    versionArg *bool
+	AppVersion string = ""
 )
 
-func Start() {
-	println(helper_funcs.Fmt_Sprintf("Version: %s", BuildVersion))
+func start() {
+	println(helper_funcs.Fmt_Sprintf("Syncher Version: %s", AppVersion))
 	println("Program Started")
+}
+
+func initSuccessIndicatorFilePath() {
+	helper_funcs.InitSuccessIndicatorFilePath()
 }
 
 func initialize() {
 	StartTimer()
 	mylog.InitLogger()
 	helper_funcs.InitVars()
+	helper_funcs.UpdateVars()
+	helper_funcs.PrintVars()
 }
 
 func validateEnvBeforeRun() {
 	helper_funcs.ValidateEnvironment()
 }
 
-func parseArgs()() {
-	mylog.Logger.Info("Parsing args")
+func parseArgs() {
+	versionArg = flag.Bool("version", false, "prints syncher version")
 	flag.Parse()
-	helper_funcs.UpdateVars()
-	helper_funcs.PrintVars()
 }
 
 func searchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.NugetPackageDetailsStruct {
@@ -64,17 +69,31 @@ func StartTimer() {
 	helper_funcs.StartTimer()
 }
 
-func Finish(filteredFoundPackagesDetailsList []global_structs.NugetPackageDetailsStruct, downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct, uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
+func printFinishRunInfo(filteredFoundPackagesDetailsList []global_structs.NugetPackageDetailsStruct, downloadedPkgsArr []global_structs.DownloadPackageDetailsStruct, uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
 	helper_funcs.PrintFinishSummary(filteredFoundPackagesDetailsList, downloadedPkgsArr, uploadedPkgsArr)
-	mylog.Logger.Infof("Version: %s", BuildVersion)
+	mylog.Logger.Infof("Syncher Version: %s", AppVersion)
 }
 
+func finish() {
+	helper_funcs.WriteSuccessIndicatorFile()  // Success finished run file indicator
+}
 
+func runProgram() {
+	initSuccessIndicatorFilePath()
 
-func main() {
-	Start()
-	initialize()
+	defer helper_funcs.HandlePanicErrors()
+
 	parseArgs()
+
+	// Check if wanted only to print app version
+	if *versionArg {
+		helper_funcs.Fmt_Print(AppVersion)
+		finish()
+		helper_funcs.Exit(0)
+	}
+
+	start()
+	initialize()
 	validateEnvBeforeRun()
 	filteredFoundPackagesDetailsList := searchSrcServersForAvailableVersionsOfSpecifiedPackages()
 	destServersFoundPackagesMap := searchDestServersForAvailableNugetPackages()
@@ -82,5 +101,11 @@ func main() {
 	uploadedPkgsArr := uploadDownloadedPackages(downloadedPkgsArr)
 	deleteLocalUploadedPackages(uploadedPkgsArr)  // Remove all packages that were uploaded (maybe from previous runs..)
 	deleteRemoteUnuploadedPackages(filteredFoundPackagesDetailsList, destServersFoundPackagesMap)  // Remove all packages that were not uploaded (maybe from previous runs..)
-	Finish(filteredFoundPackagesDetailsList, downloadedPkgsArr, uploadedPkgsArr)
+	printFinishRunInfo(filteredFoundPackagesDetailsList, downloadedPkgsArr, uploadedPkgsArr)
+	finish()
+}
+
+
+func main() {
+	runProgram()
 }
