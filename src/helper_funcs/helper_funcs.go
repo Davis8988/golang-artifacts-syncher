@@ -26,6 +26,10 @@ var (
     startTime time.Time
 )
 
+func InitSuccessIndicatorFilePath() {
+    global_vars.SuccessIndicatorFile = Filepath_Join(GetCurrentProgramDir(), "syncher_execution_finished_successfully.txt")
+}
+
 func InitVars() {
     global_vars.ErrorsDetected = false
 
@@ -51,7 +55,7 @@ func InitVars() {
         PackagesNamesStr                   : Getenv("PACKAGES_NAMES_STR", ""),
         PackagesVersionsStr                : Getenv("PACKAGES_VERSIONS_STR", ""),
         HttpRequestHeadersStr              : Getenv("HTTP_REQUEST_HEADERS_STR", ""), // Example: "key=value;key1=value1;key2=value2"
-        DownloadPkgsDirPath                : Getenv("DOWNLOAD_PKGS_DIR_PATH", filepath.Join(GetCurrentProgramDir(), "Downloads")),
+        DownloadPkgsDirPath                : Getenv("DOWNLOAD_PKGS_DIR_PATH", Filepath_Join(GetCurrentProgramDir(), "Downloads")),
         HttpRequestGlobalDefaultTimeoutSecondsInt : StrToInt(Getenv("HTTP_REQUEST_GLOBAL_DEFAULT_TIMEOUT_SECONDS_INT", strconv.Itoa(httpRequestGlobalDefaultTimeoutSecondsInt))),
         HttpRequestDownloadTimeoutSecondsInt      : StrToInt(Getenv("HTTP_REQUEST_DOWNLOAD_TIMEOUT_SECONDS_INT", strconv.Itoa(httpRequestGlobalDefaultTimeoutSecondsInt))),
         HttpRequestUploadTimeoutSecondsInt        : StrToInt(Getenv("HTTP_REQUEST_UPLOAD_TIMEOUT_SECONDS_INT", strconv.Itoa(httpRequestGlobalDefaultTimeoutSecondsInt))),
@@ -65,6 +69,14 @@ func InitVars() {
     // Log level - this is set in mylog module
     global_vars.AppConfig.LogLevel = mylog.Logger.Level.String()
     
+}
+
+func Fmt_Println(a ...interface{}) (n int, err error) {
+    return fmt.Println(a ...)
+}
+
+func Fmt_Print(a ...interface{}) (n int, err error) {
+    return fmt.Print(a ...)
 }
 
 func PrintVars() {
@@ -217,8 +229,7 @@ func Getenv(key, fallback string) string {
 func StrToInt(strVar string) int {
 	intVar, err := strconv.Atoi(strVar)
     if err != nil {
-        mylog.Logger.Errorf("\n%s\nFailed converting string: \"%s\" to integer\n", err, strVar)
-        panic(err)
+        mylog.Logger.Panicf("\n%s\nFailed converting string: \"%s\" to integer\n", err, strVar)
     }
     return intVar
 }
@@ -263,8 +274,7 @@ func ParseHttpHeadersStrToMap(httpRequestHeadersStr string) map[string]string {
     for _, headersPairStr := range tempHeadersPairsArr {
         tempPairArr := strings.Split(headersPairStr, "=")
         if len(tempPairArr) != 2 {
-            mylog.Logger.Errorf("\nFound header pair: \"%v\"  that is not in the right format of: \"key=value\"\n", tempPairArr)
-            Synched_ErrorsDetected(true)
+            mylog.Logger.Panicf("\nFound header pair: \"%v\"  that is not in the right format of: \"key=value\"\n", tempPairArr)
             return nil
         }
         headerKey := tempPairArr[0]
@@ -278,18 +288,21 @@ func GetFileName(filePath string) string {
     return filepath.Base(filePath)
 }
 
-func DirExists(dirPath string) bool {
-    if _, err := os.Stat(dirPath); err == nil {return true}  
+func PathExists(pathToCheck string) bool {
+    if _, err := os.Stat(pathToCheck); err == nil {return true}  
     return false
 }
 
+func Exit(exitCode int) {
+    os.Exit(exitCode)
+}
+
 func CreateDir(dirPath string) {
-    if DirExists(dirPath) {return}  // If dir already exists - finish here
+    if PathExists(dirPath) {return}  // If dir already exists - finish here
     mylog.Logger.Debugf("Creating dir: %s", dirPath)
     err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
-		mylog.Logger.Errorf("\n%s\nFailed creating dir: \"%s\"\n", err, dirPath)
-        panic(err)
+		mylog.Logger.Panicf("\n%s\nFailed creating dir: \"%s\"\n", err, dirPath)
 	}
 }
 
@@ -300,8 +313,7 @@ func CreateFile(filePath string) *os.File {
     // Create the file
     file, err := os.Create(filePath)
     if err != nil  {
-        mylog.Logger.Errorf("\n%s\nFailed creating file: \"%s\"\n", err, filePath)
-        panic(err)
+        mylog.Logger.Panicf("\n%s\nFailed creating file: \"%s\"\n", err, filePath)
     }
     return file
 }
@@ -311,14 +323,12 @@ func CalculateFileChecksum(filePath string) string {
     mylog.Logger.Debugf("Calculating sha512 checksum of file: %s", filePath)
     f, err := os.Open(filePath)
     if err != nil {
-        mylog.Logger.Errorf("\n%s\nFailed calculating sha512 checksum of file: \"%s\"\n", err, filePath)
-        panic(err)
+        mylog.Logger.Panicf("\n%s\nFailed calculating sha512 checksum of file: \"%s\"\n", err, filePath)
     }
     defer f.Close()
     h := sha512.New()
     if _, err := io.Copy(h, f); err != nil {
-        mylog.Logger.Errorf("\n%s\nFailed calculating sha512 checksum of file: \"%s\"\n", err, filePath)
-        panic(err)
+        mylog.Logger.Panicf("\n%s\nFailed calculating sha512 checksum of file: \"%s\"\n", err, filePath)
     }
 
     return base64.StdEncoding.EncodeToString(h.Sum(nil))  // nil instead of a byte array to append to
@@ -348,8 +358,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) *glob
 
     req, err := http.NewRequest(method, urlAddress, body)
     if err != nil {
-        mylog.Logger.Errorf("\n%s\nFailed creating HTTP request object for URL: \"%s\"\n", err, urlAddress)
-        Synched_ErrorsDetected(true)
+        mylog.Logger.Panicf("\n%s\nFailed creating HTTP request object for URL: \"%s\"\n", err, urlAddress)
         return nil
     }
 
@@ -374,8 +383,7 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) *glob
     // Make the http request
     response, err := client.Do(req)
     if err != nil {
-        mylog.Logger.Errorf("\n%s\n", err)
-        Synched_ErrorsDetected(true)
+        mylog.Logger.Panicf("\n%s\n", err)
         return nil
     }
   
@@ -396,16 +404,14 @@ func MakeHttpRequest(httpRequestArgs global_structs.HttpRequestArgsStruct) *glob
 
         _, err = io.Copy(fileHandle, response.Body)
         if err != nil  {
-            mylog.Logger.Errorf("\n%s\nFailed writing response Body to file: %s\n", err, downloadFilePath)
-            panic(err)
+            mylog.Logger.Panicf("\n%s\nFailed writing response Body to file: %s\n", err, downloadFilePath)
         }
         return &httpResponseResultStruct // Finish here
     }
 
     responseBody, err := ioutil.ReadAll(response.Body)
     if err != nil {
-        mylog.Logger.Errorf("\n%s\nFailed reading request's response body: %s\n", err, urlAddress)
-        Synched_ErrorsDetected(true)
+        mylog.Logger.Panicf("\n%s\nFailed reading request's response body: %s\n", err, urlAddress)
         return &httpResponseResultStruct
     }
 
@@ -419,8 +425,7 @@ func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName s
 
     // If missing file: return empty body
     if _, err := os.Stat(uploadFilePath); errors.Is(err, os.ErrNotExist) {
-        mylog.Logger.Errorf("\n%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object\n", err, uploadFilePath)
-        Synched_ErrorsDetected(true)
+        mylog.Logger.Panicf("\n%s\nFailed uploading file: \"%s\" since it is missing. Failed preparing HTTP request object\n", err, uploadFilePath)
         return nil, nil
     }
 
@@ -462,12 +467,6 @@ func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
 	result := ConvertSyncedMapToString(synchedMap)
 	defer global_vars.ConvertSyncedMapToString_Lock.Unlock()
 	return result
-}
-
-func Synched_ErrorsDetected(errorsDetected bool) {
-    global_vars.ErrorsDetected_Lock.Lock()
-    global_vars.ErrorsDetected = errorsDetected
-    global_vars.ErrorsDetected_Lock.Unlock()
 }
 
 func ConvertPkgDetailsArrayToMap(pkgDetailsArr [] global_structs.NugetPackageDetailsStruct) map[string] global_structs.NugetPackageDetailsStruct {
@@ -563,7 +562,7 @@ func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPac
 func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
     downloadPkgsDir := global_vars.AppConfig.DownloadPkgsDirPath
     mylog.Logger.Infof("Removing all downloaded packages from: %s", downloadPkgsDir)
-    if ! DirExists(downloadPkgsDir) {
+    if ! PathExists(downloadPkgsDir) {
         mylog.Logger.Warnf("Download dir doesn't exist at: %s", downloadPkgsDir)
         return
     }
@@ -594,10 +593,10 @@ func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageD
 
         // filename is in the map:
         mylog.Logger.Debugf("Delete: %s", filename)
-        fileToDeletePath := filepath.Join(downloadPkgsDir, filename)
+        fileToDeletePath := Filepath_Join(downloadPkgsDir, filename)
         err := os.Remove(fileToDeletePath)
         if (err != nil) {
-            mylog.Logger.Errorf("\n%s\nFailed removing: %s", err, filename)
+            mylog.Logger.Panicf("\n%s\nFailed removing: %s", err, filename)
         }
         
     }
@@ -657,8 +656,33 @@ func PrintFinishSummary(filteredFoundPackagesDetailsList []global_structs.NugetP
 	mylog.Logger.Infof("Time: %v", duration)
 	mylog.Logger.Info("")
 	if global_vars.ErrorsDetected {
-		mylog.Logger.Errorf("Errors were detected. See log above")
-		mylog.Logger.Info("")
+		mylog.Logger.Panicf("Errors were detected. See log above")
 	}
+}
+
+func HandlePanicErrors() {
+	if r := recover(); r != nil {
+        Fmt_Println(Fmt_Sprintf("\nProgram failed with a panic error. The error is: \n%v ", r))
+        DeleteSuccessIndicatorFile()
+        panic(r)
+    }
+}
+
+func DeleteSuccessIndicatorFile() {
+    if ! PathExists(global_vars.SuccessIndicatorFile) {return}
+    mylog.Logger.Debugf("Removing file: %s", global_vars.SuccessIndicatorFile)
+    err := os.Remove(global_vars.SuccessIndicatorFile)
+    if (err != nil) {
+        mylog.Logger.Panicf("\n%s\nFailed removing file: %s", err, global_vars.SuccessIndicatorFile)
+    }
+}
+
+func WriteSuccessIndicatorFile() {
+    dt := time.Now()
+    msg := Fmt_Sprintf("%s - Syncher Finished Executing Successfully", dt.Format("01-02-2006 15:04:05 Monday"))
+    err := os.WriteFile(global_vars.SuccessIndicatorFile, []byte(msg), 0755)  // <- 0755 =  default permissions: -rwxr-xr-x
+    if err != nil {
+        mylog.Logger.Panicf("Unable to write file: %v", err)
+    }
 }
 

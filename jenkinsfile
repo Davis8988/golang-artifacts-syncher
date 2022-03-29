@@ -1,0 +1,298 @@
+import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
+
+/* Load job properties lib */
+@Library("properties-lib@master")_
+
+env.genericUserName = properties_sharedConf.ELBIT_NT_GENERIC_USER_NAME
+env.credsId = properties_sharedConf.ELBIT_NT_GENERIC_USER_JENKINS_CREDS_ID
+
+/* Project & Workspace Paths */
+env.PROJ_NAME="Golang-Artifsacts-Syncher"
+env.GITLAB_REPO_URL='http://10.0.0.189/devops_simulators/golang-artifacts-syncher.git'
+env.SYNCHER_DOCKER_IMAGE_REPO = "aerospace-simulators-devops-docker"
+env.SYNCHER_DOCKER_IMAGE_REPO_INTEG = "aerospace-simulators-onesim-docker-integ"
+
+env.JENKINS_PIPELINE_TRIGGERED_TIME_CRON_STR = "H 3 * * 0-4"
+
+withCredentials([conjurSecretCredential(credentialsId:credsId,variable:'SECRET')]){	
+	properties([
+		buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '16', numToKeepStr: '20')),
+		disableResume(),
+		pipelineTriggers([
+			parameterizedCron("${env.JENKINS_PIPELINE_TRIGGERED_TIME_CRON_STR}")
+		]),
+		parameters([
+				properties_GetJobParam_GitSingleBrancheTagChoosing(PARAM_NAME: properties_sharedConf.JENKINS_PIPELINE_REPO_PARAM_NAME, PARAM_DESCRIPTION: "Branch of jenkins pipeline file to execute", REPO_URLS_TO_SEARCH_AT_STR: env.GITLAB_REPO_URL,   DEFAULT_CHOICE: "main"),
+				properties_GetJobParam_GitSingleBrancheTagChoosing(PARAM_NAME: properties_sharedConf.JENKINS_SHARED_LIB_REPO_PARAM_NAME, PARAM_DESCRIPTION: "Branch of groovy shared library repo	", REPO_URLS_TO_SEARCH_AT_STR: properties_sharedConf.JENKINS_SHARED_LIB_REPO_URL, DEFAULT_CHOICE: properties_sharedConf.JENKINS_SHARED_LIB_REPO_PARAM_DEFAULT_BRANCH),
+				booleanParam(name: 'RELOAD_UI',                 defaultValue: false,    description: 'Reloads the jenkins web ui interface'),
+				properties_GetJobParam_ParamsSeparator("Version"),
+				properties_GetJobParam_ReleaseVersionCheckbox(PARAM_DESCRIPTION: "Release version of ${PROJ_NAME}"),
+				properties_GetJobParam_DockerImageTagSingleValueChoosing(PARAM_NAME: "BUILD_VERSION", PARAM_DESCRIPTION: "Choose syncher version", REPO_URLS_TO_SEARCH_AT_STR: properties_sharedConf.ARTIFACTORY_DOCKER_BASE_URL, REPOS_NAMES_TO_SEARCH_STR:  env.SYNCHER_DOCKER_IMAGE_REPO , DOCKER_IMAGES_NAMES_TO_SEARCH_STR: "golang/artifacts-syncher/go-1.18-alpine", SORT_RESULTS: true, USER_NAME_TO_USE: env.genericUserName, PASS_TO_USE: SECRET, IGNORE_CHOICES_LIST_STR: "latest", PARAM_CLASS: "ExtensibleChoiceParameterDefinition"),
+				properties_GetJobParam_ParamsSeparator("Build"),
+				booleanParam(name: 'GET_LATEST',     			defaultValue: true,   description: 'Get Latest Configuration from the Repo' ),
+				booleanParam(name: 'BUILD_IMAGE',     			defaultValue: true,   description: "Builds the ${PROJ_NAME} image from the dockerfile in the Repo" ),
+				booleanParam(name: 'RUN_CONTAINER',     		defaultValue: true,   description: "Run container from ${PROJ_NAME} image and check it's health" ),
+				booleanParam(name: 'PUSH_CONTAINER',     		defaultValue: true,   description: "Push image to docker registery" ),
+				booleanParam(name: 'REMOVE_REMOTE_OLD_IMAGES',  defaultValue: true,   description: "Removes remote ${PROJ_NAME} old images" ),
+				booleanParam(name: 'DEBUG_CONTAINER',     		defaultValue: false,   description: "Keep container running for debug" ),
+				booleanParam(name: 'DEBUG',  		            defaultValue: false,      description: 'Keep the building container running for debug' ),
+				properties_GetJobParam_ParamsSeparator("Team"),
+				string(name: 'TEAM_MAIL_ADDRESSES', 	  	    defaultValue: 'david.yair@elbitsystems.com', description: 'Mail these on failure' )
+			])
+	])
+}
+
+if (env.RELOAD_UI.toBoolean()) {print "Reloading UI and finishing"; return}
+
+
+
+timestamps {
+	node ('nimbus-swarm-1-golang') { 
+		
+		env.USED_DOCKER_REPO = env.SYNCHER_DOCKER_IMAGE_REPO_INTEG
+		if (env.RELEASE_VERSION.toBoolean()) {env.USED_DOCKER_REPO = env.SYNCHER_DOCKER_IMAGE_REPO}
+		
+		// Load shared lib
+		library "jenkins-shared-lib@${SHARED_LIB_BRANCH}"
+
+		/* Docker-Image */
+		env.SYNCHER_BUILD_VERSION = env.BUILD_ID
+		if (env.RELEASE_VERSION.toBoolean() && env.BUILD_VERSION.toLowerCase().trim() != "latest") {env.SYNCHER_BUILD_VERSION = env.BUILD_VERSION}
+		println "Syncher build version: ${env.SYNCHER_BUILD_VERSION}"
+
+		env.DOCKER_REGISTERY_HOSTNAME="artifactory.esl.corp.elbit.co.il"
+		env.SYNCHER_DOCKER_IMAGE_NAME="${DOCKER_REGISTERY_HOSTNAME}/${env.USED_DOCKER_REPO}/golang/artifacts-syncher/go-1.18-alpine"
+		env.SYNCHER_DOCKER_IMAGE_FULL_NAME="${SYNCHER_DOCKER_IMAGE_NAME}:${env.SYNCHER_BUILD_VERSION}"
+		env.CLEAN_DOCKER_IMAGES_REPO_URL = "http://${DOCKER_REGISTERY_HOSTNAME}/artifactory/api/docker/${env.USED_DOCKER_REPO}/v2/golang/artifacts-syncher/go-1.18-alpine/tags/list"
+		
+		/* Build Vars - DO NOT CHANGE */
+		currentBuild.result = 'SUCCESS'
+		RUN_CONTAINER_AND_HEALTH_CHECK_TIMEOUT_MINUTES = 15
+		env.BUILT_IMAGE = false
+		env.NIMBUS_SWARM_REMOTE_API_PORT=2375
+		
+		
+		// Check if was started by a gitlab push hook
+		if (isStartedByGitlabPushHook()) {printStartedByHookInfo()}
+		
+		try {
+			
+			stage('Print Vars') {
+				printInfo()
+			}
+			
+			stage('Pull Latest') {
+				if(! env.GET_LATEST.toBoolean()) {skipStage(); return}
+				cloneRepo()
+			}
+			
+			stage('Build Image') {
+				if(! env.BUILD_IMAGE.toBoolean()) {skipStage(); return}
+				buildNewDockerImage()
+			}
+			
+			stage('Run Container & Health-Check') {
+				if(! env.RUN_CONTAINER.toBoolean()) {skipStage(); return}
+				runContainerFromImage()
+			}
+			
+			stage('Push Local Built Image') {
+				if(! PUSH_CONTAINER.toBoolean()) {skipStage(); return}
+				pushLocalImagesToArtifactory()
+			}
+			
+			stage('Remove Remote Old Images') {
+				if(! env.REMOVE_REMOTE_OLD_IMAGES.toBoolean()) {skipStage(); return}
+				removeRemoteImages()
+			}
+			
+		} catch(e) {
+			currentBuild.result = 'FAILURE'
+			sendFailureMail(e)
+			if (env.DEBUG_CONTAINER.toBoolean() == true) {debugContainer()}
+		} finally {
+			if (env.DEBUG.toBoolean() == true) {debugContainer()}
+			removeLocalImages()
+		}
+				
+
+	}
+}
+
+boolean isStartedByGitlabPushHook() {
+	return (env.GITLAB_HOOK_PUSH_USER_NAME) ? true : false
+}
+
+def printStartedByHookInfo() {
+	String hookMsg = "Started by a gitlab hook\n"
+	hookMsg += "- Repo name: ${GITLAB_HOOK_PUSH_REPOSITORY_NAME}\n"
+	hookMsg += "- Repo url: ${GITLAB_HOOK_PUSH_REPOSITORY_URL}\n"
+	hookMsg += "- Pushed branch: ${PIPELINE_BRANCH}\n"
+	hookMsg += "- Pushed user: ${GITLAB_HOOK_PUSH_USER_NAME}\n"
+	hookMsg += "- Commit msg: ${GITLAB_HOOK_PUSH_COMMIT_MSG}\n"
+	print hookMsg
+}
+
+def printInfo() {
+	String connectToContMsg = getConnectToContainerMsg()
+	print "\nConnect to this container by executing: \n\n" +
+		  "${connectToContMsg} \n\n"
+	
+	env.INFO_TO_PRINT="\n\n-------------------------------------------------------------------------------------------------------------\n"
+	env.INFO_TO_PRINT+="\nProject:\n"
+	env.INFO_TO_PRINT+="  PROJ_NAME=${PROJ_NAME}\n"
+					 
+	env.INFO_TO_PRINT+="\nSteps:\n"
+	env.INFO_TO_PRINT+="  GET_LATEST=${GET_LATEST}\n"
+	env.INFO_TO_PRINT+="  BUILD_IMAGE=${BUILD_IMAGE}\n"
+	env.INFO_TO_PRINT+="  RUN_CONTAINER=${RUN_CONTAINER}\n"
+	env.INFO_TO_PRINT+="  DEBUG_CONTAINER=${DEBUG_CONTAINER}\n"
+		
+	env.INFO_TO_PRINT+="\nSCM:\n"
+	env.INFO_TO_PRINT+="  GITLAB_REPO_URL=${GITLAB_REPO_URL}\n"
+	env.INFO_TO_PRINT+="  PIPELINE_BRANCH=${PIPELINE_BRANCH}\n"
+	
+	env.INFO_TO_PRINT+="\nBuild:\n"
+	env.INFO_TO_PRINT+="  DOCKER_REGISTERY_HOSTNAME=${DOCKER_REGISTERY_HOSTNAME}\n"
+	env.INFO_TO_PRINT+="  SYNCHER_BUILD_VERSION=${SYNCHER_BUILD_VERSION}\n"
+	env.INFO_TO_PRINT+="  SYNCHER_DOCKER_IMAGE_NAME=${SYNCHER_DOCKER_IMAGE_NAME}\n"
+
+	env.INFO_TO_PRINT+="\nEnvironment:\n"
+	env.INFO_TO_PRINT+="  HOSTNAME=${hostname}\n"
+					 
+	env.INFO_TO_PRINT+="\nMail:"
+	env.INFO_TO_PRINT+="  MAIL_TO=${TEAM_MAIL_ADDRESSES}\n"
+					 
+	env.INFO_TO_PRINT+="\n\n-------------------------------------------------------------------------------------------------------------\n"
+	
+	print "${env.INFO_TO_PRINT}"
+	
+	env.INFO_TO_PRINT=''
+}
+
+def cloneRepo() {
+	print("Cloning repo: ${GITLAB_REPO_URL} into branch/tag: ${PIPELINE_BRANCH}")
+	sh """
+		echo Clone to dir: pwd=\$(pwd)
+		git clone ${GITLAB_REPO_URL} . -b ${PIPELINE_BRANCH}
+	"""
+}
+
+def buildNewDockerImage() {
+	env.debriefana_landing_page_image = docker.build("${SYNCHER_DOCKER_IMAGE_FULL_NAME}",  "--pull .")
+	print "Finished building ${PROJ_NAME} image: ${SYNCHER_DOCKER_IMAGE_FULL_NAME}"
+	env.BUILT_IMAGE = true
+}
+
+def runContainerFromImage() {
+	print "Running new container from image:\ndebriefana_landing_page_image=${SYNCHER_DOCKER_IMAGE_FULL_NAME}"
+	/* Check if built the image on this run. If not - then use tag: 'latest' to run the container */
+	if (! env.debriefana_landing_page_image) {env.SYNCHER_DOCKER_IMAGE_FULL_NAME="${SYNCHER_DOCKER_IMAGE_NAME}:latest"}
+	
+	print "Running image: ${SYNCHER_DOCKER_IMAGE_FULL_NAME}"
+	
+	timeout(RUN_CONTAINER_AND_HEALTH_CHECK_TIMEOUT_MINUTES) {
+		container_name="${env.SYNCHER_BUILD_VERSION}_"+env.SYNCHER_DOCKER_IMAGE_FULL_NAME.toString().replaceAll(":" , "_")
+		container_name=container_name.toString().replaceAll("/" , "_")
+		
+		println "Running container with name: ${container_name}"
+		sh "for i in \$(docker ps -aq -fname=${container_name}); do echo Stopping and removing container: \${container_name} && docker rm -f \${i}; done"
+		
+		docker.image(env.SYNCHER_DOCKER_IMAGE_FULL_NAME).withRun(" --name=${container_name}") { c ->
+			/* Wait until container is up and healthy*/
+			sh "echo inspecting container: ${container_name}; echo; docker ps"
+			println "\n ## Waiting for container ${container_name} to be healthy ##\n"
+			sleep(unit: 'SECONDS', time: 5)
+			waitUntil {
+				"healthy" == sh(returnStdout: true,
+					script: "docker inspect ${container_name} --format=\"{{ .State.Health.Status }}\"").trim()
+			}
+			
+			println "OK. Finished waiting for container - it is running and healthy! "
+			println "Reading logs: "
+			sh "docker logs ${container_name}"
+			if (env.DEBUG_CONTAINER.toBoolean() == true) {env.DEBUG_CONTAINER = false; input " -- Debugging started --\nYou can login to host swarm machine and run:\n\ndocker exec -it ${container_name} bash \n\nto login to the container and debug it\n\nClick proceed when done"}
+		}
+	}
+}
+
+def pushLocalImagesToArtifactory() {
+	print "Pushing local images:\n " +
+		  " - ${SYNCHER_DOCKER_IMAGE_FULL_NAME}\n " +
+		  " - ${SYNCHER_DOCKER_IMAGE_NAME}:latest \nto Artifactory"
+
+
+	withCredentials([conjurSecretCredential(credentialsId:credsId,variable:'SECRET')]){
+		String dockerRegistryUrl = "https://${DOCKER_REGISTERY_HOSTNAME}"
+		docker.withRegistry(dockerRegistryUrl) {
+			println "Logging-in to docker registry by executing: docker login ${dockerRegistryUrl} -u ${env.genericUserName} -p ${SECRET}"
+			sh "docker login ${dockerRegistryUrl} -u ${env.genericUserName} -p ${SECRET}"
+			docker.image(env.SYNCHER_DOCKER_IMAGE_FULL_NAME).push()
+			sh 'docker tag ${SYNCHER_DOCKER_IMAGE_FULL_NAME} ${SYNCHER_DOCKER_IMAGE_NAME}:latest'
+			docker.image("${SYNCHER_DOCKER_IMAGE_NAME}:latest").push()
+		}	
+	}
+}
+
+def removeLocalImages() {
+	if (! env.BUILT_IMAGE.toBoolean()) {return}
+	print "Removing local images:\n " +
+		  " - ${SYNCHER_DOCKER_IMAGE_FULL_NAME}\n "
+	sh "docker rmi ${SYNCHER_DOCKER_IMAGE_FULL_NAME} -f"
+	int modulu = 10
+	int build_number_remainder = env.BUILD_NUMBER.toInteger() % modulu
+	if (build_number_remainder == 0) {
+		print "Current Build-Number: ${BUILD_NUMBER} modulu ${modulu} is 0 - so cleaning local images using command: 'docker image prune -f'. This only occurs once every ${modulu} builds.."
+		sh "docker image prune -f"
+	}
+}
+
+def removeRemoteImages() {
+	withCredentials([conjurSecretCredential(credentialsId:credsId,variable:'SECRET')]){	
+		def result = dockerImagesRetention(
+			REPO_URLS_TO_SEARCH_AT_STR: env.CLEAN_DOCKER_IMAGES_REPO_URL,
+			USER_NAME_TO_USE: env.genericUserName,
+			PASS_TO_USE: SECRET,
+		)
+	}
+}
+
+
+def getConnectToContainerMsg() {
+	String remoteApiPort="${NIMBUS_SWARM_REMOTE_API_PORT}"
+	String debug_cmd = "docker exec -it ${hostname} bash"
+	if (env.DOCKER_HOST_NAME != null && env.DOCKER_HOST_NAME.toString() != "") {
+		debug_cmd = "export DOCKER_HOST=tcp://${DOCKER_HOST_NAME}:${remoteApiPort}; "
+		debug_cmd += "docker exec -it ${hostname} bash ; "
+		debug_cmd += "unset DOCKER_HOST"
+	}
+	
+	return debug_cmd
+}
+
+def sendFailureMail(error) {
+	print "Error of this build: ${error}"
+	
+	env.MAIL_TO="${env.TEAM_MAIL_ADDRESSES}"
+	
+	
+	echo "Build Failed - Sending failure mail"
+	env.MAIL_URL_LINKS="Console Log Link: "+env.BUILD_URL.toString() +"console<br><br>Job URL{to start a new build}: "+env.JOB_URL.toString() + "<br><br>Changes From Last Build: "+env.RUN_CHANGES_DISPLAY_URL.toString()
+	env.MAIL_COMPUTER_DETAILS="Computer Building: "+env.hostname.toString()
+	
+	env.MAIL_BODY="<pre>Failed building job "+env.JOB_BASE_NAME.toString()+"<br><br>Error of This Build: <br>" +error.toString()+ "<br>For more information look in attached console-log zip<br><br>Links: <br>"+env.MAIL_URL_LINKS.toString() +" <br><br>Details: <br>"+env.MAIL_COMPUTER_DETAILS.toString()+"<br><br>------------------------------------------------------------------------------<br><br>Your beloved Jenkins</pre>"
+	env.MAIL_SUBJECT=env.JOB_BASE_NAME+" - Build Failed"
+	
+	emailext attachLog: true, body: env.MAIL_BODY, compressLog: true, recipientProviders: [[$class: 'RequesterRecipientProvider']], subject: env.MAIL_SUBJECT, to: env.MAIL_TO
+}
+
+def debugContainer() {
+	String connectToContMsg = getConnectToContainerMsg()
+	echo "--- Debugging step ---" + 
+ 		 "Building container is still running\n" +
+		 "Connect to any linux swarm host and execute the following line:\n\n" +
+		 "${connectToContMsg}\n\n" +
+		 "to log in the container and start debugging"
+		 
+	input ' Press proceed when done debugging '
+}

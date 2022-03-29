@@ -62,8 +62,7 @@ func ParsePkgNameAndVersionFromFileURL(pkgDetailsUrl string) [] string {
     resultArr := re.FindAllString(pkgDetailsUrl, -1)  // -1 = find ALL available matches
     if len(resultArr) != 2 {
         mylog.Logger.Errorf("\nFailed to parse URL for pkg Name & Version:  \"%s\"", pkgDetailsUrl)
-        mylog.Logger.Errorf("Found regex result count is: %d different from 2\n", len(resultArr))
-		helper_funcs.Synched_ErrorsDetected(true)
+        mylog.Logger.Panicf("Found regex result count is: %d different from 2\n", len(resultArr))
         return nil
     }
 
@@ -168,8 +167,7 @@ func SearchSpecificPackageVersionByURLRequest(httpRequestArgs global_structs.Htt
 
 	if responseCode >= 400 {
         mylog.Logger.Errorf("\n%d  %s", responseCode, responseBody)
-		mylog.Logger.Errorf("Returned code: %d. HTTP request failure: %s\n", responseCode, urlAddress)
-		helper_funcs.Synched_ErrorsDetected(true)
+		mylog.Logger.Panicf("Returned code: %d. HTTP request failure: %s\n", responseCode, urlAddress)
 		return [] global_structs.NugetPackageDetailsStruct {}
     }
 
@@ -187,6 +185,7 @@ func SearchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.
 	for _, pkgName := range global_vars.AppConfig.PackagesNamesArr {
 		wg.Add(1)
         go func(packageNameToSearch string) {
+			defer helper_funcs.HandlePanicErrors()
 			defer wg.Done()
 			searchUrlsArr := helper_funcs.PrepareSrcSearchUrlsForPackageArray(packageNameToSearch)
 			threadFoundPackagesDetailsMap := make(map[string] global_structs.NugetPackageDetailsStruct)
@@ -248,6 +247,7 @@ func SearchDestServersForAvailableNugetPackages() map[string] map[string] map[st
 	for _, destServerUrl := range global_vars.AppConfig.DestServersUrlsArr {
 		wg.Add(1)
         go func(destServerUrlToSearch string) {
+			defer helper_funcs.HandlePanicErrors()
 			defer wg.Done()
 			threadFoundPackagesDetailsMap := make(map[string] map[string] global_structs.NugetPackageDetailsStruct)
 			foundPackagesCount := 0
@@ -334,6 +334,7 @@ func DownloadFoundPackages(foundPackagesArr []global_structs.NugetPackageDetails
 		wg.Add(1)
 		concurrentCountGuard <- 1; // Add 1 to concurrent threads count - Would block if array is filled. Can only be freed by thread executing: '<- concurrentCountGuard' below
 		go func(downloadPkgDetailsStruct global_structs.DownloadPackageDetailsStruct) {
+			defer helper_funcs.HandlePanicErrors()
 			defer wg.Done()
 			downloadPkgDetailsStruct = DownloadNugetPackage(downloadPkgDetailsStruct)
 			helper_funcs.Synched_AppendDownloadedPkgDetailsObj(&totalDownloadedPackagesDetailsArr, downloadPkgDetailsStruct)
@@ -464,6 +465,7 @@ func UploadDownloadedPackages(downloadedPkgsArr []global_structs.DownloadPackage
 		wg.Add(1)
 		concurrentCountGuard <- 1; // Add 1 to concurrent threads count - Would block if array is filled. Can only be freed by thread executing: '<- concurrentCountGuard' below
 		go func(downloadedPkgDetails global_structs.DownloadPackageDetailsStruct) {
+			defer helper_funcs.HandlePanicErrors()
 			defer wg.Done()
 			uploadPkgStruct := global_structs.UploadPackageDetailsStruct{
 				PkgDetailsStruct       : downloadedPkgDetails.PkgDetailsStruct,
@@ -529,6 +531,7 @@ func DeleteRemoteUnuploadedPackages(uploadedPkgsArr []global_structs.NugetPackag
 				wg.Add(1)
 				concurrentCountGuard <- 1; // Add 1 to concurrent threads count - Would block if array is filled. Can only be freed by thread executing: '<- concurrentCountGuard' below
 				go func(pkgHash string, pkgDetailsStruct global_structs.NugetPackageDetailsStruct) {
+					defer helper_funcs.HandlePanicErrors()
 					defer wg.Done()
 					mylog.Logger.Debugf("Deleting pkg: %s from: %s", pkgHash, destServerUrl)
 					DeleteRemotePackage(pkgDetailsStruct)
@@ -552,8 +555,7 @@ func DeleteRemotePackage(pkgToDeleteStruct global_structs.NugetPackageDetailsStr
 	}
 	httpResponsePtr := helper_funcs.MakeHttpRequest(delRequestArgs)
 	if httpResponsePtr == nil {
-		mylog.Logger.Errorf("'httpResponsePtr' is null. Failed to delete package: %s", delRequestArgs.UrlAddress)
-		helper_funcs.Synched_ErrorsDetected(true)
+		mylog.Logger.Panicf("'httpResponsePtr' is null. Failed to delete package: %s", delRequestArgs.UrlAddress)
 		return
 	}
 	httpResponse := *httpResponsePtr
@@ -562,7 +564,6 @@ func DeleteRemotePackage(pkgToDeleteStruct global_structs.NugetPackageDetailsStr
 	if (httpResponse.StatusCode == httpCode_NotFound) {return} // <- OK
 
 	if httpResponse.StatusCode >= 400 {
-		mylog.Logger.Errorf("%s %s - Failed to delete package: %s", httpResponse.StatusStr, responseBody, delRequestArgs.UrlAddress)
-		helper_funcs.Synched_ErrorsDetected(true)
+		mylog.Logger.Panicf("%s %s - Failed to delete package: %s", httpResponse.StatusStr, responseBody, delRequestArgs.UrlAddress)
 	}
 }
