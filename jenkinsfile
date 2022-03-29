@@ -12,15 +12,10 @@ env.GITLAB_REPO_URL='http://10.0.0.189/devops_simulators/golang-artifacts-synche
 env.SYNCHER_DOCKER_IMAGE_REPO = "aerospace-simulators-devops-docker"
 env.SYNCHER_DOCKER_IMAGE_REPO_INTEG = "aerospace-simulators-onesim-docker-integ"
 
-env.JENKINS_PIPELINE_TRIGGERED_TIME_CRON_STR = "H 3 * * 0-4"
-
 withCredentials([conjurSecretCredential(credentialsId:credsId,variable:'SECRET')]){	
 	properties([
 		buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '16', numToKeepStr: '20')),
 		disableResume(),
-		pipelineTriggers([
-			parameterizedCron("${env.JENKINS_PIPELINE_TRIGGERED_TIME_CRON_STR}")
-		]),
 		parameters([
 				properties_GetJobParam_GitSingleBrancheTagChoosing(PARAM_NAME: properties_sharedConf.JENKINS_PIPELINE_REPO_PARAM_NAME, PARAM_DESCRIPTION: "Branch of jenkins pipeline file to execute", REPO_URLS_TO_SEARCH_AT_STR: env.GITLAB_REPO_URL,   DEFAULT_CHOICE: "main"),
 				properties_GetJobParam_GitSingleBrancheTagChoosing(PARAM_NAME: properties_sharedConf.JENKINS_SHARED_LIB_REPO_PARAM_NAME, PARAM_DESCRIPTION: "Branch of groovy shared library repo	", REPO_URLS_TO_SEARCH_AT_STR: properties_sharedConf.JENKINS_SHARED_LIB_REPO_URL, DEFAULT_CHOICE: properties_sharedConf.JENKINS_SHARED_LIB_REPO_PARAM_DEFAULT_BRANCH),
