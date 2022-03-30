@@ -37,12 +37,21 @@ withCredentials([conjurSecretCredential(credentialsId:credsId,variable:'SECRET')
 	])
 }
 
+// Check if was started by a gitlab push hook
+if (isStartedByGitlabHook()) {
+	env.CURRENT_GITLAB_STEP = "Waiting for slave node"
+	printStartedByHookInfo()
+	updateEnvsWithGitlabHookEnvs()
+}
+
+
 if (env.RELOAD_UI.toBoolean()) {print "Reloading UI and finishing"; return}
 
 
-
 timestamps {
+	updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'pending'
 	node ('nimbus-swarm-1-golang') { 
+		updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'success'
 		
 		env.USED_DOCKER_REPO = env.SYNCHER_DOCKER_IMAGE_REPO_INTEG
 		if (env.RELEASE_VERSION.toBoolean()) {env.USED_DOCKER_REPO = env.SYNCHER_DOCKER_IMAGE_REPO}
@@ -66,10 +75,6 @@ timestamps {
 		env.BUILT_IMAGE = false
 		env.NIMBUS_SWARM_REMOTE_API_PORT=2375
 		
-		
-		// Check if was started by a gitlab push hook
-		if (isStartedByGitlabPushHook()) {printStartedByHookInfo()}
-		
 		try {
 			
 			stage('Print Vars') {
@@ -78,32 +83,48 @@ timestamps {
 			
 			stage('Pull Latest') {
 				if(! env.GET_LATEST.toBoolean()) {skipStage(); return}
+				env.CURRENT_GITLAB_STEP = 'Get Latest'
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'pending'
 				cloneRepo()
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'success'
 			}
 			
 			stage('Build Image') {
 				if(! env.BUILD_IMAGE.toBoolean()) {skipStage(); return}
+				env.CURRENT_GITLAB_STEP = 'Build Image'
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'pending'
 				buildNewDockerImage()
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'success'
 			}
 			
 			stage('Run Container & Health-Check') {
 				if(! env.RUN_CONTAINER.toBoolean()) {skipStage(); return}
+				env.CURRENT_GITLAB_STEP = 'Container Health Check'
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'pending'
 				runContainerFromImage()
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'success'
 			}
 			
 			stage('Push Local Built Image') {
 				if(! PUSH_CONTAINER.toBoolean()) {skipStage(); return}
+				env.CURRENT_GITLAB_STEP = 'Push Image'
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'pending'
 				pushLocalImagesToArtifactory()
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'success'
 			}
 			
 			stage('Remove Remote Old Images') {
 				if(! env.REMOVE_REMOTE_OLD_IMAGES.toBoolean()) {skipStage(); return}
+				env.CURRENT_GITLAB_STEP = 'Remove Remote Images'
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'pending'
 				removeRemoteImages()
+				updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'success'
 			}
 			
 		} catch(e) {
 			currentBuild.result = 'FAILURE'
 			sendFailureMail(e)
+			if (env.CURRENT_GITLAB_STEP) {updateGitlabCommitStatus name: env.CURRENT_GITLAB_STEP, state: 'failed'}
 			if (env.DEBUG_CONTAINER.toBoolean() == true) {debugContainer()}
 		} finally {
 			if (env.DEBUG.toBoolean() == true) {debugContainer()}
@@ -114,18 +135,51 @@ timestamps {
 	}
 }
 
-boolean isStartedByGitlabPushHook() {
-	return (env.GITLAB_HOOK_PUSH_USER_NAME) ? true : false
+boolean isStartedByGitlabHook() {
+	return (env.gitlabMergeRequestId) ? true : false
 }
 
+
+/**
+Gitlab Hook Envs Example:
+gitlabActionType=MERGE
+gitlabBranch=jenkinsfile
+gitlabMergeRequestId=13974
+gitlabMergeRequestIid=17
+gitlabMergeRequestLastCommit=77eccb068d301653bb371526a5e657742850a7f0
+gitlabMergeRequestState=opened
+gitlabMergeRequestTargetProjectId=3509
+gitlabMergeRequestTitle=Jenkinsfile
+gitlabMergedByUser=DP99662
+gitlabSourceBranch=jenkinsfile
+gitlabSourceNamespace=devops_simulators
+gitlabSourceRepoHomepage=http://gitlab/devops_simulators/golang-artifacts-syncher
+gitlabSourceRepoHttpUrl=http://gitlab/devops_simulators/golang-artifacts-syncher.git
+gitlabSourceRepoName=Golang Artifacts Syncher
+gitlabSourceRepoSshUrl=git@gitlab:devops_simulators/golang-artifacts-syncher.git
+gitlabSourceRepoURL=git@gitlab:devops_simulators/golang-artifacts-syncher.git
+gitlabTargetBranch=main
+gitlabTargetNamespace=devops_simulators
+gitlabTargetRepoHttpUrl=http://gitlab/devops_simulators/golang-artifacts-syncher.git
+gitlabTargetRepoName=Golang Artifacts Syncher
+gitlabTargetRepoSshUrl=git@gitlab:devops_simulators/golang-artifacts-syncher.git
+gitlabUserEmail=david.yair@elbitsystems.com
+gitlabUserName=e030331
+*/
 def printStartedByHookInfo() {
 	String hookMsg = "Started by a gitlab hook\n"
-	hookMsg += "- Repo name: ${GITLAB_HOOK_PUSH_REPOSITORY_NAME}\n"
-	hookMsg += "- Repo url: ${GITLAB_HOOK_PUSH_REPOSITORY_URL}\n"
-	hookMsg += "- Pushed branch: ${PIPELINE_BRANCH}\n"
-	hookMsg += "- Pushed user: ${GITLAB_HOOK_PUSH_USER_NAME}\n"
-	hookMsg += "- Commit msg: ${GITLAB_HOOK_PUSH_COMMIT_MSG}\n"
-	print hookMsg
+	hookMsg += "- Repo name: ${env.gitlabSourceRepoName}\n"
+	hookMsg += "- Repo url: ${env.gitlabSourceRepoHomepage}\n"
+	hookMsg += "- Source branch: ${env.gitlabSourceBranch}\n"
+	hookMsg += "- Target branch: ${env.gitlabTargetBranch}\n"
+	hookMsg += "- Gitlab user name: ${env.gitlabUserName}\n"
+	hookMsg += "- Gitlab user email: ${env.gitlabUserEmail}\n"
+	hookMsg += "- Commit msg: ${env.gitlabMergeRequestLastCommit}\n"
+	println hookMsg
+}
+
+void updateEnvsWithGitlabHookEnvs() {
+	env.PIPELINE_BRANCH = env.gitlabSourceBranch
 }
 
 def printInfo() {
@@ -171,6 +225,15 @@ def cloneRepo() {
 		echo Clone to dir: pwd=\$(pwd)
 		git clone ${GITLAB_REPO_URL} . -b ${PIPELINE_BRANCH}
 	"""
+	if (isStartedByGitlabHook() && env.gitlabTargetBranch) {
+		println "Started by a gitlab hook - attempting to merge with branch: ${env.gitlabTargetBranch}"
+		sh """
+			echo Merging cloned branch: ${PIPELINE_BRANCH} with: ${env.gitlabTargetBranch}
+			git checkout ${env.gitlabTargetBranch} -- || exit 1
+			git checkout ${PIPELINE_BRANCH} -- || exit 1
+			git merge --no-edit ${env.gitlabTargetBranch}
+		"""
+	}
 }
 
 def buildNewDockerImage() {
