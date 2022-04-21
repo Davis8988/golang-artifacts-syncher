@@ -8,6 +8,8 @@ launch.json
 
 # App
 *execution_finished*.txt
+src/Checksums/
+src/Downloads/
 
 # Binaries for programs and plugins
 *.exe
