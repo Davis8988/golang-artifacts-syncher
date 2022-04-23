@@ -583,7 +583,7 @@ func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPac
 
 func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
     downloadPkgsDir := global_vars.AppConfig.DownloadPkgsDirPath
-    mylog.Logger.Infof("Removing all downloaded packages from: %s", downloadPkgsDir)
+    mylog.Logger.Infof("Removing all uploaded packages from: %s", downloadPkgsDir)
     if ! PathExists(downloadPkgsDir) {
         mylog.Logger.Warnf("Download dir doesn't exist at: %s", downloadPkgsDir)
         return
@@ -609,7 +609,7 @@ func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageD
         
         // If filename is in the map:
         if _, isMapContainsKey := unUploadedFileNamesMap[filename]; isMapContainsKey {
-            mylog.Logger.Warnf("Skip delete un-uploaded local file: %s", filename)
+            mylog.Logger.Warnf("Skip delete of un-uploaded local file: %s", filename)
             continue
         } 
 
@@ -626,9 +626,9 @@ func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageD
     mylog.Logger.Info("Done")
 }
 
-func DeleteLocalUnfoundPackagesChecksumFiles(foundPackagesArr []global_structs.NugetPackageDetailsStruct) {
+func DeleteLocalUploadedPackagesChecksumFiles(uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
     checksumFilesDirPath := global_vars.AppConfig.ChecksumFilesDirPath
-    mylog.Logger.Infof("Removing all checksum files of un-found packages from: %s", checksumFilesDirPath)
+    mylog.Logger.Infof("Removing all uploaded packages's checksum files from: %s", checksumFilesDirPath)
     if ! PathExists(checksumFilesDirPath) {
         mylog.Logger.Warnf("Checksum files dir doesn't exist at: %s", checksumFilesDirPath)
         return
@@ -638,12 +638,14 @@ func DeleteLocalUnfoundPackagesChecksumFiles(foundPackagesArr []global_structs.N
         mylog.Logger.Fatal(err)
     }
 
-    // Assign found packages names - Skip them on delete
-    foundPackagesFileNamesMap := map[string]bool{}
-    fileFoundIndicator := true
-    for _, foundPkgStruct := range(foundPackagesArr) {
-        expectedFilename := Fmt_Sprintf("%s.%s_checksum.txt", strings.ToLower(foundPkgStruct.Name), foundPkgStruct.Version)
-        foundPackagesFileNamesMap[expectedFilename] = fileFoundIndicator
+    // Assign un-uploaded packages names - Skip them on delete
+    unUploadedFileNamesMap := map[string]bool{}
+    fileUploadedIndicator := true
+    for _, uploadedPkgStruct := range(uploadedPkgsArr) {
+        if (uploadedPkgStruct.IsSuccessful) {continue}
+        pkgDetails := uploadedPkgStruct.PkgDetailsStruct
+        expectedFilename := Fmt_Sprintf("%s.%s_checksum.txt", strings.ToLower(pkgDetails.Name), pkgDetails.Version)
+        unUploadedFileNamesMap[expectedFilename] = fileUploadedIndicator
     }
 
     // Loop on found files - Delete files that are NOT in the assigned map
@@ -651,8 +653,8 @@ func DeleteLocalUnfoundPackagesChecksumFiles(foundPackagesArr []global_structs.N
         filename := file.Name()
         
         // If filename is in the map:
-        if _, isMapContainsKey := foundPackagesFileNamesMap[filename]; isMapContainsKey {
-            mylog.Logger.Warnf("Skip delete checksum file of found package: %s", filename)
+        if _, isMapContainsKey := unUploadedFileNamesMap[filename]; isMapContainsKey {
+            mylog.Logger.Warnf("Skip delete of un-uploaded local file: %s", filename)
             continue
         } 
 
