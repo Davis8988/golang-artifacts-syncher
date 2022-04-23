@@ -160,9 +160,7 @@ func PrepareSrcSearchUrlsForPackageArray(pkgName string, pkgVersion string) []st
 
 	mylog.Logger.Info("Preparing src search packages urls array")
 	for _, srcServerUrl := range global_vars.AppConfig.SrcServersUrlsArr {
-        if len(srcServerUrl) == 1 {continue}
-        versionsToSearchArr := LoadStringArrValueFromSynchedMap(global_vars.PackagesToDownloadMap, pkgName)
-        
+        if len(srcServerUrl) < 2 {continue}
         if len(pkgVersion) == 0 { 
             // Either use search
             searchUrlsArr = append(searchUrlsArr, srcServerUrl + "Packages()?$filter=tolower(Id)%20eq%20'"+pkgName+"'")
