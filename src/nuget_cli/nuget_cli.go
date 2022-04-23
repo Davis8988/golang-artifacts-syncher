@@ -186,10 +186,10 @@ func SearchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.
 		wg.Add(1)
 		pkgVersion := ""
 		if (i < len(global_vars.AppConfig.PackagesVersionsArr)) {pkgVersion = global_vars.AppConfig.PackagesVersionsArr[i]}
-        go func(packageNameToSearch string, pkgVersion string) {
+        go func(packageNameToSearch string, packageVersionToSearch string) {
 			defer helper_funcs.HandlePanicErrors()
 			defer wg.Done()
-			searchUrlsArr := helper_funcs.PrepareSrcSearchUrlsForPackageArray(packageNameToSearch)
+			searchUrlsArr := helper_funcs.PrepareSrcSearchUrlsForPackageArray(packageNameToSearch, packageVersionToSearch)
 			threadFoundPackagesDetailsMap := make(map[string] global_structs.NugetPackageDetailsStruct)
 			for _, urlToCheck := range searchUrlsArr {
 				getRequestArgs := global_structs.HttpRequestArgsStruct{
