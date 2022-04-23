@@ -182,9 +182,11 @@ func SearchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.
 	var totalFoundPackagesDetailsArr []global_structs.NugetPackageDetailsStruct
 	
 	wg := sync.WaitGroup{}
-	for _, pkgName := range global_vars.AppConfig.PackagesNamesArr {
+	for i, pkgName := range global_vars.AppConfig.PackagesNamesArr {
 		wg.Add(1)
-        go func(packageNameToSearch string) {
+		pkgVersion := ""
+		if (i < len(global_vars.AppConfig.PackagesVersionsArr)) {pkgVersion = global_vars.AppConfig.PackagesVersionsArr[i]}
+        go func(packageNameToSearch string, pkgVersion string) {
 			defer helper_funcs.HandlePanicErrors()
 			defer wg.Done()
 			searchUrlsArr := helper_funcs.PrepareSrcSearchUrlsForPackageArray(packageNameToSearch)
@@ -227,7 +229,7 @@ func SearchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.
 			threadFoundPackagesDetailsArr = helper_funcs.FilterLastNPackages(threadFoundPackagesDetailsArr, global_vars.AppConfig.PackagesDownloadLimitCount)
 			mylog.Logger.Infof("Targeted %d of '%s' packages", len(threadFoundPackagesDetailsArr), packageNameToSearch)
 			helper_funcs.Synched_JoinTwoPkgDetailsSlices(&totalFoundPackagesDetailsArr, threadFoundPackagesDetailsArr)
-		} (pkgName)
+		} (pkgName, pkgVersion)
 	}
 
 	mylog.Logger.Debug("Waiting for searching threads to finish searching for pkgs")
