@@ -162,7 +162,7 @@ func PrepareSrcSearchUrlsForPackageArray(pkgName string, pkgVersion string) []st
 	for _, srcServerUrl := range global_vars.AppConfig.SrcServersUrlsArr {
         if len(srcServerUrl) < 2 {continue}
         if len(pkgVersion) == 0 { 
-            // Either use search
+            // Either use global search
             searchUrlsArr = append(searchUrlsArr, srcServerUrl + "Packages()?$filter=tolower(Id)%20eq%20'"+pkgName+"'")
             continue
         } else {
