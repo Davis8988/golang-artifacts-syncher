@@ -214,7 +214,7 @@ func SearchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.
 				} else {
 					mylog.Logger.Debugf("Found %d packages '%s'  at server: %s", foundPackagesCount, packageNameToSearch, urlToCheck)
 				}
-				helper_funcs.AppendPkgDetailsArrayToMap(threadFoundPackagesDetailsMap, foundPackagesDetailsArr)  // Append found pkg to an existing map
+				helper_funcs.AppendPkgDetailsArrayToMap(threadFoundPackagesDetailsMap, foundPackagesDetailsArr)  // Append found pkgs array to an existing map
 			}
 			
 			threadFoundPackagesDetailsArr := helper_funcs.ConvertPkgDetailsMapToArray(threadFoundPackagesDetailsMap)
