@@ -62,8 +62,8 @@ func deleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageD
 }
 
 // Remove all checksum files of packages that weren't even found - not relevant anymore..
-func deleteLocalUnfoundPackagesChecksumFiles(foundPackagesArr []global_structs.NugetPackageDetailsStruct) {
-	helper_funcs.DeleteLocalUnfoundPackagesChecksumFiles(foundPackagesArr)
+func deleteLocalUploadedPackagesChecksumFiles(foundPackagesArr []global_structs.UploadPackageDetailsStruct) {
+	helper_funcs.DeleteLocalUploadedPackagesChecksumFiles(foundPackagesArr)
 }
 
 // Remove all packages from remote that were downloaded but not uploaded - no need for them anymore
@@ -110,7 +110,7 @@ func runProgram() {
 	downloadedPkgsArr := downloadFoundPackages(filteredFoundPackagesDetailsList, destServersFoundPackagesMap)
 	uploadedPkgsArr := uploadDownloadedPackages(downloadedPkgsArr)
 	deleteLocalUploadedPackages(uploadedPkgsArr)  // Remove all packages that were uploaded (maybe from previous runs..)
-	deleteLocalUnfoundPackagesChecksumFiles(filteredFoundPackagesDetailsList)  // Remove all checksum files of packages that weren't even found - not relevant anymore..
+	deleteLocalUploadedPackagesChecksumFiles(uploadedPkgsArr)  // Remove all checksum files of packages that were uploaded (maybe from previous runs..)
 	deleteRemoteUnuploadedPackages(filteredFoundPackagesDetailsList, destServersFoundPackagesMap)  // Remove all packages that were not uploaded (maybe from previous runs..)
 	printFinishRunInfo(filteredFoundPackagesDetailsList, downloadedPkgsArr, uploadedPkgsArr)
 	finish()
