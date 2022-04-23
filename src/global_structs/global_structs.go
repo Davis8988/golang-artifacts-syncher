@@ -90,6 +90,7 @@ type AppConfiguration struct {
     PackagesVersionsStr          string
     HttpRequestHeadersStr        string
     DownloadPkgsDirPath          string
+    ChecksumFilesDirPath         string
     LogLevel                     string
     HttpRequestGlobalDefaultTimeoutSecondsInt int
     HttpRequestDownloadTimeoutSecondsInt int

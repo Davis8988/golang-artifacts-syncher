@@ -56,6 +56,7 @@ func InitVars() {
         PackagesVersionsStr                : Getenv("PACKAGES_VERSIONS_STR", ""),
         HttpRequestHeadersStr              : Getenv("HTTP_REQUEST_HEADERS_STR", ""), // Example: "key=value;key1=value1;key2=value2"
         DownloadPkgsDirPath                : Getenv("DOWNLOAD_PKGS_DIR_PATH", Filepath_Join(GetCurrentProgramDir(), "Downloads")),
+        ChecksumFilesDirPath               : Getenv("CHECKSUM_FILES_DIR_PATH", Filepath_Join(GetCurrentProgramDir(), "Checksums")),
         HttpRequestGlobalDefaultTimeoutSecondsInt : StrToInt(Getenv("HTTP_REQUEST_GLOBAL_DEFAULT_TIMEOUT_SECONDS_INT", strconv.Itoa(httpRequestGlobalDefaultTimeoutSecondsInt))),
         HttpRequestDownloadTimeoutSecondsInt      : StrToInt(Getenv("HTTP_REQUEST_DOWNLOAD_TIMEOUT_SECONDS_INT", strconv.Itoa(httpRequestGlobalDefaultTimeoutSecondsInt))),
         HttpRequestUploadTimeoutSecondsInt        : StrToInt(Getenv("HTTP_REQUEST_UPLOAD_TIMEOUT_SECONDS_INT", strconv.Itoa(httpRequestGlobalDefaultTimeoutSecondsInt))),
@@ -85,6 +86,11 @@ func PrintVars() {
 	
 	packagesToDownloadMapStr := Synched_ConvertSyncedMapToString(global_vars.PackagesToDownloadMap)
 	mylog.Logger.Infof("packagesToDownloadMap: \n%v", packagesToDownloadMapStr)
+}
+
+func CreateRequiredFiles() {
+    CreateDir(global_vars.AppConfig.ChecksumFilesDirPath)
+    CreateDir(global_vars.AppConfig.DownloadPkgsDirPath)
 }
 
 func ValidateEnvironment() {
@@ -117,7 +123,7 @@ func ValidateEnvironment() {
         if len(destServerUrl) == 1 {continue}
         lastChar := destServerUrl[len(destServerUrl)-1:]
         if lastChar == "/" {continue}
-        mylog.Logger.Debugf("Fix: Adding '/' char to src server repo url: \"%s\"", destServerUrl)
+        mylog.Logger.Debugf("Fix: Adding '/' char to dest server repo url: \"%s\"", destServerUrl)
         destServerUrl += "/"
         global_vars.AppConfig.DestServersUrlsArr[i] = destServerUrl
     }
@@ -149,18 +155,18 @@ func UpdateVars() {
 	}
 }
 
-func PrepareSrcSearchUrlsForPackageArray(pkgName string) []string {
+func PrepareSrcSearchUrlsForPackageArray(pkgName string, pkgVersion string) []string {
 	var searchUrlsArr = make([]string, 0, 10) // Create a slice with length=0 and capacity=10
 
 	mylog.Logger.Info("Preparing src search packages urls array")
 	for _, srcServerUrl := range global_vars.AppConfig.SrcServersUrlsArr {
-        if len(srcServerUrl) == 1 {continue}
-        versionsToSearchArr := LoadStringArrValueFromSynchedMap(global_vars.PackagesToDownloadMap, pkgName)
-        if len(versionsToSearchArr) == 0 { // Either use search
+        if len(srcServerUrl) < 2 {continue}
+        if len(pkgVersion) == 0 { 
+            // Either use global search
             searchUrlsArr = append(searchUrlsArr, srcServerUrl + "Packages()?$filter=tolower(Id)%20eq%20'"+pkgName+"'")
             continue
-        } // Or specific package details request for each specified requested version
-        for _, pkgVersion := range versionsToSearchArr {
+        } else {
+            // Or specific package details request for each specified requested version
             searchUrlsArr = append(searchUrlsArr, srcServerUrl + "Packages(Id='"+pkgName+"',Version='"+pkgVersion+"')")
         }
 
@@ -461,6 +467,22 @@ func ReadFileContentsIntoPartsForUpload(uploadFilePath string, headerFieldName s
     return body, writer
 }
 
+func ReadFileContent(filePath string) string {
+    mylog.Logger.Infof("Reading file: %s", filePath)
+    content, err := os.ReadFile(filePath)
+    if err != nil {
+        mylog.Logger.Panic(err)
+    }
+    return strings.TrimSpace(string(content))
+}
+
+func WriteFileContent(filePath string, content string) {
+    mylog.Logger.Infof("Writing '%s' to file: %s", content, filePath)
+    if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
+        mylog.Logger.Panic(err)
+    }
+}
+
 
 func Synched_ConvertSyncedMapToString(synchedMap sync.Map) string {
 	global_vars.ConvertSyncedMapToString_Lock.Lock()
@@ -561,7 +583,7 @@ func FilterLastNPackages(nugetPackageDetailsStructArr [] global_structs.NugetPac
 
 func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
     downloadPkgsDir := global_vars.AppConfig.DownloadPkgsDirPath
-    mylog.Logger.Infof("Removing all downloaded packages from: %s", downloadPkgsDir)
+    mylog.Logger.Infof("Removing all uploaded packages from: %s", downloadPkgsDir)
     if ! PathExists(downloadPkgsDir) {
         mylog.Logger.Warnf("Download dir doesn't exist at: %s", downloadPkgsDir)
         return
@@ -572,8 +594,8 @@ func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageD
     }
 
     // Assign un-uploaded packages names - Skip them on delete
-    unUploadedFileNamesMap := map[string]int{}
-    fileUploadedIndicator := 1
+    unUploadedFileNamesMap := map[string]bool{}
+    fileUploadedIndicator := true
     for _, uploadedPkgStruct := range(uploadedPkgsArr) {
         if (uploadedPkgStruct.IsSuccessful) {continue}
         pkgDetails := uploadedPkgStruct.PkgDetailsStruct
@@ -585,15 +607,60 @@ func DeleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageD
     for _, file := range(files) {
         filename := file.Name()
         
-        // If filename is not in the map:
+        // If filename is in the map:
         if _, isMapContainsKey := unUploadedFileNamesMap[filename]; isMapContainsKey {
-            mylog.Logger.Warnf("Skip delete un-uploaded local file: %s", filename)
+            mylog.Logger.Warnf("Skip delete of un-uploaded local file: %s", filename)
             continue
         } 
 
-        // filename is in the map:
+        // filename is NOT in the map:
         mylog.Logger.Debugf("Delete: %s", filename)
         fileToDeletePath := Filepath_Join(downloadPkgsDir, filename)
+        err := os.Remove(fileToDeletePath)
+        if (err != nil) {
+            mylog.Logger.Panicf("\n%s\nFailed removing: %s", err, filename)
+        }
+        
+    }
+
+    mylog.Logger.Info("Done")
+}
+
+func DeleteLocalUploadedPackagesChecksumFiles(uploadedPkgsArr []global_structs.UploadPackageDetailsStruct) {
+    checksumFilesDirPath := global_vars.AppConfig.ChecksumFilesDirPath
+    mylog.Logger.Infof("Removing all uploaded packages's checksum files from: %s", checksumFilesDirPath)
+    if ! PathExists(checksumFilesDirPath) {
+        mylog.Logger.Warnf("Checksum files dir doesn't exist at: %s", checksumFilesDirPath)
+        return
+    }
+    files, err := ioutil.ReadDir(checksumFilesDirPath)
+    if err != nil {
+        mylog.Logger.Fatal(err)
+    }
+
+    // Assign un-uploaded packages names - Skip them on delete
+    unUploadedFileNamesMap := map[string]bool{}
+    fileUploadedIndicator := true
+    for _, uploadedPkgStruct := range(uploadedPkgsArr) {
+        if (uploadedPkgStruct.IsSuccessful) {continue}
+        pkgDetails := uploadedPkgStruct.PkgDetailsStruct
+        expectedFilename := Fmt_Sprintf("%s.%s_checksum.txt", strings.ToLower(pkgDetails.Name), pkgDetails.Version)
+        unUploadedFileNamesMap[expectedFilename] = fileUploadedIndicator
+    }
+
+    // Loop on found files - Delete files that are NOT in the assigned map
+    for _, file := range(files) {
+        filename := file.Name()
+        
+        // If filename is in the map:
+        if _, isMapContainsKey := unUploadedFileNamesMap[filename]; isMapContainsKey {
+            mylog.Logger.Warnf("Skip delete of un-uploaded local file: %s", filename)
+            continue
+        } 
+
+        // filename is NOT in the map:
+        mylog.Logger.Debugf("Delete: %s", filename)
+        fileToDeletePath := Filepath_Join(checksumFilesDirPath, filename)
         err := os.Remove(fileToDeletePath)
         if (err != nil) {
             mylog.Logger.Panicf("\n%s\nFailed removing: %s", err, filename)
@@ -648,6 +715,7 @@ func PrintFinishSummary(filteredFoundPackagesDetailsList []global_structs.NugetP
 			if (uploadedPkgsStruct.IsSuccessful) {continue}
 			mylog.Logger.Infof("  * %s", uploadedPkgsStruct.PkgDetailsStruct.HashCode())
 		}
+        mylog.Logger.Panicf("Failed uploading %d packages", failedUploadingPkgsCount)
 	}
 	mylog.Logger.Info("")
 	mylog.Logger.Info("Done")
@@ -655,14 +723,11 @@ func PrintFinishSummary(filteredFoundPackagesDetailsList []global_structs.NugetP
 	duration := EndTimer()
 	mylog.Logger.Infof("Time: %v", duration)
 	mylog.Logger.Info("")
-	if global_vars.ErrorsDetected {
-		mylog.Logger.Panicf("Errors were detected. See log above")
-	}
 }
 
 func HandlePanicErrors() {
 	if r := recover(); r != nil {
-        Fmt_Println(Fmt_Sprintf("\nProgram failed with a panic error. The error is: \n%v ", r))
+        Fmt_Println(Fmt_Sprintf("\n%v\nProgram failed with a panic error. Printing error stack ", r))
         DeleteSuccessIndicatorFile()
         panic(r)
     }

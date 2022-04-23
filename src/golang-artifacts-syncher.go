@@ -28,6 +28,7 @@ func initialize() {
 	helper_funcs.InitVars()
 	helper_funcs.UpdateVars()
 	helper_funcs.PrintVars()
+	helper_funcs.CreateRequiredFiles()
 }
 
 func validateEnvBeforeRun() {
@@ -60,6 +61,11 @@ func deleteLocalUploadedPackages(uploadedPkgsArr []global_structs.UploadPackageD
 	helper_funcs.DeleteLocalUploadedPackages(uploadedPkgsArr)
 }
 
+// Remove all checksum files of packages that weren't even found - not relevant anymore..
+func deleteLocalUploadedPackagesChecksumFiles(foundPackagesArr []global_structs.UploadPackageDetailsStruct) {
+	helper_funcs.DeleteLocalUploadedPackagesChecksumFiles(foundPackagesArr)
+}
+
 // Remove all packages from remote that were downloaded but not uploaded - no need for them anymore
 func deleteRemoteUnuploadedPackages(uploadedPkgsArr []global_structs.NugetPackageDetailsStruct, destServersFoundPackagesMap map[string] map[string] map[string] global_structs.NugetPackageDetailsStruct) {
 	nuget_cli.DeleteRemoteUnuploadedPackages(uploadedPkgsArr, destServersFoundPackagesMap)
@@ -78,20 +84,24 @@ func finish() {
 	helper_funcs.WriteSuccessIndicatorFile()  // Success finished run file indicator
 }
 
+func printVersionAndExit() {
+	helper_funcs.Fmt_Print(AppVersion)
+	finish()
+	helper_funcs.Exit(0)
+}
+
 func runProgram() {
 	initSuccessIndicatorFilePath()
 
+	// Errors handling function
 	defer helper_funcs.HandlePanicErrors()
 
 	parseArgs()
 
 	// Check if wanted only to print app version
-	if *versionArg {
-		helper_funcs.Fmt_Print(AppVersion)
-		finish()
-		helper_funcs.Exit(0)
-	}
+	if *versionArg {printVersionAndExit()}
 
+	// Start
 	start()
 	initialize()
 	validateEnvBeforeRun()
@@ -100,6 +110,7 @@ func runProgram() {
 	downloadedPkgsArr := downloadFoundPackages(filteredFoundPackagesDetailsList, destServersFoundPackagesMap)
 	uploadedPkgsArr := uploadDownloadedPackages(downloadedPkgsArr)
 	deleteLocalUploadedPackages(uploadedPkgsArr)  // Remove all packages that were uploaded (maybe from previous runs..)
+	deleteLocalUploadedPackagesChecksumFiles(uploadedPkgsArr)  // Remove all checksum files of packages that were uploaded (maybe from previous runs..)
 	deleteRemoteUnuploadedPackages(filteredFoundPackagesDetailsList, destServersFoundPackagesMap)  // Remove all packages that were not uploaded (maybe from previous runs..)
 	printFinishRunInfo(filteredFoundPackagesDetailsList, downloadedPkgsArr, uploadedPkgsArr)
 	finish()

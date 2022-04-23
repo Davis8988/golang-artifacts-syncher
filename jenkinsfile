@@ -7,7 +7,7 @@ env.genericUserName = properties_sharedConf.ELBIT_NT_GENERIC_USER_NAME
 env.credsId = properties_sharedConf.ELBIT_NT_GENERIC_USER_JENKINS_CREDS_ID
 
 /* Project & Workspace Paths */
-env.PROJ_NAME="Golang-Artifsacts-Syncher"
+env.PROJ_NAME="Golang-Artifacts-Syncher"
 env.GITLAB_REPO_URL='http://10.0.0.189/devops_simulators/golang-artifacts-syncher.git'
 env.SYNCHER_DOCKER_IMAGE_REPO = "aerospace-simulators-devops-docker"
 env.SYNCHER_DOCKER_IMAGE_REPO_INTEG = "aerospace-simulators-onesim-docker-integ"
@@ -243,7 +243,7 @@ def buildNewDockerImage() {
 }
 
 def runContainerFromImage() {
-	print "Running new container from image:\ndebriefana_landing_page_image=${SYNCHER_DOCKER_IMAGE_FULL_NAME}"
+	print "Running new container from image:\n'${SYNCHER_DOCKER_IMAGE_FULL_NAME}'"
 	/* Check if built the image on this run. If not - then use tag: 'latest' to run the container */
 	if (! env.debriefana_landing_page_image) {env.SYNCHER_DOCKER_IMAGE_FULL_NAME="${SYNCHER_DOCKER_IMAGE_NAME}:latest"}
 	
