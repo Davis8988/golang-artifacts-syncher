@@ -223,8 +223,8 @@ func SearchSrcServersForAvailableVersionsOfSpecifiedPackages() []global_structs.
 			helper_funcs.SortNugetPackageDetailsStructArr(threadFoundPackagesDetailsArr)
 
 			// Filter total found pkgs count of package: ${packageNameToSearch}
-			mylog.Logger.Debugf("Filtering thread found '%s' pkgs by requested versions", packageNameToSearch)
-			threadFoundPackagesDetailsArr = helper_funcs.FilterFoundPackagesByRequestedVersion(threadFoundPackagesDetailsArr) // Filter by requested version - if any version is specified..
+			// mylog.Logger.Debugf("Filtering thread found '%s' pkgs by requested versions", packageNameToSearch)
+			// threadFoundPackagesDetailsArr = helper_funcs.FilterFoundPackagesByRequestedVersion(threadFoundPackagesDetailsArr) // Filter by requested version - if any version is specified..
 			mylog.Logger.Debugf("Keeping last: %d of found '%s' packages", global_vars.AppConfig.PackagesDownloadLimitCount, packageNameToSearch)
 			threadFoundPackagesDetailsArr = helper_funcs.FilterLastNPackages(threadFoundPackagesDetailsArr, global_vars.AppConfig.PackagesDownloadLimitCount)
 			mylog.Logger.Infof("Targeted %d of '%s' packages", len(threadFoundPackagesDetailsArr), packageNameToSearch)
